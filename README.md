@@ -22,7 +22,7 @@ observadh/
     └── tests/            # testes customizados de validação (fonte vs. calculado)
 ```
 
-Ver a proposta completa de arquitetura em `proposta-arquitetura-observadh.md` (na raiz do projeto Claude) para o racional por trás dessas decisões.
+Ver a proposta completa de arquitetura em `proposta-arquitetura-observadh.md` (na raiz do projeto Claude) para o racional por trás dessas decisões. Ver também o catálogo de indicadores do LGBTQIA+ (`catalogo-indicadores-lgbtqia.md`, também no projeto Claude) para o mapeamento completo fórmula → aba → categoria.
 
 ## Como rodar um ciclo (quando os dados do tema estiverem prontos)
 
@@ -42,7 +42,7 @@ dbt docs generate && dbt docs serve
 
 ## Status do piloto LGBTQIA+
 
-- [ ] Planilhas recebidas e mapeadas (`ingestion/temas/lgbtqia_plus_config.yml`)
+- [x] Planilhas recebidas e mapeadas (`ingestion/temas/lgbtqia_plus_config.yml`) — 5 de 8 arquivos com abas confirmadas
 - [ ] Ingestão Python rodando (tabelas RAW criadas)
 - [ ] Sources dbt declaradas (`transform/models/staging/lgbtqia_plus/_lgbtqia_plus__sources.yml`)
 - [ ] Modelos de staging

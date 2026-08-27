@@ -1,30 +1,170 @@
 # Configuração de ingestão do tema LGBTQIA+
 #
-# Cada entrada em "planilhas" descreve UM arquivo .xlsx esperado dentro de
-# ingestion/input/lgbtqia_plus/<ano>/, e cada entrada em "abas" descreve UMA
-# aba desse arquivo que deve virar uma tabela RAW.
+# Atualizado a partir da inspeção real das planilhas em
+# ~/Projetos/Observa DH/LGBTQIA+/Planilhas/ (ver catálogo de indicadores no
+# projeto Claude para o mapeamento completo formula → aba → categoria).
 #
-# TODO: preencher com o mapeamento real assim que as planilhas do tema
-# chegarem. Isso ainda é um template — os nomes de arquivo/aba abaixo são
-# placeholders de exemplo, não confirmados.
+# Arquivos já mapeados (abas confirmadas por inspeção real): Assistência
+# Social, Perfil/Registro Civil, Quantas São (PNS/Censo), ONDH, SINAN.
+# Ainda faltam confirmar: Educação (SAEB), Saúde (CNES-atendimento, distinto
+# do arquivo de Saúde já mapeado em Assistência), Trabalho e Renda.
 
 tema: lgbtqia_plus
 
 planilhas:
-  - arquivo: perfil.xlsx          # TODO: confirmar nome real do arquivo recebido
+  - arquivo: "LGBTQIA_Assistência social_RMA_Censo SUAS_2017_2024.xlsx"
     abas:
-      - nome_aba: Perfil_Nacional      # TODO: confirmar nome real da aba
-        tabela_raw: raw_lgbtqia_plus_perfil_nacional
-        cabecalho_linha: 1              # linha (1-indexed) onde começa o cabeçalho da tabela
-      - nome_aba: Perfil_UF
-        tabela_raw: raw_lgbtqia_plus_perfil_uf
+      - nome_aba: "CRAS - Temas abordados"
+        tabela_raw: raw_lgbtqia_plus_cras_temas_abordados
+        cabecalho_linha: 1
+      - nome_aba: "Centros de Convivência - Temas "   # nota: espaço extra no nome original da aba
+        tabela_raw: raw_lgbtqia_plus_centros_convivencia_temas
+        cabecalho_linha: 1
+      - nome_aba: "Série atendimentos PAEFI"
+        tabela_raw: raw_lgbtqia_plus_serie_atendimentos_paefi
+        cabecalho_linha: 1
+      - nome_aba: "Atendim CREAS discri orient sex"
+        tabela_raw: raw_lgbtqia_plus_creas_discriminacao_orientacao
+        cabecalho_linha: 1
+      - nome_aba: "Atendim CREAS discri ident gên"
+        tabela_raw: raw_lgbtqia_plus_creas_discriminacao_identidade
+        cabecalho_linha: 1
+      - nome_aba: "Centros Pop"
+        tabela_raw: raw_lgbtqia_plus_centros_pop
+        cabecalho_linha: 1
+      - nome_aba: "Unidades de Acolhimento 2024"
+        tabela_raw: raw_lgbtqia_plus_unidades_acolhimento
+        cabecalho_linha: 1
+      # "dLocalizacao" NÃO entra como raw: é uma tabela de referência
+      # (município/UF/região) já extraída para transform/seeds/dim_municipio.csv.
+      # Ingerida via seed do dbt, não via pipeline de ingestão anual.
+
+  - arquivo: "LGBTQIA_Perfil_PNS_Estatísticas Registro Civil_2019_2013_2023_V2.xlsx"
+    abas:
+      - nome_aba: "Pessoas_Orientacao_Sexo_Total"
+        tabela_raw: raw_lgbtqia_plus_pns_orientacao_sexo_total
+        cabecalho_linha: 1
+      - nome_aba: "Pessoas_Faixa_Etaria"
+        tabela_raw: raw_lgbtqia_plus_pns_faixa_etaria
+        cabecalho_linha: 1
+      - nome_aba: "Pessoas_Cor_ou_Raça"
+        tabela_raw: raw_lgbtqia_plus_pns_cor_ou_raca
+        cabecalho_linha: 1
+      - nome_aba: "Pessoas_Area_Localidade"
+        tabela_raw: raw_lgbtqia_plus_pns_area_localidade
+        cabecalho_linha: 1
+      - nome_aba: "Pessoas_Estado_civil"
+        tabela_raw: raw_lgbtqia_plus_pns_estado_civil
+        cabecalho_linha: 1
+      - nome_aba: "Natureza_Jurídica_União"
+        tabela_raw: raw_lgbtqia_plus_natureza_juridica_uniao
+        cabecalho_linha: 1
+      - nome_aba: "Casamento_Mesmo_Sexo_Ano"
+        tabela_raw: raw_lgbtqia_plus_casamento_mesmo_sexo_ano
+        cabecalho_linha: 1
+      - nome_aba: "Total_Casamentos_UF"
+        tabela_raw: raw_lgbtqia_plus_total_casamentos_uf
+        cabecalho_linha: 1
+      - nome_aba: "Orientação sexual por UF"
+        tabela_raw: raw_lgbtqia_plus_orientacao_sexual_por_uf
         cabecalho_linha: 1
 
-  # - arquivo: violencia.xlsx
-  #   abas:
-  #     - nome_aba: ...
-  #       tabela_raw: raw_lgbtqia_plus_violencia_...
-  #       cabecalho_linha: 1
+  - arquivo: "LGBTQIA_Quantas são_PNS_2019_Censo_2010_2022.xlsx"
+    abas:
+      - nome_aba: "Orientação sexual 2019"
+        tabela_raw: raw_lgbtqia_plus_orientacao_sexual_2019
+        cabecalho_linha: 1
+      - nome_aba: "Cônjuges do mesmo sexo 2022"
+        tabela_raw: raw_lgbtqia_plus_conjuges_mesmo_sexo_2022
+        cabecalho_linha: 1
+      - nome_aba: "Censo_2010_Munic"
+        tabela_raw: raw_lgbtqia_plus_censo_2010_municipio
+        cabecalho_linha: 1
+      - nome_aba: "Censo_2010_UF"
+        tabela_raw: raw_lgbtqia_plus_censo_2010_uf
+        cabecalho_linha: 1
+      - nome_aba: "Censo_2010_Reg"
+        tabela_raw: raw_lgbtqia_plus_censo_2010_regiao
+        cabecalho_linha: 1
 
-# Ano de referência do ciclo de carga (pode ser sobrescrito via --ano na CLI)
+  - arquivo: "LGBTQIA_Violência_ONDH_2020_2024.xlsx"
+    abas:
+      - nome_aba: "ONDH_Serie_Historica_2020_2024"
+        tabela_raw: raw_lgbtqia_plus_ondh_serie_historica
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Sexo"
+        tabela_raw: raw_lgbtqia_plus_ondh_sexo
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Faixa_Etária"
+        tabela_raw: raw_lgbtqia_plus_ondh_faixa_etaria
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Raca_Cor"
+        tabela_raw: raw_lgbtqia_plus_ondh_raca_cor
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Local"
+        tabela_raw: raw_lgbtqia_plus_ondh_local
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Relação_Suspeito"
+        tabela_raw: raw_lgbtqia_plus_ondh_relacao_suspeito
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Tipo_de_Violação"
+        tabela_raw: raw_lgbtqia_plus_ondh_tipo_violacao
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Identidade_Genero"
+        tabela_raw: raw_lgbtqia_plus_ondh_identidade_genero
+        cabecalho_linha: 1
+      - nome_aba: "ONDH_Orientacao_Sexual"
+        tabela_raw: raw_lgbtqia_plus_ondh_orientacao_sexual
+        cabecalho_linha: 1
+
+  - arquivo: "LGBTQIA_Violências_Sinan_2015_2024.xlsx"
+    abas:
+      - nome_aba: "Notificações_2015_2024_SINAN"
+        tabela_raw: raw_lgbtqia_plus_sinan_notificacoes
+        cabecalho_linha: 1
+      - nome_aba: "Interpessoal_Local_Ocorrencia"
+        tabela_raw: raw_lgbtqia_plus_sinan_interpessoal_local
+        cabecalho_linha: 1
+      - nome_aba: "Autoprovocada_Local_Ocorrencia"
+        tabela_raw: raw_lgbtqia_plus_sinan_autoprovocada_local
+        cabecalho_linha: 1
+      - nome_aba: "Violências_Orientacao_Sexual"
+        tabela_raw: raw_lgbtqia_plus_sinan_violencia_orientacao_sexual
+        cabecalho_linha: 1
+      - nome_aba: "Violencias_Identidade_Genero"
+        tabela_raw: raw_lgbtqia_plus_sinan_violencia_identidade_genero
+        cabecalho_linha: 1
+      - nome_aba: "Interpessoal_Sexo_SINAN"
+        tabela_raw: raw_lgbtqia_plus_sinan_interpessoal_sexo
+        cabecalho_linha: 1
+      - nome_aba: "Interpessoal_Faixa_Etária_SINAN"
+        tabela_raw: raw_lgbtqia_plus_sinan_interpessoal_faixa_etaria
+        cabecalho_linha: 1
+      - nome_aba: "Interpessoal_Cor_ou_Raça"
+        tabela_raw: raw_lgbtqia_plus_sinan_interpessoal_cor_raca
+        cabecalho_linha: 1
+      - nome_aba: "Interpessoal-Tipos de violência"
+        tabela_raw: raw_lgbtqia_plus_sinan_interpessoal_tipos_violencia
+        cabecalho_linha: 1
+      - nome_aba: "Autoprovocada_Sexo_SINAN"
+        tabela_raw: raw_lgbtqia_plus_sinan_autoprovocada_sexo
+        cabecalho_linha: 1
+      - nome_aba: "Autoprovocada_Faixa_Etária"
+        tabela_raw: raw_lgbtqia_plus_sinan_autoprovocada_faixa_etaria
+        cabecalho_linha: 1
+      - nome_aba: "Autoprovocada_Cor_ou_Raça"
+        tabela_raw: raw_lgbtqia_plus_sinan_autoprovocada_cor_raca
+        cabecalho_linha: 1
+      - nome_aba: "Interpessoal_Perfil_Agressor"
+        tabela_raw: raw_lgbtqia_plus_sinan_interpessoal_perfil_agressor
+        cabecalho_linha: 1
+      # "ONDH - Identidade de gênero" também aparece dentro deste arquivo,
+      # duplicando parte do conteúdo do arquivo ONDH separado. TODO: confirmar
+      # com a equipe se é intencional (ex.: cópia de apoio) ou lixo/resíduo.
+
+  # TODO — ainda não inspecionados, faltam abas/colunas reais:
+  # - arquivo: LGBTQIA_Educação_PNS_SAEB_2019_2021.xlsx
+  # - arquivo: LGBTQIA_Saúde_PNS_Cnes_2019_2025_V2.xlsx
+  # - arquivo: LGBTQIA_Trabalho_PNS_2019.xlsx
+
 ano_padrao: 2026
