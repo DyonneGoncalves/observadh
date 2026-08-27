@@ -1,30 +1,38 @@
 """
 Framework comum de ingestão do ObservaDH.
 
-Responsabilidade única: ler as planilhas de um tema (conforme descrito no
-arquivo de configuração ingestion/temas/<tema>_config.yml) e gravar o
-conteúdo, SEM transformação de negócio, em tabelas RAW no Postgres.
+Responsabilidade única: ler TODAS as abas de TODAS as planilhas de um tema e
+gravar o conteúdo, SEM transformação de negócio, em tabelas RAW no Postgres.
+
+Descoberta automática: cada aba de cada arquivo .xlsx/.xls em
+    ingestion/input/<tema>/<ano>/
+vira uma tabela  <schema_raw>.<prefixo>_<arquivo>_<aba>  com nomes
+normalizados (sem acento, snake_case, abreviados, limite de 63 caracteres do
+Postgres). Nenhum mapeamento manual de aba é necessário.
+
+Cada execução RECRIA as tabelas do zero (carga limpa — sem histórico de
+linhas). O histórico das EXECUÇÕES fica em  <schema_raw>.etl_importacao_arquivos.
 
 Toda a lógica de normalização/cálculo de indicador fica no projeto dbt
-(transform/), não aqui. Este script só deve: identificar arquivos, ler,
-tipar minimamente, anexar metadados de carga e persistir.
+(transform/), não aqui.
 
 Uso:
     python ingest.py --tema lgbtqia_plus --ano 2026
     python ingest.py --tema lgbtqia_plus --ano 2026 --dry-run
 
-Variáveis de ambiente esperadas (conexão com o banco):
-    OBSERVADH_DB_HOST, OBSERVADH_DB_PORT, OBSERVADH_DB_NAME,
-    OBSERVADH_DB_USER, OBSERVADH_DB_PASSWORD
+Conexão com o banco (ordem de precedência):
+    DATABASE_URL   ex.: postgresql+psycopg2://user:senha@host:5432/db
+    ou as variáveis  OBSERVADH_DB_HOST / _PORT / _NAME / _USER / _PASSWORD
+    (default: localhost:5432 / observadh / postgres / sem senha)
 """
 
 import argparse
-import hashlib
 import logging
 import os
+import re
 import sys
-import uuid
-from datetime import datetime, timezone
+import unicodedata
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -47,6 +55,10 @@ TEMAS_DIR = ROOT_DIR / "temas"
 INPUT_DIR = ROOT_DIR / "input"
 
 
+# --------------------------------------------------------------------------- #
+# Configuração do tema
+# --------------------------------------------------------------------------- #
+
 def carregar_config_tema(tema: str) -> dict:
     caminho = TEMAS_DIR / f"{tema}_config.yml"
     if not caminho.exists():
@@ -55,143 +67,285 @@ def carregar_config_tema(tema: str) -> dict:
             f"Crie o arquivo de configuração antes de rodar a ingestão."
         )
     with open(caminho, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        return yaml.safe_load(f) or {}
 
 
-def hash_arquivo(caminho: Path) -> str:
-    """Hash do conteúdo do arquivo — usado para registrar, no log de carga,
-    exatamente qual versão do arquivo foi processada (rastreabilidade)."""
-    h = hashlib.sha256()
-    with open(caminho, "rb") as f:
-        for bloco in iter(lambda: f.read(8192), b""):
-            h.update(bloco)
-    return h.hexdigest()
+# --------------------------------------------------------------------------- #
+# Normalização de nomes (portado do importador PSR/PI/PCD, já validado em
+# produção nos temas anteriores)
+# --------------------------------------------------------------------------- #
 
+def normalizar_nome(texto) -> str:
+    """minúsculo, sem acento/cedilha, separadores -> underscore, sem
+    caracteres especiais, sem underscores duplicados."""
+    if texto is None:
+        return ""
+    texto = str(texto).strip().lower()
+    texto = unicodedata.normalize("NFKD", texto)
+    texto = texto.encode("ascii", "ignore").decode("utf-8")
+    texto = re.sub(r"[^a-z0-9]+", "_", texto)
+    texto = re.sub(r"_+", "_", texto)
+    return texto.strip("_")
+
+
+ABREVIACOES = {
+    # termos gerais
+    "codigo": "cod", "unidade": "unid", "quantidade": "qtd", "numero": "num",
+    "populacao": "pop", "percentual": "perc", "porcentagem": "perc",
+    "medio": "medio", "rendimento": "rend", "salarial": "sal",
+    "trabalho": "trab", "trabalhos": "trabs", "ocupacao": "ocup",
+    "remuneradas": "remun", "remunerados": "remun", "formalizacao": "formal",
+    "condicao": "cond", "relacao": "rel",
+    # faixa etária / demografia
+    "faixa": "fx", "masculino": "masc", "feminino": "fem",
+    "indigena": "indigena",
+    # assistência social / proteção social / benefício
+    "beneficio": "benef", "assistencia": "assist", "politica": "polit",
+    "participacao": "particip", "protecao": "prot",
+    "beneficiarias": "benef", "beneficiarios": "benef",
+    # educação
+    "educacao": "educ", "graduacao": "graduacao", "instrucao": "instr",
+    "fundamental": "fund", "incompleto": "incompl", "completo": "compl",
+    "analfabetismo": "analfab", "analfabetos": "analfab",
+    # saúde / violência / direitos humanos
+    "saude": "saude", "avaliacao": "aval", "atendimentos": "atend",
+    "atendimento": "atend", "notificacoes": "notif", "violencia": "viol",
+    "violacoes": "violacoes", "denuncias": "denuncias", "denuncia": "denuncia",
+    "direitos": "dir", "humanos": "dh",
+    # LGBTQIA+
+    "orientacao": "orient", "identidade": "ident", "genero": "gen",
+    "discriminacao": "discrim", "acolhimento": "acolh",
+    "transexuais": "trans", "travestis": "trav", "conjuges": "conj",
+    "casamento": "casam", "casamentos": "casam",
+}
+
+
+def abreviar(nome: str) -> str:
+    """Encurta nomes longos trocando termos conhecidos por abreviações
+    estáveis. Termos desconhecidos passam intactos."""
+    partes = nome.split("_")
+    partes = [ABREVIACOES.get(p, p) for p in partes]
+    return re.sub(r"_+", "_", "_".join(partes)).strip("_")
+
+
+def normalizar_nome_tabela(nome: str, limite: int = 63) -> str:
+    nome = abreviar(normalizar_nome(nome))
+    nome = re.sub(r"_+", "_", nome).strip("_")
+    if len(nome) <= limite:
+        return nome
+    # mantém começo e fim para não perder contexto
+    ini = 42
+    fim = limite - ini - 1
+    return f"{nome[:ini].rstrip('_')}_{nome[-fim:].lstrip('_')}"
+
+
+def normalizar_colunas_dataframe(df: pd.DataFrame, limite: int = 55) -> pd.DataFrame:
+    """Normaliza os nomes das colunas garantindo legibilidade, tamanho
+    controlado e unicidade (sufixo _1, _2... em colisão)."""
+    novas = []
+    usados: dict[str, int] = {}
+    for col in df.columns:
+        nome = abreviar(normalizar_nome(col)) or "coluna"
+        base = nome[:limite].rstrip("_")
+        if base not in usados:
+            usados[base] = 0
+            nome_final = base
+        else:
+            usados[base] += 1
+            sufixo = f"_{usados[base]}"
+            nome_final = f"{base[:limite - len(sufixo)]}{sufixo}"
+        novas.append(nome_final)
+    df.columns = novas
+    return df
+
+
+def tratar_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove colunas e linhas totalmente vazias."""
+    df = df.copy()
+    df = df.dropna(axis=1, how="all")
+    df = df.dropna(axis=0, how="all")
+    return df
+
+
+# --------------------------------------------------------------------------- #
+# Banco
+# --------------------------------------------------------------------------- #
 
 def get_engine():
     if create_engine is None:
         raise RuntimeError(
             "sqlalchemy não instalado. Rode: pip install sqlalchemy psycopg2-binary"
         )
-    host = os.environ["OBSERVADH_DB_HOST"]
-    port = os.environ.get("OBSERVADH_DB_PORT", "5432")
-    name = os.environ["OBSERVADH_DB_NAME"]
-    user = os.environ["OBSERVADH_DB_USER"]
-    password = os.environ["OBSERVADH_DB_PASSWORD"]
-    url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        host = os.environ.get("OBSERVADH_DB_HOST", "localhost")
+        port = os.environ.get("OBSERVADH_DB_PORT", "5432")
+        name = os.environ.get("OBSERVADH_DB_NAME", "observadh")
+        user = os.environ.get("OBSERVADH_DB_USER", "postgres")
+        password = os.environ.get("OBSERVADH_DB_PASSWORD", "")
+        url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
     return create_engine(url)
 
 
-def registrar_metadados_carga(engine, id_carga: str, tema: str, arquivo: str,
-                               hash_arq: str, linhas_carregadas: int, ano: int):
-    """Grava uma linha na tabela de controle metadados_carga — o log de
-    auditoria que responde 'de qual arquivo, e quando, saiu este dado'."""
+def criar_schema(engine, schema: str):
     with engine.begin() as conn:
-        conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS metadados_carga (
-                id_carga UUID PRIMARY KEY,
-                tema TEXT NOT NULL,
-                arquivo_origem TEXT NOT NULL,
-                hash_arquivo TEXT NOT NULL,
-                ano_referencia INT NOT NULL,
-                linhas_carregadas INT NOT NULL,
-                data_processamento TIMESTAMPTZ NOT NULL
+        conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
+
+
+def preparar_tabela_log(engine, schema: str, recriar: bool):
+    with engine.begin() as conn:
+        if recriar:
+            conn.execute(text(f'DROP TABLE IF EXISTS "{schema}".etl_importacao_arquivos'))
+        conn.execute(text(f'''
+            CREATE TABLE IF NOT EXISTS "{schema}".etl_importacao_arquivos (
+                id SERIAL PRIMARY KEY,
+                nm_tema TEXT,
+                nm_arquivo TEXT,
+                nm_aba TEXT,
+                nm_tabela TEXT,
+                qtd_linhas INTEGER,
+                dt_importacao TIMESTAMP,
+                status_importacao TEXT,
+                mensagem_erro TEXT
             )
-        """))
-        conn.execute(text("""
-            INSERT INTO metadados_carga
-                (id_carga, tema, arquivo_origem, hash_arquivo, ano_referencia,
-                 linhas_carregadas, data_processamento)
-            VALUES
-                (:id_carga, :tema, :arquivo, :hash_arq, :ano, :linhas, :agora)
-        """), dict(
-            id_carga=id_carga, tema=tema, arquivo=arquivo, hash_arq=hash_arq,
-            ano=ano, linhas=linhas_carregadas, agora=datetime.now(timezone.utc),
-        ))
+        '''))
 
 
-def processar_aba(engine, tema: str, ano: int, caminho_arquivo: Path,
-                   aba_cfg: dict, id_carga: str, dry_run: bool) -> int:
-    nome_aba = aba_cfg["nome_aba"]
-    tabela_raw = aba_cfg["tabela_raw"]
-    cabecalho_linha = aba_cfg.get("cabecalho_linha", 1)
-
-    log.info("Lendo %s (aba: %s) -> %s", caminho_arquivo.name, nome_aba, tabela_raw)
-
-    df = pd.read_excel(
-        caminho_arquivo,
-        sheet_name=nome_aba,
-        header=cabecalho_linha - 1,
-    )
-
-    # Metadados de carga — mantidos em toda tabela RAW para rastreabilidade.
-    df["arquivo_origem"] = caminho_arquivo.name
-    df["nome_aba"] = nome_aba
-    df["ano_referencia_carga"] = ano
-    df["id_carga"] = id_carga
-    df["data_processamento"] = datetime.now(timezone.utc)
-
-    if dry_run:
-        log.info("[dry-run] %d linhas lidas de %s, nada gravado.", len(df), nome_aba)
-        return len(df)
-
-    # RAW é append-only: cada carga soma ao histórico, nunca sobrescreve.
-    df.to_sql(tabela_raw, engine, if_exists="append", index=False)
-    log.info("Gravadas %d linhas em %s", len(df), tabela_raw)
-    return len(df)
+def log_importacao(engine, schema, tema, arquivo, aba, tabela, linhas,
+                   status="SUCESSO", mensagem_erro=None):
+    with engine.begin() as conn:
+        conn.execute(text(f'''
+            INSERT INTO "{schema}".etl_importacao_arquivos
+            (nm_tema, nm_arquivo, nm_aba, nm_tabela, qtd_linhas,
+             dt_importacao, status_importacao, mensagem_erro)
+            VALUES (:tema, :arquivo, :aba, :tabela, :linhas, :data, :status, :erro)
+        '''), dict(tema=tema, arquivo=arquivo, aba=aba, tabela=tabela,
+                   linhas=linhas, data=datetime.now(), status=status,
+                   erro=mensagem_erro))
 
 
-def ingerir_tema(tema: str, ano: int, dry_run: bool = False):
-    config = carregar_config_tema(tema)
+def importar_dataframe(engine, schema: str, df: pd.DataFrame, tabela: str):
+    """Recria a tabela raw do zero para garantir carga limpa."""
+    with engine.begin() as conn:
+        conn.execute(text(f'DROP TABLE IF EXISTS "{schema}"."{tabela}"'))
+    df.to_sql(tabela, engine, schema=schema, if_exists="fail",
+              index=False, method="multi", chunksize=1000)
+
+
+# --------------------------------------------------------------------------- #
+# Orquestração
+# --------------------------------------------------------------------------- #
+
+def nome_base_arquivo(nome_arquivo: str) -> str:
+    base = normalizar_nome(re.sub(r"\.(xlsx|xls)$", "", nome_arquivo, flags=re.I))
+    for prefixo in ("lgbtqia_", "lgbt_"):
+        if base.startswith(prefixo):
+            return base[len(prefixo):]
+    return base
+
+
+def processar_arquivo(engine, cfg: dict, caminho: Path, dry_run: bool) -> int:
+    tema = cfg["tema"]
+    prefixo = cfg.get("prefixo_tabela", tema)
+    schema = cfg.get("schema_raw", "raw")
+    ignorar_abas = {normalizar_nome(a) for a in cfg.get("ignorar_abas", [])}
+
+    nome_arquivo = caminho.name
+    nome_base = nome_base_arquivo(nome_arquivo)
+    log.info("Arquivo: %s  (base: %s)", nome_arquivo, nome_base)
+
+    total = 0
+    xls = pd.ExcelFile(caminho)
+    for aba in xls.sheet_names:
+        if normalizar_nome(aba) in ignorar_abas:
+            log.info("  aba '%s' ignorada (ignorar_abas)", aba)
+            continue
+
+        tabela = None
+        try:
+            df = pd.read_excel(xls, sheet_name=aba)
+            df = tratar_dataframe(df)
+            if df.empty:
+                log.info("  aba '%s' vazia/sem dados úteis — pulada", aba)
+                continue
+
+            df = normalizar_colunas_dataframe(df)
+            df["nm_arquivo_origem"] = nome_arquivo
+            df["nm_aba_origem"] = aba
+            df["dt_importacao"] = datetime.now()
+
+            tabela = normalizar_nome_tabela(f"{prefixo}_{nome_base}_{normalizar_nome(aba)}")
+
+            if dry_run:
+                log.info("  [dry-run] %s.%s <- aba '%s' (%d linhas, %d colunas)",
+                         schema, tabela, aba, len(df), len(df.columns) - 3)
+                total += len(df)
+                continue
+
+            importar_dataframe(engine, schema, df, tabela)
+            log_importacao(engine, schema, tema, nome_arquivo, aba, tabela, len(df))
+            log.info("  %s.%s  <- aba '%s'  (%d linhas)", schema, tabela, aba, len(df))
+            total += len(df)
+
+        except Exception as e:  # noqa: BLE001 — registra e segue para a próxima aba
+            log.exception("  ERRO na aba '%s'", aba)
+            if not dry_run:
+                log_importacao(engine, schema, tema, nome_arquivo, aba,
+                               tabela or "", 0, status="ERRO", mensagem_erro=str(e))
+
+    return total
+
+
+def ingerir_tema(tema: str, ano: int, dry_run: bool = False, recriar_log: bool = True):
+    cfg = carregar_config_tema(tema)
+    cfg["tema"] = tema
+    schema = cfg.get("schema_raw", "raw")
+
     diretorio_ano = INPUT_DIR / tema / str(ano)
-
     if not diretorio_ano.exists():
         raise FileNotFoundError(
             f"Diretório de entrada não encontrado: {diretorio_ano}. "
             f"Coloque as planilhas em ingestion/input/{tema}/{ano}/ antes de rodar."
         )
 
-    engine = None if dry_run else get_engine()
-    total_linhas = 0
-
-    for planilha_cfg in config["planilhas"]:
-        nome_arquivo = planilha_cfg["arquivo"]
-        caminho_arquivo = diretorio_ano / nome_arquivo
-
-        if not caminho_arquivo.exists():
-            log.warning("Arquivo esperado não encontrado, pulando: %s", caminho_arquivo)
-            continue
-
-        id_carga = str(uuid.uuid4())
-        hash_arq = hash_arquivo(caminho_arquivo)
-
-        for aba_cfg in planilha_cfg["abas"]:
-            linhas = processar_aba(
-                engine, tema, ano, caminho_arquivo, aba_cfg, id_carga, dry_run
-            )
-            total_linhas += linhas
-
-        if not dry_run:
-            registrar_metadados_carga(
-                engine, id_carga, tema, nome_arquivo, hash_arq, total_linhas, ano
-            )
-
-    log.info(
-        "Ingestão do tema '%s' (ano %d) concluída. Total de linhas processadas: %d",
-        tema, ano, total_linhas,
+    arquivos = sorted(
+        p for p in diretorio_ano.iterdir()
+        if p.is_file()
+        and p.suffix.lower() in (".xlsx", ".xls")
+        and not p.name.startswith("~$")
     )
+    if not arquivos:
+        log.warning("Nenhuma planilha .xlsx/.xls em %s", diretorio_ano)
+        return
+
+    log.info("Tema '%s' (ano %d): %d planilha(s) encontrada(s)", tema, ano, len(arquivos))
+
+    engine = None if dry_run else get_engine()
+    if not dry_run:
+        criar_schema(engine, schema)
+        preparar_tabela_log(engine, schema, recriar_log)
+
+    total = 0
+    for caminho in arquivos:
+        total += processar_arquivo(engine, cfg, caminho, dry_run)
+
+    log.info("Ingestão do tema '%s' (ano %d) concluída. Linhas processadas: %d",
+             tema, ano, total)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Ingestão de planilhas do ObservaDH")
     parser.add_argument("--tema", required=True, help="ex.: lgbtqia_plus")
-    parser.add_argument("--ano", type=int, required=True, help="ano de referência da carga")
+    parser.add_argument("--ano", type=int, required=True, help="ano do ciclo de recebimento das planilhas")
     parser.add_argument("--dry-run", action="store_true",
-                         help="lê e valida as planilhas sem gravar no banco")
+                        help="lê e normaliza as planilhas sem gravar no banco")
+    parser.add_argument("--manter-log", action="store_true",
+                        help="não recria a tabela de log — preserva o histórico de execuções")
     args = parser.parse_args()
 
     try:
-        ingerir_tema(args.tema, args.ano, dry_run=args.dry_run)
+        ingerir_tema(args.tema, args.ano, dry_run=args.dry_run,
+                     recriar_log=not args.manter_log)
     except Exception:
         log.exception("Falha na ingestão do tema '%s'", args.tema)
         sys.exit(1)

@@ -8,9 +8,9 @@ Este repositório contém a camada de dados do ObservaDH: leitura das planilhas 
 
 ```
 observadh/
-├── ingestion/          # Python — lê as planilhas e grava nas tabelas RAW
+├── ingestion/          # Python — importa TODA aba de TODA planilha para o schema raw
 │   ├── input/           # planilhas recebidas, organizadas por tema/ano
-│   └── temas/            # um arquivo de configuração por tema (mapeamento planilha → tabela raw)
+│   └── temas/            # um arquivo de configuração por tema (prefixo de tabela, schema, abas a ignorar)
 │
 └── transform/           # projeto dbt — staging → intermediate → marts
     ├── seeds/            # tabelas de referência compartilhadas entre temas (UF, município...)
@@ -27,29 +27,35 @@ Ver a proposta completa de arquitetura em `proposta-arquitetura-observadh.md` (n
 ## Como rodar um ciclo (quando os dados do tema estiverem prontos)
 
 ```bash
-# 1. Colocar as planilhas em ingestion/input/<tema>/<ano>/
+# 1. Colocar as planilhas em ingestion/input/<tema>/<ano>/  (o "ano" = ciclo de recebimento)
 
-# 2. Rodar a ingestão (Python) — cria/atualiza as tabelas RAW
+# 2. Rodar a ingestão (Python) — importa TODA aba de TODA planilha para o schema raw.
+#    Cada execução recria as tabelas do zero. Use --dry-run para ver os nomes
+#    de tabela gerados sem gravar; --manter-log para preservar o histórico de execuções.
 python ingestion/ingest.py --tema lgbtqia_plus --ano 2026
 
 # 3. Rodar a transformação (dbt) — recalcula staging → intermediate → marts e roda os testes
 cd transform
 dbt deps   # instala dbt-utils (usado nos testes de schema)
+dbt seed   # carrega as tabelas de referência (dim_municipio, dim_uf)
 dbt build --select tag:lgbtqia_plus
 
 # 4. Conferir o grafo de linhagem e a documentação
 dbt docs generate && dbt docs serve
 ```
 
+Conexão com o banco: variáveis `OBSERVADH_DB_HOST/_PORT/_NAME/_USER/_PASSWORD`
+(a ingestão também aceita `DATABASE_URL`) e `transform/profiles.yml.example`
+copiado para `~/.dbt/profiles.yml`.
+
 ## Status do piloto LGBTQIA+ — categoria 6.1 (Proteção Social Especial)
 
-- [x] Planilhas recebidas e mapeadas (`ingestion/temas/lgbtqia_plus_config.yml`) — 5 de 8 arquivos com abas confirmadas
-- [x] Ingestão Python rodando de verdade contra um Postgres — carga da planilha de Assistência Social (7 abas, 40.617 linhas) executada com sucesso
-- [x] Sources dbt declaradas (`_lgbtqia_plus_assistencia_social__sources.yml`)
+- [x] **Todas as 8 planilhas ingeridas** — 54 tabelas no schema `raw` (toda aba de todo arquivo), 234.557 linhas, via descoberta automática (`ingestion/ingest.py`)
+- [x] Ingestão Python rodando de verdade contra um Postgres
+- [x] Sources dbt declaradas (`_lgbtqia_plus_assistencia_social__sources.yml`) — apontam para o schema `raw` via `identifier`
 - [x] Modelos de staging (5 — PAEFI, CREAS orientação, CREAS identidade, Centros POP, Unidades de Acolhimento)
 - [x] Modelos intermediate (5 — cálculo dos indicadores por município)
 - [x] Marts finais (nacional / estadual / municipal)
-- [x] Testes de validação (fonte vs. calculado) — lógica conferida em Python contra os dados reais: percentuais calculados batem com os pré-calculados da planilha (diferença máxima ~0,004 p.p.)
-- [x] Rodar `dbt build` de verdade contra um Postgres real — `dbt build --select tag:lgbtqia_plus`: 13 modelos + 11 testes, tudo verde. Um bug de fan-out no `int_lgbtqia_plus_acolhimento_por_municipio` (agregava por nome de município em texto livre, com grafias inconsistentes) foi encontrado e corrigido nessa primeira execução real.
-- [ ] Demais 6 categorias do LGBTQIA+ (2.5, 5.1, 4.1, 7/7.1, 1, 2)
-- [ ] Ingerir os outros 4 arquivos já mapeados (Perfil, Quantas São, ONDH, SINAN) — necessários para as categorias além da 6.1
+- [x] Testes de validação (fonte vs. calculado) — percentuais calculados batem com os pré-calculados da planilha (diferença máxima ~0,004 p.p.)
+- [x] Rodar `dbt build` de verdade contra um Postgres real — `dbt build --select tag:lgbtqia_plus`: 13 modelos + 11 testes, tudo verde. Bug de fan-out no `int_lgbtqia_plus_acolhimento_por_municipio` (agregava por nome de município em texto livre) encontrado e corrigido na primeira execução real.
+- [ ] Modelar as demais 6 categorias do LGBTQIA+ (2.5, 5.1, 4.1, 7/7.1, 1, 2) — dado bruto já está no banco

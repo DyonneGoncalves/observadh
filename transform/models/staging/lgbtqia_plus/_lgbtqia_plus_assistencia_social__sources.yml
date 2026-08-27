@@ -1,49 +1,50 @@
 # Sources da categoria 6/6.1 (Assistência Social / Proteção Social Especial).
-# Nomes de coluna confirmados por inspeção real das planilhas em
-# ~/Projetos/Observa DH/LGBTQIA+/Planilhas/LGBTQIA_Assistência social_RMA_Censo SUAS_2017_2024.xlsx
 #
-# Todas as tabelas (exceto Unidades de Acolhimento) já vêm na granularidade
-# de MUNICÍPIO — nacional/estadual são agregações desta mesma base, não
-# arquivos separados. Ver catálogo de indicadores no projeto Claude.
+# A ingestão (ingestion/ingest.py) importa toda aba de toda planilha para o
+# schema `raw`, com nome de tabela auto-gerado e normalizado
+# (<prefixo>_<arquivo>_<aba>, truncado em 63 caracteres). Por isso cada tabela
+# abaixo tem um `identifier` (o nome real, feio, no banco) separado do `name`
+# (o apelido estável usado nos modelos). Para reconferir os `identifier` após
+# uma nova carga: `python ingestion/ingest.py --tema lgbtqia_plus --ano <ano> --dry-run`.
 
 version: 2
 
 sources:
   - name: raw_lgbtqia_plus
-    schema: public   # TODO: confirmar schema real onde o Python grava o RAW
+    schema: raw
+    loaded_at_field: dt_importacao
     tables:
       - name: raw_lgbtqia_plus_serie_atendimentos_paefi
+        identifier: lgbt_assist_social_rma_censo_suas_2017_2024_serie_atend_paefi
         description: >
           Pessoas vítimas de discriminação por orientação sexual que
           ingressaram no PAEFI, por município e mês/ano de referência
           (série 2017-2024). Aba original "Série atendimentos PAEFI".
-        loaded_at_field: data_processamento
 
       - name: raw_lgbtqia_plus_creas_discriminacao_orientacao
+        identifier: lgbt_assist_social_rma_censo_suas_2017_202_as_discri_orient_sex
         description: >
           CREAS por município: se atendem casos de discriminação por
           orientação sexual no PAEFI. Aba original "Atendim CREAS discri
-          orient sex". A planilha já traz uma coluna de % pré-calculada
-          por município — usada como golden value para validar nosso
-          próprio cálculo.
-        loaded_at_field: data_processamento
+          orient sex". Traz uma coluna de % pré-calculada por município —
+          usada como golden value para validar nosso próprio cálculo.
 
       - name: raw_lgbtqia_plus_creas_discriminacao_identidade
+        identifier: lgbt_assist_social_rma_censo_suas_2017_202_eas_discri_ident_gen
         description: >
           Mesma estrutura da anterior, para discriminação por identidade
           de gênero. Aba original "Atendim CREAS discri ident gên".
-        loaded_at_field: data_processamento
 
       - name: raw_lgbtqia_plus_centros_pop
+        identifier: lgbt_assist_social_rma_censo_suas_2017_2024_centros_pop
         description: >
           Centros POP por município: se atenderam pessoas LGBTQIA+. Aba
           original "Centros Pop".
-        loaded_at_field: data_processamento
 
       - name: raw_lgbtqia_plus_unidades_acolhimento
+        identifier: lgbt_assist_social_rma_censo_suas_2017_202_idades_de_acolh_2024
         description: >
           Unidades de acolhimento (grão = UNIDADE, não município — várias
           unidades por município). Aba original "Unidades de Acolhimento
           2024". Não tem coluna de ano de referência (implícito: 2024, ver
           nome da aba) nem código IBGE de 7 dígitos (só 6).
-        loaded_at_field: data_processamento
