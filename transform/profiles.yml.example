@@ -1,0 +1,25 @@
+# Copie este arquivo para ~/.dbt/profiles.yml (fora do git) e preencha com as
+# credenciais reais do banco. NUNCA versionar o profiles.yml com senha real.
+
+observadh:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: "{{ env_var('OBSERVADH_DB_USER') }}"
+      password: "{{ env_var('OBSERVADH_DB_PASSWORD') }}"
+      port: 5432
+      dbname: observadh
+      schema: dev
+      threads: 4
+
+    prod:
+      type: postgres
+      host: "{{ env_var('OBSERVADH_DB_HOST') }}"
+      user: "{{ env_var('OBSERVADH_DB_USER') }}"
+      password: "{{ env_var('OBSERVADH_DB_PASSWORD') }}"
+      port: 5432
+      dbname: observadh
+      schema: public
+      threads: 4

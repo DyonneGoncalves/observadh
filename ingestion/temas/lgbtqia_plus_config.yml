@@ -1,0 +1,30 @@
+# Configuração de ingestão do tema LGBTQIA+
+#
+# Cada entrada em "planilhas" descreve UM arquivo .xlsx esperado dentro de
+# ingestion/input/lgbtqia_plus/<ano>/, e cada entrada em "abas" descreve UMA
+# aba desse arquivo que deve virar uma tabela RAW.
+#
+# TODO: preencher com o mapeamento real assim que as planilhas do tema
+# chegarem. Isso ainda é um template — os nomes de arquivo/aba abaixo são
+# placeholders de exemplo, não confirmados.
+
+tema: lgbtqia_plus
+
+planilhas:
+  - arquivo: perfil.xlsx          # TODO: confirmar nome real do arquivo recebido
+    abas:
+      - nome_aba: Perfil_Nacional      # TODO: confirmar nome real da aba
+        tabela_raw: raw_lgbtqia_plus_perfil_nacional
+        cabecalho_linha: 1              # linha (1-indexed) onde começa o cabeçalho da tabela
+      - nome_aba: Perfil_UF
+        tabela_raw: raw_lgbtqia_plus_perfil_uf
+        cabecalho_linha: 1
+
+  # - arquivo: violencia.xlsx
+  #   abas:
+  #     - nome_aba: ...
+  #       tabela_raw: raw_lgbtqia_plus_violencia_...
+  #       cabecalho_linha: 1
+
+# Ano de referência do ciclo de carga (pode ser sobrescrito via --ano na CLI)
+ano_padrao: 2026

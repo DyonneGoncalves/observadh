@@ -1,0 +1,16 @@
+# dbt
+transform/target/
+transform/dbt_packages/
+transform/logs/
+profiles.yml
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# planilhas recebidas — não versionar dados em si, só a estrutura
+ingestion/input/**/*.xlsx
+ingestion/input/**/*.xls
+ingestion/input/**/*.csv
+!ingestion/input/**/.gitkeep

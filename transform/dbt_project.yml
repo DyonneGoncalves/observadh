@@ -1,0 +1,35 @@
+name: 'observadh'
+version: '1.0.0'
+config-version: 2
+
+profile: 'observadh'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Materializações padrão por camada.
+# staging fica como view (barata, sempre reflete o RAW mais recente).
+# intermediate fica como view (facilita depurar a lógica sem duplicar dado).
+# marts materializa como table (é o que a aplicação consulta — precisa ser rápido de ler).
+models:
+  observadh:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+
+seeds:
+  observadh:
+    +schema: referencia

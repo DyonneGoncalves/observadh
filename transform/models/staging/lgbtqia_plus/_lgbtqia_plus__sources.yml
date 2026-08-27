@@ -1,0 +1,38 @@
+# Declaração das tabelas RAW do tema LGBTQIA+ como "sources" do dbt.
+#
+# Isso é o que permite ao dbt montar o grafo de linhagem completo, da tabela
+# final até a planilha de origem, e também rodar testes de frescor/qualidade
+# direto sobre o RAW.
+#
+# TODO: ajustar nomes de tabela/coluna conforme o mapeamento real definido em
+# ingestion/temas/lgbtqia_plus_config.yml assim que as planilhas chegarem.
+
+version: 2
+
+sources:
+  - name: raw_lgbtqia_plus
+    schema: public   # TODO: confirmar schema onde o Python grava o RAW
+    tables:
+      - name: raw_lgbtqia_plus_perfil_nacional
+        description: >
+          Dados brutos da aba "Perfil Nacional" da planilha de perfil do tema
+          LGBTQIA+, exatamente como recebidos, com colunas de metadados de
+          carga (arquivo_origem, id_carga, data_processamento).
+        loaded_at_field: data_processamento
+        columns:
+          - name: id_carga
+            description: Identifica unicamente a execução de ingestão que gravou esta linha.
+            tests:
+              - not_null
+          - name: arquivo_origem
+            description: Nome do arquivo .xlsx de onde esta linha veio.
+            tests:
+              - not_null
+
+      - name: raw_lgbtqia_plus_perfil_uf
+        description: Dados brutos da aba "Perfil UF" da planilha de perfil do tema LGBTQIA+.
+        loaded_at_field: data_processamento
+        columns:
+          - name: id_carga
+            tests:
+              - not_null
