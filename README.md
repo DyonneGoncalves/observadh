@@ -44,11 +44,12 @@ dbt docs generate && dbt docs serve
 ## Status do piloto LGBTQIA+ — categoria 6.1 (Proteção Social Especial)
 
 - [x] Planilhas recebidas e mapeadas (`ingestion/temas/lgbtqia_plus_config.yml`) — 5 de 8 arquivos com abas confirmadas
-- [ ] Ingestão Python rodando de verdade contra um Postgres (ainda não executada — falta banco configurado)
+- [x] Ingestão Python rodando de verdade contra um Postgres — carga da planilha de Assistência Social (7 abas, 40.617 linhas) executada com sucesso
 - [x] Sources dbt declaradas (`_lgbtqia_plus_assistencia_social__sources.yml`)
 - [x] Modelos de staging (5 — PAEFI, CREAS orientação, CREAS identidade, Centros POP, Unidades de Acolhimento)
 - [x] Modelos intermediate (5 — cálculo dos indicadores por município)
 - [x] Marts finais (nacional / estadual / municipal)
 - [x] Testes de validação (fonte vs. calculado) — lógica conferida em Python contra os dados reais: percentuais calculados batem com os pré-calculados da planilha (diferença máxima ~0,004 p.p.)
-- [ ] Rodar `dbt build` de verdade contra um Postgres real (SQL ainda não executado no banco — só validado logicamente)
+- [x] Rodar `dbt build` de verdade contra um Postgres real — `dbt build --select tag:lgbtqia_plus`: 13 modelos + 11 testes, tudo verde. Um bug de fan-out no `int_lgbtqia_plus_acolhimento_por_municipio` (agregava por nome de município em texto livre, com grafias inconsistentes) foi encontrado e corrigido nessa primeira execução real.
 - [ ] Demais 6 categorias do LGBTQIA+ (2.5, 5.1, 4.1, 7/7.1, 1, 2)
+- [ ] Ingerir os outros 4 arquivos já mapeados (Perfil, Quantas São, ONDH, SINAN) — necessários para as categorias além da 6.1

@@ -22,25 +22,28 @@ with unidades as (
 
 agregado_por_municipio as (
 
+    -- Agrega SÓ pelo código IBGE de 6 dígitos. O campo "Município" do raw
+    -- vem com grafias inconsistentes para o mesmo município ("Belem" vs
+    -- "Belém", caixa, abreviações) — agrupar também por nome/UF quebraria o
+    -- grão de 1 linha por município (o join com dim_municipio no mart
+    -- multiplicaria as linhas). Nome e UF canônicos vêm de dim_municipio.
     select
         municipio_codigo_ibge_6dig,
-        municipio_nome,
-        uf_sigla,
         ano_referencia,
         count(*)                                                         as qtd_unidades_acolhimento,
         sum(case when possui_pessoas_trans_acolhidas then 1 else 0 end)  as qtd_unidades_com_pessoas_trans,
         sum(qtd_pessoas_acolhidas_unidade)                               as qtd_pessoas_acolhidas_total,
         sum(qtd_pessoas_trans_acolhidas_unidade)                         as qtd_pessoas_trans_acolhidas_total
     from unidades
-    group by 1, 2, 3, 4
+    group by 1, 2
 
 )
 
 select
     dm.codigo_municipio       as municipio_codigo_ibge,
-    a.municipio_nome,
+    dm.nome_municipio         as municipio_nome,
     dm.codigo_uf              as uf_codigo,
-    a.uf_sigla,
+    dm.sigla_uf               as uf_sigla,
     a.ano_referencia,
     a.qtd_unidades_acolhimento,
     a.qtd_unidades_com_pessoas_trans,
