@@ -23,12 +23,18 @@ models:
     staging:
       +materialized: view
       +schema: staging
+      lgbtqia_plus:
+        +tags: ["lgbtqia_plus"]
     intermediate:
       +materialized: view
       +schema: intermediate
+      lgbtqia_plus:
+        +tags: ["lgbtqia_plus"]
     marts:
       +materialized: table
       +schema: marts
+      lgbtqia_plus:
+        +tags: ["lgbtqia_plus"]
 
 seeds:
   observadh:

@@ -1,0 +1,49 @@
+# Sources da categoria 6/6.1 (Assistência Social / Proteção Social Especial).
+# Nomes de coluna confirmados por inspeção real das planilhas em
+# ~/Projetos/Observa DH/LGBTQIA+/Planilhas/LGBTQIA_Assistência social_RMA_Censo SUAS_2017_2024.xlsx
+#
+# Todas as tabelas (exceto Unidades de Acolhimento) já vêm na granularidade
+# de MUNICÍPIO — nacional/estadual são agregações desta mesma base, não
+# arquivos separados. Ver catálogo de indicadores no projeto Claude.
+
+version: 2
+
+sources:
+  - name: raw_lgbtqia_plus
+    schema: public   # TODO: confirmar schema real onde o Python grava o RAW
+    tables:
+      - name: raw_lgbtqia_plus_serie_atendimentos_paefi
+        description: >
+          Pessoas vítimas de discriminação por orientação sexual que
+          ingressaram no PAEFI, por município e mês/ano de referência
+          (série 2017-2024). Aba original "Série atendimentos PAEFI".
+        loaded_at_field: data_processamento
+
+      - name: raw_lgbtqia_plus_creas_discriminacao_orientacao
+        description: >
+          CREAS por município: se atendem casos de discriminação por
+          orientação sexual no PAEFI. Aba original "Atendim CREAS discri
+          orient sex". A planilha já traz uma coluna de % pré-calculada
+          por município — usada como golden value para validar nosso
+          próprio cálculo.
+        loaded_at_field: data_processamento
+
+      - name: raw_lgbtqia_plus_creas_discriminacao_identidade
+        description: >
+          Mesma estrutura da anterior, para discriminação por identidade
+          de gênero. Aba original "Atendim CREAS discri ident gên".
+        loaded_at_field: data_processamento
+
+      - name: raw_lgbtqia_plus_centros_pop
+        description: >
+          Centros POP por município: se atenderam pessoas LGBTQIA+. Aba
+          original "Centros Pop".
+        loaded_at_field: data_processamento
+
+      - name: raw_lgbtqia_plus_unidades_acolhimento
+        description: >
+          Unidades de acolhimento (grão = UNIDADE, não município — várias
+          unidades por município). Aba original "Unidades de Acolhimento
+          2024". Não tem coluna de ano de referência (implícito: 2024, ver
+          nome da aba) nem código IBGE de 7 dígitos (só 6).
+        loaded_at_field: data_processamento
