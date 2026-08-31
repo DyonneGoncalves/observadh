@@ -264,21 +264,28 @@ Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
 
 ### 7. Violência contra pessoas LGBTQIA+ — `N E M`
 
-**7.0 (abre a seção — base SINAN)**:
+**7.0. Notificações de violência (SINAN)** — `N E M` — ✅ **MODELADA (formato longo)**
 
-| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
-|---|---|---|---|
-| Soma de denúncias 2024 (`qtd_denuncias_2024`) | Notificações_2015_2024_SINAN | `lgbt_viol_sinan_notificacoes_2015_2024_sinan` | — |
-| % de notificações por tipo (interpessoal / autoprovocada / origem desconhecida) sobre o total com info, 2024 | Notificações_2015_2024_SINAN | idem | — |
-| Série do total de notificações por ano (2015–2024) | Notificações_2015_2024_SINAN | idem | — |
-| % de municípios com ≥1 notificação em 2024 (÷ 5570 no N; ÷ total do estado no E/M) | Notificações_2015_2024_SINAN | idem | — |
-| Maior % de local de ocorrência (interpessoal / autoprovocada) | Interpessoal_Local_Ocorrencia / Autoprovocada_Local_Ocorrencia | `lgbt_viol_sinan_interpessoal_local_ocorrencia` / `..._autoprovocada_local_ocorrencia` | — |
-| % de notificações por origem da agressão × orientação sexual | Violências_Orientacao_Sexual | `lgbt_viol_sinan_violencias_orientacao_sexual` | — |
-| % de notificações por origem da agressão × identidade de gênero | Violencias_Identidade_Genero | `lgbt_viol_sinan_violencias_identidade_genero` | — |
-| Perfil das vítimas (interpessoal): sexo / faixa etária / raça-cor | Interpessoal_Sexo_SINAN · Interpessoal_Faixa_Etária_SINAN · Interpessoal_Cor_ou_Raça | `lgbt_viol_sinan_interpessoal_sexo_sinan` · `..._interpessoal_faixa_etaria_sinan` · `..._interpessoal_cor_ou_raca` | — |
-| Perfil das vítimas (autoprovocada): sexo / faixa etária / raça-cor | Autoprovocada_Sexo_SINAN · Autoprovocada_Faixa_Etária · Autoprovocada_Cor_ou_Raça | `lgbt_viol_sinan_autoprovocada_sexo_sinan` · `..._autoprovocada_faixa_etaria` · `..._autoprovocada_cor_ou_raca` | — |
-| 10 maiores % de tipo de agressor (interpessoal) | Interpessoal_Perfil_Agressor | `lgbt_viol_sinan_interpessoal_perfil_agressor` | — |
-| *(aba ingerida, sem indicador citado)* tipos de violência interpessoal | Interpessoal-Tipos de violência | `lgbt_viol_sinan_interpessoal_tipos_de_violencia` | — |
+Modelo: `int_lgbtqia_plus_7_0_violencia_sinan` (macro `sinan_breakdown_percentual`).
+Validação: `tests/lgbtqia_plus_7_0_valores.sql`. Dados de perfil são de 2024.
+
+| `indicador` (slug) | `categoria` | fonte | N/E/M | esperado (nacional) |
+|---|---|---|---|---|
+| `notificacoes_por_ano` / `notificacoes_total_2024` | ano / — | Notificações_2015_2024_SINAN | N E M | 2024 = 22.906 |
+| `pct_notificacoes_por_tipo_2024` | Interpessoal / Autoprovocada / Origem desconhecida | idem | N E M | 55,21 / 42,29 / 2,51 |
+| `pct_municipios_com_notificacao_2024` | — | idem | N E | 47,56 (N ÷5.570; E ÷ nº de municípios da UF) |
+| `pct_viol_interpessoal_por_sexo` · `pct_viol_autoprovocada_por_sexo` | Feminino / Masculino / Indefinido | Interpessoal_Sexo_SINAN · Autoprovocada_Sexo_SINAN | N E M | interp. Fem 66,04 · autop. Fem 61,52 |
+| `pct_viol_interpessoal_por_faixa_etaria` · `..._autoprovocada_...` | Até 29 / Crianças e adol. / 18-29 / 30-39 … | Interpessoal_Faixa_Etária_SINAN · Autoprovocada_Faixa_Etária | N E M | interp. até 29 = 57,46 · autop. = 70,83 |
+| `pct_viol_interpessoal_por_raca_cor` · `..._autoprovocada_...` | Negra / Branca / Amarela / Indígena | Interpessoal_Cor_ou_Raça · Autoprovocada_Cor_ou_Raça | N E M | interp. Negra 60,02 · autop. 52,30 |
+| `pct_viol_interpessoal_por_orientacao_sexual` · `..._autoprovocada_...` | Heterossexual (derivado) / Bissexual / Homossexual / Ignorado / Não se aplica | Violências_Orientacao_Sexual | N E M | interp. Homo 52,27 · Bi 20,46 |
+| `pct_viol_interpessoal_por_identidade_genero` · `..._autoprovocada_...` | Travesti / Transexual mulher / Transexual homem / Ignorado / Não se aplica | Violencias_Identidade_Genero | N E M | interp. Trans mulher 25,62 · Travesti 4,80 |
+
+> "Heterossexual" não é coluna nas abas de orientação — é derivado (total − bissexual − homossexual − não se aplica − ignorado), como na planilha.
+
+**Ainda não modelado da 7.0**: local de ocorrência
+(`lgbt_viol_sinan_{interpessoal,autoprovocada}_local_ocorrencia`) e perfil do agressor
+(`lgbt_viol_sinan_interpessoal_perfil_agressor`). A aba `Interpessoal-Tipos de violência`
+foi ingerida mas não tem indicador no catálogo.
 
 **7.1. Denúncias de violações de direitos humanos (ONDH)** — `N E M` — ✅ **MODELADA (formato longo)**
 
@@ -310,8 +317,9 @@ para as quebras). Validação: `tests/lgbtqia_plus_7_1_valores.sql`.
 - ✅ **5.1 Serviços de saúde para pessoas trans** — modelada (N e E) no **formato longo**.
 - ✅ **2.5 Casamentos e uniões** — modelada (N/E/M; PNS só N) no **formato longo**.
 - ✅ **4.1 Projetos escolares contra LGBTQIAfobia** — modelada (N, E) no **formato longo**.
+- ✅ **7.0 Notificações de violência (SINAN)** — modelada (N/E/M) no **formato longo** (falta local e perfil do agressor).
 - ✅ **7.1 Denúncias de violações de DH (ONDH)** — modelada (N/E/M) no **formato longo** (falta local e relação do suspeito).
-- ⬜ Demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
+- ⬜ Demais seções (1, 2.1–2.4, 3) — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
 
 ### Formato longo — `lgbtqia_plus_indicadores`
 

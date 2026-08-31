@@ -59,7 +59,8 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Seção 5.1 — Serviços de saúde para pessoas trans** (N, E) no formato longo. Validada contra a planilha de cálculo da equipe.
 - [x] **Seção 2.5 — Casamentos e uniões** (N, E, M; parte PNS só N) no formato longo. Validada contra a planilha de cálculo e contra o texto-base do relatório.
 - [x] **Seção 4.1 — Projetos escolares contra LGBTQIAfobia** (N, E) no formato longo. Validada contra a planilha de cálculo.
-- [x] **Seção 7.1 — Denúncias de violações de DH (ONDH)** (N, E, M) no formato longo — série + quebras por perfil da vítima e tipo de violação. Validada contra a planilha de cálculo. Falta local de ocorrência e relação do suspeito.
-- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde (50 nós). `lgbtqia_plus_indicadores` com ~243k linhas.
-- [ ] Modelar as demais seções (7.0/SINAN, 1, 2, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
+- [x] **Seção 7.1 — Denúncias de violações de DH (ONDH)** (N, E, M) no formato longo. Validada contra a planilha de cálculo. Falta local e relação do suspeito.
+- [x] **Seção 7.0 — Notificações de violência (SINAN)** (N, E, M) no formato longo — série + % por tipo + % de municípios + perfil das vítimas (sexo/idade/raça, orientação, identidade) para violência interpessoal e autoprovocada. Validada contra a planilha de cálculo. Falta local e perfil do agressor.
+- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde (52 nós). `lgbtqia_plus_indicadores` com ~406k linhas.
+- [ ] Modelar as demais seções (1, 2.1–2.4, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
 - [ ] Migrar a 6.1 do formato largo para o `lgbtqia_plus_indicadores`.

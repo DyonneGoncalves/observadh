@@ -141,3 +141,43 @@ sources:
           Denúncias por município e tipo de violação. Grão = 1 linha por
           município x tipo; a coluna total_com_info É a contagem daquele
           tipo no município (nome enganoso). Aba "ONDH_Tipo_de_Violação".
+
+      # --- 7 / 7.0 — Violência / Notificações SINAN 2015-2024 (dados de 2024
+      #     nas tabelas de perfil; a de notificações tem ano_de_referencia) ---
+      - name: raw_lgbtqia_plus_sinan_notificacoes
+        identifier: lgbt_viol_sinan_notificacoes_2015_2024_sinan
+        description: >
+          Notificações SINAN por município e ano. Colunas viol_interpessoal,
+          viol_autoprovocada, nao_aplica, ignorado, missing e
+          total_com_info_de_notificacao. Aba "Notificações_2015_2024_SINAN".
+      - name: raw_lgbtqia_plus_sinan_interpessoal_sexo
+        identifier: lgbt_viol_sinan_interpessoal_sexo_sinan
+        description: Vítimas de violência interpessoal por município e sexo (2024). Aba "Interpessoal_Sexo_SINAN".
+      - name: raw_lgbtqia_plus_sinan_interpessoal_faixa_etaria
+        identifier: lgbt_viol_sinan_interpessoal_faixa_etaria_sinan
+        description: Vítimas de violência interpessoal por município e faixa etária (2024). Aba "Interpessoal_Faixa_Etária_SINAN".
+      - name: raw_lgbtqia_plus_sinan_interpessoal_cor_raca
+        identifier: lgbt_viol_sinan_interpessoal_cor_ou_raca
+        description: Vítimas de violência interpessoal por município e raça/cor (2024). Aba "Interpessoal_Cor_ou_Raça".
+      - name: raw_lgbtqia_plus_sinan_autoprovocada_sexo
+        identifier: lgbt_viol_sinan_autoprovocada_sexo_sinan
+        description: Vítimas de violência autoprovocada por município e sexo (2024). Aba "Autoprovocada_Sexo_SINAN".
+      - name: raw_lgbtqia_plus_sinan_autoprovocada_faixa_etaria
+        identifier: lgbt_viol_sinan_autoprovocada_faixa_etaria
+        description: >
+          Vítimas de violência autoprovocada por município e faixa etária (2024).
+          Coluna de total tem o nome com typo: "total_com_indo". Aba "Autoprovocada_Faixa_Etária".
+      - name: raw_lgbtqia_plus_sinan_autoprovocada_cor_raca
+        identifier: lgbt_viol_sinan_autoprovocada_cor_ou_raca
+        description: Vítimas de violência autoprovocada por município e raça/cor (2024). Aba "Autoprovocada_Cor_ou_Raça".
+      - name: raw_lgbtqia_plus_sinan_violencias_orientacao_sexual
+        identifier: lgbt_viol_sinan_violencias_orientacao_sexual
+        description: >
+          Notificações por município, origem da agressão (interpessoal /
+          autoprovocada) e orientação sexual da vítima (2024). Aba
+          "Violências_Orientacao_Sexual".
+      - name: raw_lgbtqia_plus_sinan_violencias_identidade_genero
+        identifier: lgbt_viol_sinan_violencias_identidade_genero
+        description: >
+          Notificações por município, origem da agressão e identidade de
+          gênero da vítima (2024). Aba "Violencias_Identidade_Genero".
