@@ -1,0 +1,266 @@
+# Catálogo de indicadores — LGBTQIA+
+
+Guia de trabalho que liga cada **seção do relatório** à sua **fórmula**, à **aba do Excel** de
+origem, à **tabela `raw`** já ingerida e ao **modelo dbt** que a produz (ou "a fazer").
+
+Fonte de verdade: os 6 documentos nesta pasta.
+
+| Documento | Papel |
+|---|---|
+| `Cálculo_Indicadores_LGBTQIA+_Nacional_V2.docx` | Especificação dos cálculos — nível **Nacional** (Brasil) |
+| `Cálculo_Indicadores_LGBTQIA+_Estadual_V2.docx` | Especificação dos cálculos — nível **Estadual** (por UF) |
+| `Cálculo_Indicadores_LGBTQIA+_Municipal_V2.docx` | Especificação dos cálculos — nível **Municipal** |
+| `LGBTQIA - TEXTO BASE_FILTRO NACIONAL_V3.docx` | Template da narrativa do relatório (prosa com lacunas) — Nacional |
+| `LGBTQIA - TEXTO BASE_FILTRO ESTADUAL_V3.docx` | Idem — Estadual |
+| `LGBTQIA - TEXTO BASE_FILTRO MUNICIPAL_V3.docx` | Idem — Municipal |
+
+Os números **`X` / `X.Y`** são o **sumário do relatório**: `X` = seção, `X.Y` = subseção.
+O relatório é gerado nos 3 níveis geográficos; nem toda seção existe em todos (ver coluna N/E/M
+abaixo — **N**acional, **E**stadual, **M**unicipal).
+
+---
+
+## 1. Mapa de fontes — aba do Excel → tabela `raw`
+
+Os nomes de tabela são gerados automaticamente pela ingestão (`ingestion/ingest.py`),
+normalizados e truncados em 63 caracteres. Reconferir após nova carga com
+`python ingestion/ingest.py --tema lgbtqia_plus --ano <ano> --dry-run`.
+
+### Assistência social (`LGBTQIA_Assistência social_RMA_Censo SUAS_2017_2024.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| CRAS - Temas abordados | `lgbt_assist_social_rma_censo_suas_2017_202_cras_temas_abordados` |
+| Centros de Convivência - Temas | `lgbt_assist_social_rma_censo_suas_2017_202_de_convivencia_temas` |
+| Série atendimentos PAEFI | `lgbt_assist_social_rma_censo_suas_2017_2024_serie_atend_paefi` |
+| Atendim CREAS discri orient sex | `lgbt_assist_social_rma_censo_suas_2017_202_as_discri_orient_sex` |
+| Atendim CREAS discri ident gên | `lgbt_assist_social_rma_censo_suas_2017_202_eas_discri_ident_gen` |
+| Centros Pop | `lgbt_assist_social_rma_censo_suas_2017_2024_centros_pop` |
+| Unidades de Acolhimento 2024 | `lgbt_assist_social_rma_censo_suas_2017_202_idades_de_acolh_2024` |
+| dLocalizacao | *(não ingerida — vira seed `dim_municipio`)* |
+
+### Perfil / Registro Civil (`LGBTQIA_Perfil_PNS_Estatísticas Registro Civil_2019_2013_2023_V2.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| Pessoas_Orientacao_Sexo_Total | `lgbt_perfil_pns_estatisticas_registro_civi_as_orient_sexo_total` |
+| Pessoas_Faixa_Etaria | `lgbt_perfil_pns_estatisticas_registro_civi_v2_pessoas_fx_etaria` |
+| Pessoas_Cor_ou_Raça | `lgbt_perfil_pns_estatisticas_registro_civi_pessoas_cor_ou_raca` |
+| Pessoas_Area_Localidade | `lgbt_perfil_pns_estatisticas_registro_civi_soas_area_localidade` |
+| Pessoas_Estado_civil | `lgbt_perfil_pns_estatisticas_registro_civi_pessoas_estado_civil` |
+| Natureza_Jurídica_União | `lgbt_perfil_pns_estatisticas_registro_civi_ureza_juridica_uniao` |
+| Casamento_Mesmo_Sexo_Ano | `lgbt_perfil_pns_estatisticas_registro_civi_casam_mesmo_sexo_ano` |
+| Total_Casamentos_UF | `lgbt_perfil_pns_estatisticas_registro_civi_23_v2_total_casam_uf` |
+| Orientação sexual por UF | `lgbt_perfil_pns_estatisticas_registro_civi_orient_sexual_por_uf` |
+
+### Quantas são (`LGBTQIA_Quantas são_PNS_2019_Censo_2010_2022.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| Orientação sexual 2019 | `lgbt_quantas_sao_pns_2019_censo_2010_2022_orient_sexual_2019` |
+| Cônjuges do mesmo sexo 2022 | `lgbt_quantas_sao_pns_2019_censo_2010_2022_j_do_mesmo_sexo_2022` |
+| Censo_2010_Munic | `lgbt_quantas_sao_pns_2019_censo_2010_2022_censo_2010_munic` |
+| Censo_2010_UF | `lgbt_quantas_sao_pns_2019_censo_2010_2022_censo_2010_uf` |
+| Censo_2010_Reg | `lgbt_quantas_sao_pns_2019_censo_2010_2022_censo_2010_reg` |
+
+### Trabalho (`LGBTQIA_Trabalho_PNS_2019.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| Taxa de ocupação por orient sex | `lgbt_trab_pns_2019_taxa_de_ocup_por_orient_sex` |
+| Renda per capta | `lgbt_trab_pns_2019_renda_per_capta` |
+
+### Educação (`LGBTQIA_Educação_PNS_SAEB_2019_2021.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| Nível de instrução | `lgbt_educ_pns_saeb_2019_2021_nivel_de_instr` |
+| Projetos contra homofobia 2019 | `lgbt_educ_pns_saeb_2019_2021_projetos_contra_homofobia_2019` |
+| Projetos contra homofobia 2021 | `lgbt_educ_pns_saeb_2019_2021_projetos_contra_homofobia_2021` |
+| projeto_homofobia_local 2021 | `lgbt_educ_pns_saeb_2019_2021_projeto_homofobia_local_2021` |
+
+### Saúde / CNES (`LGBTQIA_Saúde_PNS_Cnes_2019_2025_V2.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| Autoavaliacao_saude_PNS | `lgbt_saude_pns_cnes_2019_2025_v2_autoavaliacao_saude_pns` |
+| Atividade_Esportiva_PNS | `lgbt_saude_pns_cnes_2019_2025_v2_atividade_esportiva_pns` |
+| Taxa_Depressao_PNS | `lgbt_saude_pns_cnes_2019_2025_v2_taxa_depressao_pns` |
+| Estabelecimento_CNES | `lgbt_saude_pns_cnes_2019_2025_v2_estabelecimento_cnes` |
+
+### Violência / ONDH (`LGBTQIA_Violência_ONDH_2020_2024.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| ONDH_Serie_Historica_2020_2024 | `lgbt_viol_ondh_2020_2024_ondh_serie_historica_2020_2024` |
+| ONDH_Sexo | `lgbt_viol_ondh_2020_2024_ondh_sexo` |
+| ONDH_Faixa_Etária | `lgbt_viol_ondh_2020_2024_ondh_fx_etaria` |
+| ONDH_Raca_Cor | `lgbt_viol_ondh_2020_2024_ondh_raca_cor` |
+| ONDH_Local | `lgbt_viol_ondh_2020_2024_ondh_local` |
+| ONDH_Relação_Suspeito | `lgbt_viol_ondh_2020_2024_ondh_rel_suspeito` |
+| ONDH_Tipo_de_Violação | `lgbt_viol_ondh_2020_2024_ondh_tipo_de_violacao` |
+| ONDH_Identidade_Genero | `lgbt_viol_ondh_2020_2024_ondh_ident_gen` |
+| ONDH_Orientacao_Sexual | `lgbt_viol_ondh_2020_2024_ondh_orient_sexual` |
+
+### Violência / SINAN (`LGBTQIA_Violências_Sinan_2015_2024.xlsx`)
+
+| Aba | Tabela `raw` |
+|---|---|
+| Notificações_2015_2024_SINAN | `lgbt_violencias_sinan_2015_2024_notif_2015_2024_sinan` |
+| Interpessoal_Local_Ocorrencia | `lgbt_violencias_sinan_2015_2024_interpessoal_local_ocorrencia` |
+| Autoprovocada_Local_Ocorrencia | `lgbt_violencias_sinan_2015_2024_autoprovocada_local_ocorrencia` |
+| Violências_Orientacao_Sexual | `lgbt_violencias_sinan_2015_2024_violencias_orient_sexual` |
+| Violencias_Identidade_Genero | `lgbt_violencias_sinan_2015_2024_violencias_ident_gen` |
+| Interpessoal_Sexo_SINAN | `lgbt_violencias_sinan_2015_2024_interpessoal_sexo_sinan` |
+| Interpessoal_Faixa_Etária_SINAN | `lgbt_violencias_sinan_2015_2024_interpessoal_fx_etaria_sinan` |
+| Interpessoal_Cor_ou_Raça | `lgbt_violencias_sinan_2015_2024_interpessoal_cor_ou_raca` |
+| Interpessoal-Tipos de violência | `lgbt_violencias_sinan_2015_2024_interpessoal_tipos_de_viol` |
+| Autoprovocada_Sexo_SINAN | `lgbt_violencias_sinan_2015_2024_autoprovocada_sexo_sinan` |
+| Autoprovocada_Faixa_Etária | `lgbt_violencias_sinan_2015_2024_autoprovocada_fx_etaria` |
+| Autoprovocada_Cor_ou_Raça | `lgbt_violencias_sinan_2015_2024_autoprovocada_cor_ou_raca` |
+| Interpessoal_Perfil_Agressor | `lgbt_violencias_sinan_2015_2024_interpessoal_perfil_agressor` |
+| ONDH - Identidade de gênero *(cópia dentro do arquivo SINAN)* | `lgbt_violencias_sinan_2015_2024_ondh_ident_de_gen` |
+
+---
+
+## 2. Catálogo por seção
+
+Legenda **N/E/M**: níveis em que a subseção existe (**N**acional, **E**stadual, **M**unicipal).
+"Modelo dbt" = "—" significa **a fazer**.
+
+### 1. População LGBTQIA+ no Brasil — `N E M`
+
+| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
+|---|---|---|---|
+| % de 18+ com orientação LGBTQIA+ = (homossexual + bissexual + outra) / pop. 18+ ×100 *(N e E; sem versão M)* | Orientação sexual 2019 | `..._orient_sexual_2019` | — |
+| Nº absoluto de cônjuges/companheiros(as) do mesmo sexo — Censo 2010 | Censo_2010_Reg (N) / Censo_2010_UF (E) / Censo_2010_Munic (M) | `..._censo_2010_reg` / `_uf` / `_munic` | — |
+| Nº absoluto de cônjuges do mesmo sexo — 2022 | Cônjuges do mesmo sexo 2022 | `..._j_do_mesmo_sexo_2022` | — |
+| Estimativa "ao menos N mil pessoas" = soma 2010 (×2) + 2022 | Cônjuges do mesmo sexo 2022 | idem | — |
+
+### 2. Perfil das pessoas LGBTQIA+ — `N E M`
+
+**2.0 (abre a seção)** — % do total da população por orientação sexual X = total da orientação X / total com info de orientação ×100
+· aba `Pessoas_Orientacao_Sexo_Total` → `..._as_orient_sexo_total` *(N)*.
+No **E**: "Número percentual por tipo X de orientação sexual" · aba `Orientação sexual por UF` → `..._orient_sexual_por_uf`.
+
+| Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E/M | Modelo dbt |
+|---|---|---|---|---|---|
+| 2.1 | % de pessoas da orientação X que são do sexo Y = total orient. X / total do sexo Y na mesma orient. ×100 | Pessoas_Orientacao_Sexo_Total | `..._as_orient_sexo_total` | N | — |
+| 2.2 | % por faixa etária Y, dentro da orientação X | Pessoas_Faixa_Etaria | `..._v2_pessoas_fx_etaria` | N | — |
+| 2.3 | % por cor/raça Y, dentro da orientação X | Pessoas_Cor_ou_Raça | `..._pessoas_cor_ou_raca` | N | — |
+| 2.4 | % por área (urbana/rural) Y, dentro da orientação X | Pessoas_Area_Localidade | `..._soas_area_localidade` | N | — |
+| 2.5 | % por estado civil X, dentro da orientação Y | Pessoas_Estado_civil | `..._pessoas_estado_civil` | N | — |
+| 2.5 | % por natureza jurídica da união X, dentro da orientação Y | Natureza_Jurídica_União | `..._ureza_juridica_uniao` | N | — |
+| 2.5 | Nº absoluto de casamentos entre pessoas do mesmo sexo por ano (2013, 2023); total lesbohomoafetivo = entre mulheres + entre homens | Casamento_Mesmo_Sexo_Ano | `..._casam_mesmo_sexo_ano` | N E M | — |
+| 2.5 | % de variação 2013→2023 = (uniões 2023 − uniões 2013) / uniões 2013 ×100 | Casamento_Mesmo_Sexo_Ano | idem | N E M | — |
+| 2.5 | % de casamentos por gênero em 2023 = casamentos do gênero X / total geral lesbohomoafetivos 2023 ×100 | Casamento_Mesmo_Sexo_Ano | idem | N E M | — |
+| 2.5 | % de casamentos do mesmo sexo por estado = registros do mesmo sexo na UF X / total geral de matrimônios na UF X ×100 | Casamento_Mesmo_Sexo_Ano | idem | N | — |
+| 2.5 | % de casamentos lesbohomoafetivos por UF = lesbohomoafetivos na UF X / total de casamentos entre cônjuges na mesma UF ×100 | Total_Casamentos_UF | `..._23_v2_total_casam_uf` | N | — |
+| 2.6 | **População Trans** — percentuais fixos no texto, **sem base de dados** ("Sinalização CGTI") | — | — | N | n/a |
+
+> No corpo dos docs Estadual e Municipal essa subseção aparece renumerada como **"2.1. Casamentos e uniões"** (o índice mantém 2.5). Tratar como a mesma coisa.
+
+### 3. Trabalho e renda — `N` apenas (E e M = "Sem dados")
+
+| Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
+|---|---|---|---|---|
+| 3.0 | % total Brasil por orientação sexual, 18+ | Taxa de ocupação por orient sex | `lgbt_trab_pns_2019_taxa_de_ocup_por_orient_sex` | — |
+| 3.0 | % 18+ por orientação sexual com renda per capita > 5 salários mínimos | Renda per capta | `lgbt_trab_pns_2019_renda_per_capta` | — |
+| 3.1 | **Pessoas Trans** — destaque de estudo do Ipea (2025), **sem base de dados** ("Sinalização CGTI") | — | — | n/a |
+
+### 4. Educação — `N E` (M = "Sem dados")
+
+| Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E | Modelo dbt |
+|---|---|---|---|---|---|
+| 4.0 | % por orientação sexual e nível de instrução | Nível de instrução | `lgbt_educ_pns_saeb_2019_2021_nivel_de_instr` | N | — |
+| 4.0 | "O Censo Trans" — destaque **sem base de dados** ("Sinalização CGTI") | — | — | N | n/a |
+| 4.1 | % de escolas com projeto contra LGBTQIAfobia = possui projeto / total (2021) ou / total com informação (2019) ×100 | Projetos contra homofobia 2021 / 2019 | `..._projetos_contra_homofobia_2021` / `_2019` | N E | — |
+| 4.1 | maior/menor % de escolas com projeto, por desagregação | Projetos contra homofobia 2021 | `..._projetos_contra_homofobia_2021` | N | — |
+| 4.1 | % de escolas com projeto por localização (urbana/rural) = escolas com projeto / total com info ×100 | projeto_homofobia_local 2021 | `..._projeto_homofobia_local_2021` | N | — |
+
+### 5. Saúde — `N E` (M = "Sem dados")
+
+| Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E | Modelo dbt |
+|---|---|---|---|---|---|
+| 5.0 | % por tipo de autoavaliação da saúde, por orientação sexual (junta "muito boa+boa", "muito ruim+ruim") | Autoavaliacao_saude_PNS | `..._autoavaliacao_saude_pns` | N | — |
+| 5.0 | % por autoavaliação x atividade esportiva, por orientação sexual | Atividade_Esportiva_PNS | `..._atividade_esportiva_pns` | N | — |
+| 5.0 | % com/sem diagnóstico de depressão, por orientação sexual | Taxa_Depressao_PNS | `..._taxa_depressao_pns` | N | — |
+| 5.1 | Nº de estabelecimentos no país/estado | Estabelecimento_CNES | `..._estabelecimento_cnes` | N E | — |
+| 5.1 | Nº de estabelecimentos com habilitação ambulatorial / hospitalar / ambos | Estabelecimento_CNES | idem | N E | — |
+| 5.1 | contagem de estados com habilitação hospitalar / só ambulatorial / sem nenhuma | Estabelecimento_CNES | idem | N | — |
+
+### 6. Assistência social — `N E M`
+
+**6.0 (abre a seção)** — cobertura de CRAS e Centros de Convivência (Serviço de Convivência):
+
+| Indicador (resumo) | Aba Excel | Tabela `raw` | N/E/M | Modelo dbt |
+|---|---|---|---|---|
+| % de CRAS que abordaram frequentemente orientação sexual/identidade de gênero = abordaram / ofertavam SCFV ×100 (também por UF) | CRAS - Temas abordados | `..._cras_temas_abordados` | N E | — |
+| % de Centros de Convivência que abordaram o tema = abordaram / total de Centros ×100 (também por UF) | Centros de Convivência - Temas | `..._de_convivencia_temas` | N E | — |
+
+**6.1. Proteção social especial** — `N E M` — ✅ **PILOTO IMPLEMENTADO**
+
+| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
+|---|---|---|---|
+| Nº de vítimas de discriminação por orientação sexual que ingressaram no PAEFI (soma; série 2017–2024 no M) | Série atendimentos PAEFI | `..._serie_atend_paefi` | `stg_lgbtqia_plus_paefi` → `int_lgbtqia_plus_paefi_por_municipio` |
+| Nº total de CREAS | Atendim CREAS discri orient sex | `..._as_discri_orient_sex` | `stg_lgbtqia_plus_creas_discriminacao_orientacao` |
+| % de CREAS que **não** atendem discriminação por orientação sexual = não atende / total de CREAS ×100 | Atendim CREAS discri orient sex | idem | `int_lgbtqia_plus_creas_orientacao_por_municipio` (valida contra o % da planilha em `tests/`) |
+| % de CREAS que **não** atendem discriminação por identidade de gênero = não atende / total de CREAS ×100 | Atendim CREAS discri ident gên | `..._eas_discri_ident_gen` | `int_lgbtqia_plus_creas_identidade_por_municipio` (idem) |
+| Nº total de Centros POP | Centros Pop | `..._centros_pop` | `stg_lgbtqia_plus_centros_pop` |
+| % de Centros POP que atenderam LGBTQIA+ = atenderam / total ×100 | Centros Pop | idem | `int_lgbtqia_plus_centros_pop_por_municipio` |
+| % de unidades de acolhimento com pessoas trans/travestis = "possui (Sim)" / "possui (Sim + Não)" ×100 | Unidades de Acolhimento 2024 | `..._idades_de_acolh_2024` | `int_lgbtqia_plus_acolhimento_por_municipio` |
+| Nº de pessoas trans/travestis acolhidas (soma) | Unidades de Acolhimento 2024 | idem | idem |
+
+Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
+
+### 7. Violência contra pessoas LGBTQIA+ — `N E M`
+
+**7.0 (abre a seção — base SINAN)**:
+
+| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
+|---|---|---|---|
+| Soma de denúncias 2024 (`qtd_denuncias_2024`) | Notificações_2015_2024_SINAN | `..._notif_2015_2024_sinan` | — |
+| % de notificações por tipo (interpessoal / autoprovocada / origem desconhecida) sobre o total com info, 2024 | Notificações_2015_2024_SINAN | idem | — |
+| Série do total de notificações por ano (2015–2024) | Notificações_2015_2024_SINAN | idem | — |
+| % de municípios com ≥1 notificação em 2024 (÷ 5570 no N; ÷ total do estado no E/M) | Notificações_2015_2024_SINAN | idem | — |
+| Maior % de local de ocorrência (interpessoal / autoprovocada) | Interpessoal_Local_Ocorrencia / Autoprovocada_Local_Ocorrencia | `..._interpessoal_local_ocorrencia` / `..._autoprovocada_local_ocorrencia` | — |
+| % de notificações por origem da agressão × orientação sexual | Violências_Orientacao_Sexual | `..._violencias_orient_sexual` | — |
+| % de notificações por origem da agressão × identidade de gênero | Violencias_Identidade_Genero | `..._violencias_ident_gen` | — |
+| Perfil das vítimas (interpessoal): sexo / faixa etária / raça-cor | Interpessoal_Sexo_SINAN · Interpessoal_Faixa_Etária_SINAN · Interpessoal_Cor_ou_Raça | `..._interpessoal_sexo_sinan` · `..._interpessoal_fx_etaria_sinan` · `..._interpessoal_cor_ou_raca` | — |
+| Perfil das vítimas (autoprovocada): sexo / faixa etária / raça-cor | Autoprovocada_Sexo_SINAN · Autoprovocada_Faixa_Etária · Autoprovocada_Cor_ou_Raça | `..._autoprovocada_sexo_sinan` · `..._autoprovocada_fx_etaria` · `..._autoprovocada_cor_ou_raca` | — |
+| 10 maiores % de tipo de agressor (interpessoal) | Interpessoal_Perfil_Agressor | `..._interpessoal_perfil_agressor` | — |
+| *(aba ingerida, sem indicador citado)* tipos de violência interpessoal | Interpessoal-Tipos de violência | `..._interpessoal_tipos_de_viol` | — |
+
+**7.1. Denúncias de violações de direitos humanos (ONDH)** — `N E M`:
+
+| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
+|---|---|---|---|
+| Total de denúncias 2020–2024 (soma `qtd_denuncias_2020..2024`) | ONDH_Serie_Historica_2020_2024 | `lgbt_viol_ondh_2020_2024_ondh_serie_historica_2020_2024` | — |
+| Nº absoluto de denúncias e de violações, por ano | ONDH_Serie_Historica_2020_2024 | idem | — |
+| % de estados por maior nº de denúncias em 2024 | ONDH_Serie_Historica_2020_2024 | idem | — |
+| % de denúncias por sexo X | ONDH_Sexo | `..._ondh_sexo` | — |
+| % de denúncias por faixa etária X (junta "até 29" e "idosos") | ONDH_Faixa_Etária | `..._ondh_fx_etaria` | — |
+| % de denúncias por raça/cor (junta pretas + pardas = negras) | ONDH_Raca_Cor | `..._ondh_raca_cor` | — |
+| % de local de ocorrência das violações | ONDH_Local | `..._ondh_local` | — |
+| 10 maiores % por tipo de relação do suspeito | ONDH_Relação_Suspeito | `..._ondh_rel_suspeito` | — |
+| % por tipo de violação X | ONDH_Tipo_de_Violação | `..._ondh_tipo_de_violacao` | — |
+| % por tipo de identidade de gênero X | ONDH_Identidade_Genero | `..._ondh_ident_gen` | — |
+| % por tipo de orientação sexual X | ONDH_Orientacao_Sexual | `..._ondh_orient_sexual` | — |
+
+---
+
+## 3. Situação atual
+
+- ✅ **6.1 Proteção social especial** — modelada nos 3 níveis (piloto). Ver `transform/models/*/lgbtqia_plus/`.
+- ⬜ Todas as demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
+- Ordem sugerida pela equipe (README): próximas mais "limpas" são **2.5** (Casamentos e uniões) e **5.1** (Serviços de saúde para pessoas trans).
+
+## 4. Observações e inconsistências
+
+- **"Sinalização CGTI"** = indicador que fica no relatório como texto fixo, **sem cálculo nem base de dados** (2.6 População Trans; 3.1 Pessoas Trans; "O Censo Trans" em 4). Não vira modelo dbt.
+- **Renumeração 2.5 ↔ 2.1**: nos docs Estadual/Municipal a subseção "Casamentos e uniões" aparece como "2.1" no corpo, mas "2.5" no índice. É a mesma subseção.
+- **"7. Violência contra pessoas idosas"**: título no índice/corpo dos docs Estadual e Municipal — resíduo de copiar do relatório de Pessoa Idosa. O conteúdo é de LGBTQIA+.
+- **Aba "ONDH - Identidade de gênero" dentro do arquivo SINAN**: duplica parte do arquivo ONDH separado. Ingerida como `lgbt_violencias_sinan_2015_2024_ondh_ident_de_gen`. Confirmar com a equipe se é intencional.
+- **Nomes de aba divergentes entre "V2" e o citado nos docs**: ex. doc diz "Unidade de Acolhimento 2024" (singular) e "Unidades de Acolhimento 2024" (plural) na mesma página; "Conjuges" vs "Cônjuges". Usar sempre o nome real da aba no arquivo `.xlsx`.
+- **Ano de referência**: alguns docs dizem "2024" onde a planilha traz série histórica (PAEFI 2017–2024). O piloto 6.1 usa o ano mais recente por município e deixou TODO para a equipe confirmar se o relatório quer o valor pontual ou a série.
+- As 11 inconsistências mencionadas no README vêm deste conjunto de observações + do catálogo original da equipe.

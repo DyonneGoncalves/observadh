@@ -22,7 +22,9 @@ observadh/
     └── tests/            # testes customizados de validação (fonte vs. calculado)
 ```
 
-Ver a proposta completa de arquitetura em `proposta-arquitetura-observadh.md` (na raiz do projeto Claude) para o racional por trás dessas decisões. Ver também o catálogo de indicadores do LGBTQIA+ (`catalogo-indicadores-lgbtqia.md`, também no projeto Claude) para o mapeamento completo fórmula → aba → categoria, incluindo 11 inconsistências encontradas nos documentos-fonte que ainda precisam de decisão da equipe.
+Ver a proposta completa de arquitetura em `proposta-arquitetura-observadh.md` (na raiz do projeto Claude) para o racional por trás dessas decisões.
+
+O mapeamento completo **seção do relatório → fórmula → aba do Excel → tabela `raw` → modelo dbt** está em [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md), junto com os 6 documentos-fonte da equipe (3 de cálculo + 3 de texto-base do relatório) e as inconsistências pendentes de decisão.
 
 ## Como rodar um ciclo (quando os dados do tema estiverem prontos)
 
