@@ -18,7 +18,7 @@ observadh/
     ├── models/
     │   ├── staging/       # 1 modelo por aba/planilha de origem — limpeza e tipagem, sem regra de negócio
     │   ├── intermediate/  # cálculo dos indicadores
-    │   └── marts/         # tabelas finais: <tema>_relatorio_nacional / _estadual / _municipal
+    │   └── marts/         # tabela final única lgbtqia_plus_indicadores (formato longo) + 3 views por nível
     └── tests/            # testes customizados de validação (fonte vs. calculado)
 ```
 
@@ -54,7 +54,7 @@ copiado para `~/.dbt/profiles.yml`.
 
 - [x] **Todas as 8 planilhas ingeridas** — 54 tabelas no schema `raw` (toda aba de todo arquivo), 234.557 linhas, via descoberta automática (`ingestion/ingest.py`)
 - [x] Sources dbt (`_lgbtqia_plus__sources.yml`) — apontam para o schema `raw` via `identifier`
-- [x] **Seção 6.1 — Proteção Social Especial** (piloto) — staging + intermediate + marts nos 3 níveis, no **formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`). Testes de validação contra o % pré-calculado da planilha. *A migrar para o formato longo.*
+- [x] **Seção 6.1 — Proteção Social Especial** (piloto) — nos 3 níveis, migrada para o **formato longo** (`int_lgbtqia_plus_6_1_protecao_social_especial`). Testes contra o % pré-calculado da planilha.
 - [x] **Formato longo** — mart único `lgbtqia_plus_indicadores` (uma linha por nivel × recorte × seção × indicador × categoria) + views `_nacional`/`_estadual`/`_municipal`. Cada (sub)seção é um `int_lgbtqia_plus_<secao>_*`.
 - [x] **Seção 5.1 — Serviços de saúde para pessoas trans** (N, E) no formato longo. Validada contra a planilha de cálculo da equipe.
 - [x] **Seção 2.5 — Casamentos e uniões** (N, E, M; parte PNS só N) no formato longo. Validada contra a planilha de cálculo e contra o texto-base do relatório.
@@ -62,6 +62,5 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Seção 7.1 — Denúncias de violações de DH (ONDH)** (N, E, M) no formato longo. Validada contra a planilha de cálculo. Falta local e relação do suspeito.
 - [x] **Seção 7.0 — Notificações de violência (SINAN)** (N, E, M) no formato longo. Validada. Falta local e perfil do agressor.
 - [x] **Seções 1, 2.0–2.4 e 3 — População, Perfil e Trabalho (PNS 2019 / Censo)** no formato longo. Validadas contra a planilha de cálculo e o texto-base.
-- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde (57 nós). `lgbtqia_plus_indicadores` com ~412k linhas — **8 das 8 seções do relatório** (falta só migrar a 6.1).
-- [ ] Migrar a **6.1** do formato largo para o `lgbtqia_plus_indicadores`; extras adiados de 7.0/7.1 (local, agressor, relação do suspeito). Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
-- [ ] Migrar a 6.1 do formato largo para o `lgbtqia_plus_indicadores`.
+- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde (47 nós). **`lgbtqia_plus_indicadores`: ~437k linhas, as 8 seções do relatório no formato longo.**
+- [ ] Extras adiados: 7.0 (local de ocorrência, perfil do agressor), 7.1 (local, relação do suspeito), 2.5 ("% casamentos mesmo sexo por estado"). Seção 6 não-6.1 (temas em CRAS/Centros de Convivência) ainda sem indicador. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).

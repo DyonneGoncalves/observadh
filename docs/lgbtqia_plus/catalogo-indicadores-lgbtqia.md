@@ -258,7 +258,7 @@ Validação: `tests/lgbtqia_plus_5_1_valores_nacionais.sql` (contra a planilha d
 | % de CRAS que abordaram frequentemente orientação sexual/identidade de gênero = abordaram / ofertavam SCFV ×100 (também por UF) | CRAS - Temas abordados | `lgbt_assist_social_cras_temas_abordados` | N E | — |
 | % de Centros de Convivência que abordaram o tema = abordaram / total de Centros ×100 (também por UF) | Centros de Convivência - Temas | `lgbt_assist_social_centros_de_convivencia_temas` | N E | — |
 
-**6.1. Proteção social especial** — `N E M` — ✅ **PILOTO IMPLEMENTADO**
+**6.1. Proteção social especial** — `N E M` — ✅ **MODELADA (formato longo)**
 
 | Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
 |---|---|---|---|
@@ -271,7 +271,7 @@ Validação: `tests/lgbtqia_plus_5_1_valores_nacionais.sql` (contra a planilha d
 | % de unidades de acolhimento com pessoas trans/travestis = "possui (Sim)" / "possui (Sim + Não)" ×100 | Unidades de Acolhimento 2024 | `lgbt_assist_social_unidades_de_acolhimento_2024` | `int_lgbtqia_plus_acolhimento_por_municipio` |
 | Nº de pessoas trans/travestis acolhidas (soma) | Unidades de Acolhimento 2024 | idem | idem |
 
-Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
+Reagrupada no formato longo por `int_lgbtqia_plus_6_1_protecao_social_especial` (a partir dos 5 `int_lgbtqia_plus_*_por_municipio`, que seguem sendo o ponto de cálculo). Indicadores: `vitimas_paefi`, `creas_total`, `creas_nao_atende_orientacao`/`_identidade` (+ `pct_...`), `centros_pop_total` (+ `pct_centros_pop_atenderam_lgbtqia`), `unidades_acolhimento_total`, `pct_unidades_acolhimento_com_pessoas_trans`, `pessoas_acolhidas_total`, `pessoas_trans_acolhidas_total`. Validação: `tests/lgbtqia_plus_6_1_valores.sql` + `tests/lgbtqia_plus_valida_pct_creas_{orientacao,identidade}.sql`.
 
 ### 7. Violência contra pessoas LGBTQIA+ — `N E M`
 
@@ -331,7 +331,7 @@ para as quebras). Validação: `tests/lgbtqia_plus_7_1_valores.sql`.
 - ✅ **5.1 Serviços de saúde para pessoas trans** — N, E, formato longo.
 - ✅ **7.0 Notificações de violência (SINAN)** — N/E/M, formato longo (falta local e perfil do agressor).
 - ✅ **7.1 Denúncias de violações de DH (ONDH)** — N/E/M, formato longo (falta local e relação do suspeito).
-- ✅ **6.1 Proteção social especial** — N/E/M (piloto). Ainda no **formato largo** (`lgbtqia_plus_relatorio_*`). A migrar para o formato longo.
+- ✅ **6.1 Proteção social especial** — N/E/M, formato longo (`int_lgbtqia_plus_6_1_protecao_social_especial`).
 - ✅ **3 Trabalho e renda** — só N, formato longo.
 - ⬜ **2.6 / 3.1 / "Censo Trans"** — sem base de dados ("Sinalização CGTI"), não viram modelo.
 
