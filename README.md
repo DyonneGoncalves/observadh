@@ -55,7 +55,9 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Todas as 8 planilhas ingeridas** — 54 tabelas no schema `raw` (toda aba de todo arquivo), 234.557 linhas, via descoberta automática (`ingestion/ingest.py`)
 - [x] Sources dbt (`_lgbtqia_plus__sources.yml`) — apontam para o schema `raw` via `identifier`
 - [x] **Seção 6.1 — Proteção Social Especial** (piloto) — staging + intermediate + marts nos 3 níveis, no **formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`). Testes de validação contra o % pré-calculado da planilha. *A migrar para o formato longo.*
-- [x] **Seção 5.1 — Serviços de saúde para pessoas trans** (N e E) — no **formato longo**: mart único `lgbtqia_plus_indicadores` (uma linha por nivel × recorte × seção × indicador × categoria) + views `_nacional`/`_estadual`/`_municipal`. Validada contra a planilha de cálculo da equipe.
+- [x] **Formato longo** — mart único `lgbtqia_plus_indicadores` (uma linha por nivel × recorte × seção × indicador × categoria) + views `_nacional`/`_estadual`/`_municipal`. Cada (sub)seção é um `int_lgbtqia_plus_<secao>_*`.
+- [x] **Seção 5.1 — Serviços de saúde para pessoas trans** (N, E) no formato longo. Validada contra a planilha de cálculo da equipe.
+- [x] **Seção 2.5 — Casamentos e uniões** (N, E, M; parte PNS só N) no formato longo. Validada contra a planilha de cálculo e contra o texto-base do relatório.
 - [x] `dbt build --select tag:lgbtqia_plus` — tudo verde.
-- [ ] Modelar as demais seções (2.5, 4.1, 7/7.1, 1, 2, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
+- [ ] Modelar as demais seções (4.1, 7/7.1, 1, 2, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
 - [ ] Migrar a 6.1 do formato largo para o `lgbtqia_plus_indicadores`.

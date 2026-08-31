@@ -13,7 +13,8 @@
 
 select * from {{ ref('int_lgbtqia_plus_5_1_servicos_saude_trans') }}
 
-{# Próximas seções: acrescentar aqui como
-   union all
-   select * from {{ ref('int_lgbtqia_plus_2_5_casamentos_e_unioes') }}
-   (comentário Jinja — não vira dependência) #}
+union all
+select * from {{ ref('int_lgbtqia_plus_2_5_casamentos_registro_civil') }}
+
+union all
+select * from {{ ref('int_lgbtqia_plus_2_5_perfil_conjugal_pns') }}

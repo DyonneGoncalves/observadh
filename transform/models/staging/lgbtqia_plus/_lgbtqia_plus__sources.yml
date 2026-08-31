@@ -60,3 +60,34 @@ sources:
           atenção a pessoas trans (ambulatorial e/ou hospitalar), CNES 2025.
           Aba "Estabelecimento_CNES". Grão = 1 linha por estabelecimento; UFs
           sem serviço aparecem como 1 linha com tipo_de_habilitacao = 'Não possui'.
+
+      # --- 2 / 2.5 — Perfil / Casamentos e uniões ---
+      - name: raw_lgbtqia_plus_casamento_mesmo_sexo_ano
+        identifier: lgbt_perfil_pns_est_reg_civil_casamento_mesmo_sexo_ano
+        description: >
+          Registros de casamento entre pessoas do mesmo sexo por município e
+          ano (colunas 2013..2023). Grão = 1 linha por município x categoria
+          ("Casamentos entre homens" / "Casamentos entre mulheres"). Aba
+          "Casamento_Mesmo_Sexo_Ano".
+
+      - name: raw_lgbtqia_plus_total_casamentos_uf
+        identifier: lgbt_perfil_pns_est_reg_civil_total_casamentos_uf
+        description: >
+          Por UF: total de casamentos entre cônjuges masculino/feminino e total
+          de casamentos lesbohomoafetivos. ano_de_referencia = 2022, mas o total
+          lesbohomoafetivo bate com a soma de 2023 de Casamento_Mesmo_Sexo_Ano
+          (inconsistência a confirmar com a equipe). Aba "Total_Casamentos_UF".
+
+      - name: raw_lgbtqia_plus_pessoas_estado_civil
+        identifier: lgbt_perfil_pns_est_reg_civil_pessoas_estado_civil
+        description: >
+          PNS 2019: população por estado civil (casado/divorciado/viúvo/solteiro)
+          e orientação sexual. Grão = 1 linha por orientação (Brasil). Aba
+          "Pessoas_Estado_civil".
+
+      - name: raw_lgbtqia_plus_natureza_juridica_uniao
+        identifier: lgbt_perfil_pns_est_reg_civil_natureza_juridica_uniao
+        description: >
+          PNS 2019: população por natureza jurídica da união (casamento civil /
+          união estável) e orientação sexual. Grão = 1 linha por orientação
+          (Brasil). Aba "Natureza_Jurídica_União".

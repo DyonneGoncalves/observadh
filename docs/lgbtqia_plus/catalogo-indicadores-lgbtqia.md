@@ -158,17 +158,33 @@ No **E**: "Número percentual por tipo X de orientação sexual" · aba `Orienta
 | 2.2 | % por faixa etária Y, dentro da orientação X | Pessoas_Faixa_Etaria | `..._pessoas_faixa_etaria` | N | — |
 | 2.3 | % por cor/raça Y, dentro da orientação X | Pessoas_Cor_ou_Raça | `..._pessoas_cor_ou_raca` | N | — |
 | 2.4 | % por área (urbana/rural) Y, dentro da orientação X | Pessoas_Area_Localidade | `..._pessoas_area_localidade` | N | — |
-| 2.5 | % por estado civil X, dentro da orientação Y | Pessoas_Estado_civil | `..._pessoas_estado_civil` | N | — |
-| 2.5 | % por natureza jurídica da união X, dentro da orientação Y | Natureza_Jurídica_União | `..._natureza_juridica_uniao` | N | — |
-| 2.5 | Nº absoluto de casamentos entre pessoas do mesmo sexo por ano (2013, 2023); total lesbohomoafetivo = entre mulheres + entre homens | Casamento_Mesmo_Sexo_Ano | `..._casamento_mesmo_sexo_ano` | N E M | — |
-| 2.5 | % de variação 2013→2023 = (uniões 2023 − uniões 2013) / uniões 2013 ×100 | Casamento_Mesmo_Sexo_Ano | idem | N E M | — |
-| 2.5 | % de casamentos por gênero em 2023 = casamentos do gênero X / total geral lesbohomoafetivos 2023 ×100 | Casamento_Mesmo_Sexo_Ano | idem | N E M | — |
-| 2.5 | % de casamentos do mesmo sexo por estado = registros do mesmo sexo na UF X / total geral de matrimônios na UF X ×100 | Casamento_Mesmo_Sexo_Ano | idem | N | — |
-| 2.5 | % de casamentos lesbohomoafetivos por UF = lesbohomoafetivos na UF X / total de casamentos entre cônjuges na mesma UF ×100 | Total_Casamentos_UF | `..._total_casamentos_uf` | N | — |
 | 2.6 | **População Trans** — percentuais fixos no texto, **sem base de dados** ("Sinalização CGTI") | — | — | N | n/a |
 
 > `..._` = prefixo `lgbt_perfil_pns_est_reg_civil_`.
-> No corpo dos docs Estadual e Municipal essa subseção aparece renumerada como **"2.1. Casamentos e uniões"** (o índice mantém 2.5). É a mesma coisa.
+
+**2.5. Casamentos e uniões** — ✅ **MODELADA (formato longo)**
+
+| `indicador` (slug) | `categoria` | fórmula | N/E/M | `valor_tipo` |
+|---|---|---|---|---|
+| `casamentos_mesmo_sexo_total_ano` | ano `2013`..`2023` | soma (entre homens + entre mulheres) no recorte/ano | N E M | numero_absoluto |
+| `variacao_casamentos_mesmo_sexo_13_23` | — | (total 2023 − total 2013) / total 2013 ×100 | N E M | variacao_percentual |
+| `pct_casamentos_mesmo_sexo_por_genero_23` | `Casamentos entre homens` / `... mulheres` | gênero / total do recorte em 2023 ×100 | N E M | percentual |
+| `pct_casamentos_lesbohomoafetivos` | — | lesbohomoafetivos / casamentos masc-fem ×100 (Total_Casamentos_UF, ano_ref 2022) | N E | percentual |
+| `pct_estado_civil_por_orientacao` | `<orientação> / <estado civil>` | estado civil / total com info da orientação ×100 (PNS 2019) | N | percentual |
+| `pct_natureza_juridica_por_orientacao` | `<orientação> / <natureza>` | natureza / total com info da orientação ×100 (PNS 2019) | N | percentual |
+
+Abas → tabelas `raw`: `Casamento_Mesmo_Sexo_Ano` → `..._casamento_mesmo_sexo_ano`;
+`Total_Casamentos_UF` → `..._total_casamentos_uf`; `Pessoas_Estado_civil` →
+`..._pessoas_estado_civil`; `Natureza_Jurídica_União` → `..._natureza_juridica_uniao`.
+Modelos: `stg_lgbtqia_plus_{casamentos_mesmo_sexo, total_casamentos_uf, pessoas_estado_civil,
+natureza_juridica_uniao}` → `int_lgbtqia_plus_2_5_{casamentos_registro_civil, perfil_conjugal_pns}`
+→ `lgbtqia_plus_indicadores`. Validação: `tests/lgbtqia_plus_2_5_valores.sql`.
+
+Ainda **não modelado** da 2.5: "% de casamentos do mesmo sexo por estado" (indicador
+nacional que se sobrepõe a `pct_casamentos_lesbohomoafetivos` e tem denominador ambíguo —
+confirmar com a equipe).
+
+> No corpo dos docs Estadual e Municipal a subseção aparece renumerada como **"2.1. Casamentos e uniões"** (o índice mantém 2.5). É a mesma coisa.
 
 ### 3. Trabalho e renda — `N` apenas (E e M = "Sem dados")
 
@@ -275,6 +291,7 @@ Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
 
 - ✅ **6.1 Proteção social especial** — modelada nos 3 níveis (piloto). **Formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`, uma coluna por indicador). A migrar para o formato longo.
 - ✅ **5.1 Serviços de saúde para pessoas trans** — modelada (N e E) no **formato longo**.
+- ✅ **2.5 Casamentos e uniões** — modelada (N/E/M; PNS só N) no **formato longo**.
 - ⬜ Demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
 
 ### Formato longo — `lgbtqia_plus_indicadores`

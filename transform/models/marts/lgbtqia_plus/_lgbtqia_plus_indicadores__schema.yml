@@ -20,13 +20,19 @@ models:
         tests:
           - not_null
       - name: valor
+        description: >
+          Numérico. NULL quando o indicador não é calculável para o recorte
+          (ex.: variação ou % com denominador zero — município sem casamentos
+          em 2013). Linhas de numero_absoluto nunca são NULL.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: "valor_tipo = 'numero_absoluto'"
       - name: valor_tipo
         tests:
           - accepted_values:
               arguments:
-                values: ["numero_absoluto", "percentual", "variacao_pp"]
+                values: ["numero_absoluto", "percentual", "variacao_percentual"]
 
   - name: lgbtqia_plus_indicadores_nacional
     description: Recorte nacional (nivel = 'nacional') do mart longo.
