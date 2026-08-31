@@ -137,28 +137,34 @@ da aba, só normalizado. Reconferir após nova carga com
 Legenda **N/E/M**: níveis em que a subseção existe (**N**acional, **E**stadual, **M**unicipal).
 "Modelo dbt" = "—" significa **a fazer**.
 
-### 1. População LGBTQIA+ no Brasil — `N E M`
+### 1. População LGBTQIA+ no Brasil — ✅ **MODELADA (formato longo)**
 
-| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
+Modelo: `int_lgbtqia_plus_1_populacao`. Validação: `tests/lgbtqia_plus_1_2_valores.sql`.
+
+| `indicador` (slug) | `categoria` | fórmula | N/E/M | esperado (nacional) |
+|---|---|---|---|---|
+| `pct_populacao_lgbtqia_18_mais` | — | (homossexual + bissexual + outra) / total ×100 (E: soma das 3 colunas de % de `Orientação sexual por UF`) | N E | 1,89% |
+| `conjuges_mesmo_sexo_2010` | — | nº absoluto, Censo 2010 (`Censo_2010_Reg` linha Brasil / `Censo_2010_UF`) | N E | 60.035 |
+| `conjuges_mesmo_sexo_2022` | — | nº absoluto, Censo 2022 (`Cônjuges do mesmo sexo 2022`; "-" = 0) | N E M | 391.080 |
+| `pessoas_uniao_mesmo_sexo_estimativa` | — | cônjuges 2022 × 2 | N | 782.160 |
+
+### 2. Perfil das pessoas LGBTQIA+ — ✅ **MODELADA (2.0–2.4, formato longo)**
+
+Modelo: `int_lgbtqia_plus_2_perfil_pns`. Só nível **NACIONAL** (PNS 2019). Cálculo linha
+a linha (categoria da orientação X / total da orientação X). Validação: `tests/lgbtqia_plus_1_2_valores.sql`.
+
+| `indicador` (slug) | `categoria` | Aba Excel | esperado (nacional) |
 |---|---|---|---|
-| % de 18+ com orientação LGBTQIA+ = (homossexual + bissexual + outra) / pop. 18+ ×100 *(N e E; sem versão M)* | Orientação sexual 2019 | `lgbt_quantas_sao_pns_censo_orientacao_sexual_2019` | — |
-| Nº absoluto de cônjuges/companheiros(as) do mesmo sexo — Censo 2010 | Censo_2010_Reg (N) / Censo_2010_UF (E) / Censo_2010_Munic (M) | `lgbt_quantas_sao_pns_censo_censo_2010_reg` / `_uf` / `_munic` | — |
-| Nº absoluto de cônjuges do mesmo sexo — 2022 | Cônjuges do mesmo sexo 2022 | `lgbt_quantas_sao_pns_censo_conjuges_do_mesmo_sexo_2022` | — |
-| Estimativa "ao menos N mil pessoas" = soma 2010 (×2) + 2022 | Cônjuges do mesmo sexo 2022 | idem | — |
+| `pct_populacao_por_orientacao` | Heterossexual / Bissexual / … | Pessoas_Orientacao_Sexo_Total | Het 94,75 · Bi 0,68 · Homo 1,15 |
+| `pct_orientacao_por_sexo` | `<orientação> / Homens\|Mulheres` | Pessoas_Orientacao_Sexo_Total | Homossexual/Mulheres 43,07 |
+| `pct_orientacao_por_faixa_etaria` | `<orientação> / <faixa>` | Pessoas_Faixa_Etaria | Heterossexual/50-59 = 17,33 |
+| `pct_orientacao_por_raca_cor` | `<orientação> / <cor>` | Pessoas_Cor_ou_Raça | Bissexual/Parda = 43,24 |
+| `pct_orientacao_por_localidade` | `<orientação> / Urbana\|Rural` | Pessoas_Area_Localidade | Homossexual/Urbana = 94,22 |
 
-### 2. Perfil das pessoas LGBTQIA+ — `N E M`
-
-**2.0 (abre a seção)** — % do total da população por orientação sexual X = total da orientação X / total com info de orientação ×100
-· aba `Pessoas_Orientacao_Sexo_Total` → `lgbt_perfil_pns_est_reg_civil_pessoas_orientacao_sexo_total` *(N)*.
-No **E**: "Número percentual por tipo X de orientação sexual" · aba `Orientação sexual por UF` → `lgbt_perfil_pns_est_reg_civil_orientacao_sexual_por_uf`.
-
-| Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E/M | Modelo dbt |
-|---|---|---|---|---|---|
-| 2.1 | % de pessoas da orientação X que são do sexo Y = total orient. X / total do sexo Y na mesma orient. ×100 | Pessoas_Orientacao_Sexo_Total | `..._pessoas_orientacao_sexo_total` | N | — |
-| 2.2 | % por faixa etária Y, dentro da orientação X | Pessoas_Faixa_Etaria | `..._pessoas_faixa_etaria` | N | — |
-| 2.3 | % por cor/raça Y, dentro da orientação X | Pessoas_Cor_ou_Raça | `..._pessoas_cor_ou_raca` | N | — |
-| 2.4 | % por área (urbana/rural) Y, dentro da orientação X | Pessoas_Area_Localidade | `..._pessoas_area_localidade` | N | — |
-| 2.6 | **População Trans** — percentuais fixos no texto, **sem base de dados** ("Sinalização CGTI") | — | — | N | n/a |
+| Sub | Indicador | Aba Excel | Modelo dbt |
+|---|---|---|---|
+| 2.5 | Casamentos e uniões | (ver abaixo) | ✅ |
+| 2.6 | **População Trans** — percentuais fixos no texto, **sem base de dados** ("Sinalização CGTI") | — | n/a |
 
 > `..._` = prefixo `lgbt_perfil_pns_est_reg_civil_`.
 
@@ -313,13 +319,16 @@ para as quebras). Validação: `tests/lgbtqia_plus_7_1_valores.sql`.
 
 ## 3. Situação atual
 
-- ✅ **6.1 Proteção social especial** — modelada nos 3 níveis (piloto). **Formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`, uma coluna por indicador). A migrar para o formato longo.
-- ✅ **5.1 Serviços de saúde para pessoas trans** — modelada (N e E) no **formato longo**.
-- ✅ **2.5 Casamentos e uniões** — modelada (N/E/M; PNS só N) no **formato longo**.
-- ✅ **4.1 Projetos escolares contra LGBTQIAfobia** — modelada (N, E) no **formato longo**.
-- ✅ **7.0 Notificações de violência (SINAN)** — modelada (N/E/M) no **formato longo** (falta local e perfil do agressor).
-- ✅ **7.1 Denúncias de violações de DH (ONDH)** — modelada (N/E/M) no **formato longo** (falta local e relação do suspeito).
-- ⬜ Demais seções (1, 2.1–2.4, 3) — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
+- ✅ **1 População** — N/E/M (parte), formato longo.
+- ✅ **2 Perfil (2.0–2.4)** — N, formato longo.
+- ✅ **2.5 Casamentos e uniões** — N/E/M (PNS só N), formato longo.
+- ✅ **4.1 Projetos escolares contra LGBTQIAfobia** — N, E, formato longo.
+- ✅ **5.1 Serviços de saúde para pessoas trans** — N, E, formato longo.
+- ✅ **7.0 Notificações de violência (SINAN)** — N/E/M, formato longo (falta local e perfil do agressor).
+- ✅ **7.1 Denúncias de violações de DH (ONDH)** — N/E/M, formato longo (falta local e relação do suspeito).
+- ✅ **6.1 Proteção social especial** — N/E/M (piloto). Ainda no **formato largo** (`lgbtqia_plus_relatorio_*`). A migrar para o formato longo.
+- ⬜ **3 Trabalho e renda** — só N. Falta modelar.
+- ⬜ **2.6 / 3.1 / "Censo Trans"** — sem base de dados ("Sinalização CGTI"), não viram modelo.
 
 ### Formato longo — `lgbtqia_plus_indicadores`
 

@@ -181,3 +181,34 @@ sources:
         description: >
           Notificações por município, origem da agressão e identidade de
           gênero da vítima (2024). Aba "Violencias_Identidade_Genero".
+
+      # --- 1 e 2 — População e Perfil das pessoas LGBTQIA+ (PNS 2019, Censo) ---
+      # Tabelas já no nível Brasil: 1 linha por orientação sexual, colunas de
+      # categoria + uma coluna de total. O % é calculado linha a linha.
+      - name: raw_lgbtqia_plus_pessoas_orientacao_sexo_total
+        identifier: lgbt_perfil_pns_est_reg_civil_pessoas_orientacao_sexo_total
+        description: PNS 2019 — população por orientação sexual e sexo (Brasil). Aba "Pessoas_Orientacao_Sexo_Total".
+      - name: raw_lgbtqia_plus_pessoas_faixa_etaria
+        identifier: lgbt_perfil_pns_est_reg_civil_pessoas_faixa_etaria
+        description: PNS 2019 — população por orientação sexual e faixa etária (Brasil). Aba "Pessoas_Faixa_Etaria".
+      - name: raw_lgbtqia_plus_pessoas_cor_ou_raca
+        identifier: lgbt_perfil_pns_est_reg_civil_pessoas_cor_ou_raca
+        description: PNS 2019 — população por orientação sexual e cor/raça (Brasil). Aba "Pessoas_Cor_ou_Raça".
+      - name: raw_lgbtqia_plus_pessoas_area_localidade
+        identifier: lgbt_perfil_pns_est_reg_civil_pessoas_area_localidade
+        description: PNS 2019 — população por orientação sexual e área (urbana/rural) (Brasil). Aba "Pessoas_Area_Localidade".
+      - name: raw_lgbtqia_plus_orientacao_sexual_por_uf
+        identifier: lgbt_perfil_pns_est_reg_civil_orientacao_sexual_por_uf
+        description: PNS 2019 — % da população por orientação sexual, por UF. Aba "Orientação sexual por UF".
+      - name: raw_lgbtqia_plus_censo_2010_reg
+        identifier: lgbt_quantas_sao_pns_censo_censo_2010_reg
+        description: Censo 2010 — pessoas por tipo de relação no domicílio, Brasil e regiões. Aba "Censo_2010_Reg".
+      - name: raw_lgbtqia_plus_censo_2010_uf
+        identifier: lgbt_quantas_sao_pns_censo_censo_2010_uf
+        description: Censo 2010 — pessoas por tipo de relação no domicílio, por UF. Aba "Censo_2010_UF".
+      - name: raw_lgbtqia_plus_conjuges_mesmo_sexo_2022
+        identifier: lgbt_quantas_sao_pns_censo_conjuges_do_mesmo_sexo_2022
+        description: >
+          Censo 2022 — pessoas por tipo de relação no domicílio, por município.
+          Colunas de contagem vêm como TEXTO com "-" onde não há dado. Aba
+          "Cônjuges do mesmo sexo 2022".

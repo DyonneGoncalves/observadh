@@ -14,6 +14,12 @@
 select * from {{ ref('int_lgbtqia_plus_5_1_servicos_saude_trans') }}
 
 union all
+select * from {{ ref('int_lgbtqia_plus_1_populacao') }}
+
+union all
+select * from {{ ref('int_lgbtqia_plus_2_perfil_pns') }}
+
+union all
 select * from {{ ref('int_lgbtqia_plus_2_5_casamentos_registro_civil') }}
 
 union all
