@@ -32,6 +32,9 @@ union all
 select * from {{ ref('int_lgbtqia_plus_4_1_projetos_escolares') }}
 
 union all
+select * from {{ ref('int_lgbtqia_plus_6_0_assistencia_social') }}
+
+union all
 select * from {{ ref('int_lgbtqia_plus_6_1_protecao_social_especial') }}
 
 union all

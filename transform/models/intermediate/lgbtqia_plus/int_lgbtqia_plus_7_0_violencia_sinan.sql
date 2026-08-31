@@ -177,10 +177,41 @@ brk_autop_ident as (
     ]) }}
 ),
 
+-- local de ocorrência — denominador = SOMA das 10 categorias (a coluna
+-- total_com_info_de_local_de_ocorrencia não bate com a planilha de cálculo).
+{% set local_pairs = [
+    ['Residência', 's.residencia'], ['Bar ou similar', 's.bar_ou_similar'], ['Outro', 's.outro'],
+    ['Via pública', 's.via_publica'], ['Ignorado', 's.ignorado'], ['Escola', 's.escola'],
+    ['Habitação coletiva', 's.habitacao_coletiva'], ['Comércio/Serviços', 's.comercio_servicos'],
+    ['Indústrias/Construção', 's.industrias_construcao'], ['Local de prática esportiva', 's.local_de_pratica_esportiva']
+] %}
+brk_int_local as (
+    {{ ondh_breakdown_percentual(source('raw_lgbtqia_plus','raw_lgbtqia_plus_sinan_interpessoal_local_ocorrencia'),
+        'pct_viol_interpessoal_por_local', local_pairs) }}
+),
+brk_autop_local as (
+    {{ ondh_breakdown_percentual(source('raw_lgbtqia_plus','raw_lgbtqia_plus_sinan_autoprovocada_local_ocorrencia'),
+        'pct_viol_autoprovocada_por_local', local_pairs) }}
+),
+
+-- perfil do agressor (categorias agregadas do relatório; denominador = total_viol)
+brk_int_agressor as (
+    {{ sinan_breakdown_percentual(source('raw_lgbtqia_plus','raw_lgbtqia_plus_sinan_interpessoal_perfil_agressor'),
+        'pct_viol_interpessoal_por_agressor', 'total_viol', [
+        ['Pai, mãe, padrasto, madrasta, irmão(ã) ou filho(a)', 's.pai + s.mae + s.padrasto + s.madrasta + s.irmao + s.filho'],
+        ['Pessoas conhecidas ou amigas', 's.conhecido'],
+        ['Cônjuges, namorados, ex-cônjuges ou ex-namorados', 's.conjuge + s.namorado + s.exconjuge + s.exnamorado'],
+        ['Cuidadores(as) ou patrões(as)', 's.cuidador + s.patrao'],
+        ['Polícias ou institucionais', 's.policial + s.institucional'],
+        ['Pessoas desconhecidas ou outros', 's.desconhecido + s.outros']
+    ]) }}
+),
+
 todos as (
     select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from notif_ind
     {% for c in ['brk_int_sexo','brk_int_faixa','brk_int_raca','brk_autop_sexo','brk_autop_faixa','brk_autop_raca',
-                 'brk_int_orient','brk_autop_orient','brk_int_ident','brk_autop_ident'] %}
+                 'brk_int_orient','brk_autop_orient','brk_int_ident','brk_autop_ident',
+                 'brk_int_local','brk_autop_local','brk_int_agressor'] %}
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from {{ c }}
     {% endfor %}
 )

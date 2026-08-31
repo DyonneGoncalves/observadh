@@ -16,6 +16,19 @@ sources:
     loaded_at_field: dt_importacao
     tables:
 
+      # --- 6 / 6.0 — Assistência Social / CRAS e Centros de Convivência ---
+      - name: raw_lgbtqia_plus_cras_temas_abordados
+        identifier: lgbt_assist_social_cras_temas_abordados
+        description: >
+          Censo SUAS 2024 — CRAS por município: ofertavam SCFV e se abordaram
+          frequentemente orientação sexual / identidade de gênero. Aba
+          "CRAS - Temas abordados".
+      - name: raw_lgbtqia_plus_centros_convivencia_temas
+        identifier: lgbt_assist_social_centros_de_convivencia_temas
+        description: >
+          Censo SUAS 2024 — Centros de Convivência por município: se abordaram
+          frequentemente o tema. Aba "Centros de Convivência - Temas".
+
       # --- 6 / 6.1 — Assistência Social / Proteção Social Especial ---
       - name: raw_lgbtqia_plus_serie_atendimentos_paefi
         identifier: lgbt_assist_social_serie_atendimentos_paefi
@@ -135,6 +148,12 @@ sources:
       - name: raw_lgbtqia_plus_ondh_orientacao_sexual
         identifier: lgbt_viol_ondh_ondh_orientacao_sexual
         description: Denúncias por município e orientação sexual da vítima. Aba "ONDH_Orientacao_Sexual".
+      - name: raw_lgbtqia_plus_ondh_local
+        identifier: lgbt_viol_ondh_ondh_local
+        description: Denúncias por município e local de ocorrência (32 categorias). Aba "ONDH_Local".
+      - name: raw_lgbtqia_plus_ondh_relacao_suspeito
+        identifier: lgbt_viol_ondh_ondh_relacao_suspeito
+        description: Denúncias por município e tipo de relação com o suspeito (49 categorias). Aba "ONDH_Relação_Suspeito".
       - name: raw_lgbtqia_plus_ondh_tipo_de_violacao
         identifier: lgbt_viol_ondh_ondh_tipo_de_violacao
         description: >
@@ -181,6 +200,17 @@ sources:
         description: >
           Notificações por município, origem da agressão e identidade de
           gênero da vítima (2024). Aba "Violencias_Identidade_Genero".
+      - name: raw_lgbtqia_plus_sinan_interpessoal_local_ocorrencia
+        identifier: lgbt_viol_sinan_interpessoal_local_ocorrencia
+        description: Violência interpessoal por município e local de ocorrência (2024). Aba "Interpessoal_Local_Ocorrencia".
+      - name: raw_lgbtqia_plus_sinan_autoprovocada_local_ocorrencia
+        identifier: lgbt_viol_sinan_autoprovocada_local_ocorrencia
+        description: Violência autoprovocada por município e local de ocorrência (2024). Aba "Autoprovocada_Local_Ocorrencia".
+      - name: raw_lgbtqia_plus_sinan_interpessoal_perfil_agressor
+        identifier: lgbt_viol_sinan_interpessoal_perfil_agressor
+        description: >
+          Violência interpessoal por município e tipo de agressor (2024).
+          Coluna total_viol é o denominador. Aba "Interpessoal_Perfil_Agressor".
 
       # --- 1 e 2 — População e Perfil das pessoas LGBTQIA+ (PNS 2019, Censo) ---
       # Tabelas já no nível Brasil: 1 linha por orientação sexual, colunas de

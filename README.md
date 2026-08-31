@@ -62,5 +62,5 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Seção 7.1 — Denúncias de violações de DH (ONDH)** (N, E, M) no formato longo. Validada contra a planilha de cálculo. Falta local e relação do suspeito.
 - [x] **Seção 7.0 — Notificações de violência (SINAN)** (N, E, M) no formato longo. Validada. Falta local e perfil do agressor.
 - [x] **Seções 1, 2.0–2.4 e 3 — População, Perfil e Trabalho (PNS 2019 / Censo)** no formato longo. Validadas contra a planilha de cálculo e o texto-base.
-- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde (47 nós). **`lgbtqia_plus_indicadores`: ~437k linhas, as 8 seções do relatório no formato longo.**
-- [ ] Extras adiados: 7.0 (local de ocorrência, perfil do agressor), 7.1 (local, relação do suspeito), 2.5 ("% casamentos mesmo sexo por estado"). Seção 6 não-6.1 (temas em CRAS/Centros de Convivência) ainda sem indicador. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
+- [x] **Abertura da seção 6** (CRAS/Centros de Convivência) + **extras de 7.0/7.1** (local de ocorrência, perfil do agressor, relação do suspeito) no formato longo. Validados contra a planilha de cálculo.
+- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde (49 nós). **`lgbtqia_plus_indicadores`: ~595k linhas.** O relatório LGBTQIA+ está completo no formato longo (falta só a 2.5 "% casamentos mesmo sexo por estado", de denominador ambíguo).

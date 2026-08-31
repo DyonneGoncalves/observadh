@@ -118,6 +118,64 @@ brk_orientacao as (
     ) }}
 ),
 
+brk_local as (
+    {{ ondh_breakdown_percentual(
+        source('raw_lgbtqia_plus', 'raw_lgbtqia_plus_ondh_local'),
+        'pct_denuncias_por_local',
+        [['Ambiente de lazer/esporte/entretenimento', 's.ambiente_de_lazer_esporte_entretenimento'],
+         ['Ambiente virtual (internet)', 's.ambiente_virtual_no_ambito_da_internet'],
+         ['Berçário/Creche', 's.bercario_creche'], ['Casa da vítima', 's.casa_da_vitima'],
+         ['Casa de familiares', 's.casa_de_familiares'], ['Casa de terceiro', 's.casa_de_terceiro'],
+         ['Casa do suspeito', 's.casa_do_suspeito'],
+         ['Casa onde reside a vítima e o suspeito', 's.casa_onde_reside_a_vitima_e_o_suspeito'],
+         ['Centro de referência', 's.centro_de_referencia'], ['Delegacia de polícia', 's.delegacia_de_policia'],
+         ['Estabelecimento comercial', 's.estabelecimento_comercial'], ['Estabelecimento de saúde', 's.estabelecimento_de_saude'],
+         ['Evento público', 's.evento_publico'], ['Instituição de ensino', 's.instituicao_de_ensino'],
+         ['Instituição de longa permanência de idoso (ILPI)', 's.instituicao_de_longa_permanencia_de_idoso_ilpi'],
+         ['Instituição financeira', 's.instituicao_financeira'],
+         ['Local de trabalho da vítima', 's.local_de_trab_da_vitima'],
+         ['Local de trabalho do agressor', 's.local_de_trab_do_agressor'],
+         ['Manicômio/Hospital psiquiátrico/Casa de saúde mental', 's.manicomio_hospital_psiquiatrico_casa_de_saude_mental'],
+         ['Metrô/Trem', 's.metro_trem'], ['Não sabe informar', 's.nao_sabe_informar'], ['Outros', 's.outros'],
+         ['Serviço de abrigamento', 's.servico_de_abrigamento'],
+         ['Taxi/Transporte por aplicativo', 's.taxi_transporte_aplicativo'],
+         ['Transporte aéreo', 's.transporte_aereo'], ['Transporte marítimo', 's.transporte_maritimo'],
+         ['Unidade de medida socioeducativa', 's.unid_de_medida_socioeducativa'],
+         ['Unidade prisional', 's.unid_prisional'], ['Via pública', 's.via_publica'],
+         ['Órgãos públicos', 's.orgaos_publicos'], ['Ônibus', 's.onibus']]
+    ) }}
+),
+
+brk_relacao as (
+    {{ ondh_breakdown_percentual(
+        source('raw_lgbtqia_plus', 'raw_lgbtqia_plus_ondh_relacao_suspeito'),
+        'pct_denuncias_por_relacao_suspeito',
+        [['Aluno(a)', 's.aluno_a'], ['Amigo(a)', 's.amigo_a'], ['Amigo(a) de família', 's.amigo_a_de_familia'],
+         ['Avô(ó)', 's.avo_o'], ['Colega de trabalho (mesmo nível)', 's.colega_de_trab_mesmo_nivel_hierarquico'],
+         ['Companheiro(a)', 's.companheiro_a'], ['Companheiro(a) de mãe/do pai', 's.companheiro_a_de_mae_do_pai'],
+         ['Cuidador(a)', 's.cuidador_a'], ['Cunhado(a)', 's.cunhado_a'], ['Desconhecido(a)', 's.desconhecido_a'],
+         ['Diretor(a) de escola', 's.diretor_a_de_escola'], ['Diretor(a) de unidade prisional', 's.diretor_a_de_unid_prisional'],
+         ['Diretor/gestor de instituição', 's.diretor_gestor_de_instituicao'],
+         ['Empregado(a) doméstico', 's.empregado_a_domestico'],
+         ['Empregado (hierarquicamente inferior)', 's.empregado_hierarquicamente_inferior'],
+         ['Empregador/patrão (hierarquicamente superior)', 's.empregador_patrao_hierarquicamente_superior'],
+         ['Enteado(a)', 's.enteado_a'], ['Esposa(o)', 's.esposa_o'], ['Ex-companheiro(a)', 's.ex_companheiro_a'],
+         ['Ex-esposa(o)', 's.ex_esposa_o'], ['Ex-namorado(a)', 's.ex_namorado_a'], ['Filho(a)', 's.filho_a'],
+         ['Funcionário/voluntário/prestador de serviço para instituição', 's.funcionario_voluntario_ou_prestador_de_servico_para_ins'],
+         ['Genro/nora', 's.genro_nora'], ['Irmão(ã)', 's.irmao_a'], ['Líder religioso(a)', 's.lider_religioso_a'],
+         ['Morou/mora na mesma residência (não familiar)', 's.morou_mora_na_mesma_residencia_nao_familiar'],
+         ['Namorado(a)', 's.namorado_a'], ['Neto(a)', 's.neto_a'], ['Não informado', 's.nao_informado'],
+         ['Não se aplica', 's.nao_se_aplica'], ['Outros', 's.outros'], ['Outros familiares', 's.outros_familiares'],
+         ['Outros profissionais de educação', 's.outros_profissionais_de_educ'],
+         ['Padrasto/madrasta', 's.padrasto_madrasta'], ['Padrinho/madrinha', 's.padrinho_madrinha'],
+         ['Pai/mãe', 's.pai_mae'],
+         ['Pessoa com quem mantém/manteve convivência familiar', 's.pessoa_com_quem_mantem_manteve_convivencia_familiar'],
+         ['Prestador(a) de serviço', 's.prestador_a_de_servico'], ['Primo(a)', 's.primo_a'],
+         ['Professor(a)', 's.professor_a'], ['Profissional de saúde', 's.profissional_de_saude'],
+         ['Sobrinho(a)', 's.sobrinho_a'], ['Sogro(a)', 's.sogro_a'], ['Tio(a)', 's.tio_a'], ['Vizinho(a)', 's.vizinho_a']]
+    ) }}
+),
+
 -- --------------------------------------------------------- TIPO DE VIOLAÇÃO
 tv_agg as (
     select 'nacional'::text as nivel, null::int as recorte_codigo, tipo_de_violacao as categoria,
@@ -150,6 +208,8 @@ todos as (
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_raca
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_identidade
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_orientacao
+    union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_local
+    union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_relacao
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from tv_ind
 )
 

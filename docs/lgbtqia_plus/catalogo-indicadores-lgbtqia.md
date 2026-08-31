@@ -251,12 +251,14 @@ Validação: `tests/lgbtqia_plus_5_1_valores_nacionais.sql` (contra a planilha d
 
 ### 6. Assistência social — `N E M`
 
-**6.0 (abre a seção)** — cobertura de CRAS e Centros de Convivência (Serviço de Convivência):
+**6 (abre a seção) — CRAS e Centros de Convivência** — `N E M` — ✅ **MODELADA (formato longo)**
 
-| Indicador (resumo) | Aba Excel | Tabela `raw` | N/E/M | Modelo dbt |
-|---|---|---|---|---|
-| % de CRAS que abordaram frequentemente orientação sexual/identidade de gênero = abordaram / ofertavam SCFV ×100 (também por UF) | CRAS - Temas abordados | `lgbt_assist_social_cras_temas_abordados` | N E | — |
-| % de Centros de Convivência que abordaram o tema = abordaram / total de Centros ×100 (também por UF) | Centros de Convivência - Temas | `lgbt_assist_social_centros_de_convivencia_temas` | N E | — |
+Modelo: `int_lgbtqia_plus_6_0_assistencia_social`. Validação: `tests/lgbtqia_plus_extras_valores.sql`.
+
+| `indicador` (slug) | fórmula | esperado (nacional) |
+|---|---|---|
+| `pct_cras_abordaram_tema` | CRAS que abordaram / CRAS que ofertavam SCFV ×100 | 43,07 |
+| `pct_centros_convivencia_abordaram_tema` | Centros que abordaram / total de Centros ×100 | 53,78 |
 
 **6.1. Proteção social especial** — `N E M` — ✅ **MODELADA (formato longo)**
 
@@ -290,13 +292,14 @@ Validação: `tests/lgbtqia_plus_7_0_valores.sql`. Dados de perfil são de 2024.
 | `pct_viol_interpessoal_por_raca_cor` · `..._autoprovocada_...` | Negra / Branca / Amarela / Indígena | Interpessoal_Cor_ou_Raça · Autoprovocada_Cor_ou_Raça | N E M | interp. Negra 60,02 · autop. 52,30 |
 | `pct_viol_interpessoal_por_orientacao_sexual` · `..._autoprovocada_...` | Heterossexual (derivado) / Bissexual / Homossexual / Ignorado / Não se aplica | Violências_Orientacao_Sexual | N E M | interp. Homo 52,27 · Bi 20,46 |
 | `pct_viol_interpessoal_por_identidade_genero` · `..._autoprovocada_...` | Travesti / Transexual mulher / Transexual homem / Ignorado / Não se aplica | Violencias_Identidade_Genero | N E M | interp. Trans mulher 25,62 · Travesti 4,80 |
+| `pct_viol_interpessoal_por_local` · `..._autoprovocada_...` | Residência / Via pública / … (10) | Interpessoal_Local_Ocorrencia · Autoprovocada_Local_Ocorrencia | N E M | interp. Residência 54,11 · autop. 83,19 |
+| `pct_viol_interpessoal_por_agressor` | 6 grupos (pai/mãe/…, conhecidos, cônjuges/…, cuidadores/patrões, polícia/institucional, desconhecidos/outros) | Interpessoal_Perfil_Agressor (`total_viol`) | N E M | Cônjuges/namorados 32,91 · Pai/mãe/… 16,86 |
 
 > "Heterossexual" não é coluna nas abas de orientação — é derivado (total − bissexual − homossexual − não se aplica − ignorado), como na planilha.
 
-**Ainda não modelado da 7.0**: local de ocorrência
-(`lgbt_viol_sinan_{interpessoal,autoprovocada}_local_ocorrencia`) e perfil do agressor
-(`lgbt_viol_sinan_interpessoal_perfil_agressor`). A aba `Interpessoal-Tipos de violência`
-foi ingerida mas não tem indicador no catálogo.
+> Local de ocorrência: o denominador é a SOMA das 10 categorias (a coluna
+> `total_com_info_de_local_de_ocorrencia` não bate com a planilha de cálculo).
+> A aba `Interpessoal-Tipos de violência` foi ingerida mas não tem indicador no catálogo.
 
 **7.1. Denúncias de violações de direitos humanos (ONDH)** — `N E M` — ✅ **MODELADA (formato longo)**
 
@@ -329,8 +332,9 @@ para as quebras). Validação: `tests/lgbtqia_plus_7_1_valores.sql`.
 - ✅ **2.5 Casamentos e uniões** — N/E/M (PNS só N), formato longo.
 - ✅ **4.1 Projetos escolares contra LGBTQIAfobia** — N, E, formato longo.
 - ✅ **5.1 Serviços de saúde para pessoas trans** — N, E, formato longo.
-- ✅ **7.0 Notificações de violência (SINAN)** — N/E/M, formato longo (falta local e perfil do agressor).
-- ✅ **7.1 Denúncias de violações de DH (ONDH)** — N/E/M, formato longo (falta local e relação do suspeito).
+- ✅ **6 (abertura) CRAS e Centros de Convivência** — N/E/M, formato longo.
+- ✅ **7.0 Notificações de violência (SINAN)** — N/E/M, formato longo (série, tipo, municípios, perfil das vítimas, local, agressor).
+- ✅ **7.1 Denúncias de violações de DH (ONDH)** — N/E/M, formato longo (série, tipo de violação, perfil, local, relação do suspeito).
 - ✅ **6.1 Proteção social especial** — N/E/M, formato longo (`int_lgbtqia_plus_6_1_protecao_social_especial`).
 - ✅ **3 Trabalho e renda** — só N, formato longo.
 - ⬜ **2.6 / 3.1 / "Censo Trans"** — sem base de dados ("Sinalização CGTI"), não viram modelo.
