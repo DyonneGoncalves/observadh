@@ -280,21 +280,27 @@ Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
 | 10 maiores % de tipo de agressor (interpessoal) | Interpessoal_Perfil_Agressor | `lgbt_viol_sinan_interpessoal_perfil_agressor` | — |
 | *(aba ingerida, sem indicador citado)* tipos de violência interpessoal | Interpessoal-Tipos de violência | `lgbt_viol_sinan_interpessoal_tipos_de_violencia` | — |
 
-**7.1. Denúncias de violações de direitos humanos (ONDH)** — `N E M`:
+**7.1. Denúncias de violações de direitos humanos (ONDH)** — `N E M` — ✅ **MODELADA (formato longo)**
 
-| Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
-|---|---|---|---|
-| Total de denúncias 2020–2024 (soma `qtd_denuncias_2020..2024`) | ONDH_Serie_Historica_2020_2024 | `lgbt_viol_ondh_ondh_serie_historica_2020_2024` | — |
-| Nº absoluto de denúncias e de violações, por ano | ONDH_Serie_Historica_2020_2024 | idem | — |
-| % de estados por maior nº de denúncias em 2024 | ONDH_Serie_Historica_2020_2024 | idem | — |
-| % de denúncias por sexo X | ONDH_Sexo | `lgbt_viol_ondh_ondh_sexo` | — |
-| % de denúncias por faixa etária X (junta "até 29" e "idosos") | ONDH_Faixa_Etária | `lgbt_viol_ondh_ondh_faixa_etaria` | — |
-| % de denúncias por raça/cor (junta pretas + pardas = negras) | ONDH_Raca_Cor | `lgbt_viol_ondh_ondh_raca_cor` | — |
-| % de local de ocorrência das violações | ONDH_Local | `lgbt_viol_ondh_ondh_local` | — |
-| 10 maiores % por tipo de relação do suspeito | ONDH_Relação_Suspeito | `lgbt_viol_ondh_ondh_relacao_suspeito` | — |
-| % por tipo de violação X | ONDH_Tipo_de_Violação | `lgbt_viol_ondh_ondh_tipo_de_violacao` | — |
-| % por tipo de identidade de gênero X | ONDH_Identidade_Genero | `lgbt_viol_ondh_ondh_identidade_genero` | — |
-| % por tipo de orientação sexual X | ONDH_Orientacao_Sexual | `lgbt_viol_ondh_ondh_orientacao_sexual` | — |
+Modelo: `int_lgbtqia_plus_7_1_denuncias_ondh` (usa o macro `ondh_breakdown_percentual`
+para as quebras). Validação: `tests/lgbtqia_plus_7_1_valores.sql`.
+
+| `indicador` (slug) | `categoria` | fonte | N/E/M | valor esperado (nacional) |
+|---|---|---|---|---|
+| `denuncias_por_ano` / `violacoes_por_ano` | ano `2020`..`2024` | ONDH_Serie_Historica | N E M | 2024: 8.176 den. / 48.599 viol. |
+| `denuncias_total_2020_2024` | — | idem | N E M | 21.672 |
+| `pct_participacao_denuncias_2024` | — | idem | E M | (recorte / 8.176 ×100) |
+| `pct_denuncias_por_sexo` | Feminino / Intersexo / Masculino | ONDH_Sexo | N E M | 44,69 / 0,94 / 54,36 (denom exclui "não informado") |
+| `pct_denuncias_por_faixa_etaria` | Até 29 / 30-39 / 40-49 / 50-59 / Idosos 60+ | ONDH_Faixa_Etária | N E M | 48,03 / … / 4,04 (denom = soma das 10 faixas) |
+| `pct_denuncias_por_raca_cor` | Negra / Branca / Amarela / Indígena | ONDH_Raca_Cor | N E M | 54,98 / 43,37 / 0,50 / 1,14 |
+| `pct_denuncias_por_identidade_genero` | 8 categorias | ONDH_Identidade_Genero | N E M | Homem trans 6,85 · Mulher trans 10,95 |
+| `pct_denuncias_por_orientacao_sexual` | 6 categorias | ONDH_Orientacao_Sexual | N E M | Homossexual 54,97 · Bissexual 14,51 |
+| `pct_denuncias_por_tipo_violacao` | 1 por tipo (~103) | ONDH_Tipo_de_Violação (`total_com_info` = contagem do tipo) | N E M | Tortura Psíquica 12,48 · Constrangimento 10,99 |
+
+**Ainda não modelado da 7.1** (mesma mecânica, listas de colunas longas):
+`ONDH_Local` (`lgbt_viol_ondh_ondh_local`, 32 colunas) e `ONDH_Relação_Suspeito`
+(`lgbt_viol_ondh_ondh_relacao_suspeito`, 50 colunas). Denúncias com local no exterior
+(hash no lugar do código IBGE) são contadas só no nacional.
 
 ---
 
@@ -304,6 +310,7 @@ Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
 - ✅ **5.1 Serviços de saúde para pessoas trans** — modelada (N e E) no **formato longo**.
 - ✅ **2.5 Casamentos e uniões** — modelada (N/E/M; PNS só N) no **formato longo**.
 - ✅ **4.1 Projetos escolares contra LGBTQIAfobia** — modelada (N, E) no **formato longo**.
+- ✅ **7.1 Denúncias de violações de DH (ONDH)** — modelada (N/E/M) no **formato longo** (falta local e relação do suspeito).
 - ⬜ Demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
 
 ### Formato longo — `lgbtqia_plus_indicadores`

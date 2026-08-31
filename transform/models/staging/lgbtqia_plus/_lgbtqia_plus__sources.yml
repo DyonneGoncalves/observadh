@@ -112,3 +112,32 @@ sources:
         description: >
           SAEB 2021, por UF x localização (Urbana/Rural): total com info e
           escolas com projeto. Aba "projeto_homofobia_local 2021".
+
+      # --- 7 / 7.1 — Violência / Denúncias de violações de DH (ONDH 2020-2024) ---
+      # Tabelas em formato largo (1 linha por município, uma coluna por categoria),
+      # exceto tipo_de_violacao (1 linha por município x tipo). Sem linha de total
+      # Brasil/UF — a agregação é feita nos modelos.
+      - name: raw_lgbtqia_plus_ondh_serie_historica
+        identifier: lgbt_viol_ondh_ondh_serie_historica_2020_2024
+        description: Denúncias e violações por município e ano (2020-2024). Aba "ONDH_Serie_Historica_2020_2024".
+      - name: raw_lgbtqia_plus_ondh_sexo
+        identifier: lgbt_viol_ondh_ondh_sexo
+        description: Denúncias por município e sexo da vítima. Aba "ONDH_Sexo".
+      - name: raw_lgbtqia_plus_ondh_faixa_etaria
+        identifier: lgbt_viol_ondh_ondh_faixa_etaria
+        description: Denúncias por município e faixa etária da vítima. Aba "ONDH_Faixa_Etária".
+      - name: raw_lgbtqia_plus_ondh_raca_cor
+        identifier: lgbt_viol_ondh_ondh_raca_cor
+        description: Denúncias por município e raça/cor da vítima. Aba "ONDH_Raca_Cor".
+      - name: raw_lgbtqia_plus_ondh_identidade_genero
+        identifier: lgbt_viol_ondh_ondh_identidade_genero
+        description: Denúncias por município e identidade de gênero da vítima. Aba "ONDH_Identidade_Genero".
+      - name: raw_lgbtqia_plus_ondh_orientacao_sexual
+        identifier: lgbt_viol_ondh_ondh_orientacao_sexual
+        description: Denúncias por município e orientação sexual da vítima. Aba "ONDH_Orientacao_Sexual".
+      - name: raw_lgbtqia_plus_ondh_tipo_de_violacao
+        identifier: lgbt_viol_ondh_ondh_tipo_de_violacao
+        description: >
+          Denúncias por município e tipo de violação. Grão = 1 linha por
+          município x tipo; a coluna total_com_info É a contagem daquele
+          tipo no município (nome enganoso). Aba "ONDH_Tipo_de_Violação".

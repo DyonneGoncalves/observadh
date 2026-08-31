@@ -21,3 +21,6 @@ select * from {{ ref('int_lgbtqia_plus_2_5_perfil_conjugal_pns') }}
 
 union all
 select * from {{ ref('int_lgbtqia_plus_4_1_projetos_escolares') }}
+
+union all
+select * from {{ ref('int_lgbtqia_plus_7_1_denuncias_ondh') }}
