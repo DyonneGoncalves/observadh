@@ -91,3 +91,24 @@ sources:
           PNS 2019: população por natureza jurídica da união (casamento civil /
           união estável) e orientação sexual. Grão = 1 linha por orientação
           (Brasil). Aba "Natureza_Jurídica_União".
+
+      # --- 4 / 4.1 — Educação / Projetos escolares contra LGBTQIAfobia ---
+      - name: raw_lgbtqia_plus_projetos_contra_homofobia_2019
+        identifier: lgbt_educ_pns_saeb_projetos_contra_homofobia_2019
+        description: >
+          SAEB 2019, por UF: escolas que possuem / não possuem projeto de
+          enfrentamento à LGBTQIAfobia. Denominador do indicador = "total com
+          informação" (total - ignorado). Aba "Projetos contra homofobia 2019".
+
+      - name: raw_lgbtqia_plus_projetos_contra_homofobia_2021
+        identifier: lgbt_educ_pns_saeb_projetos_contra_homofobia_2021
+        description: >
+          SAEB 2021, por UF: escolas que possuem / não possuem projeto. Sem
+          coluna "ignorado" — denominador do indicador = "total". Aba
+          "Projetos contra homofobia 2021".
+
+      - name: raw_lgbtqia_plus_projeto_homofobia_local_2021
+        identifier: lgbt_educ_pns_saeb_projeto_homofobia_local_2021
+        description: >
+          SAEB 2021, por UF x localização (Urbana/Rural): total com info e
+          escolas com projeto. Aba "projeto_homofobia_local 2021".

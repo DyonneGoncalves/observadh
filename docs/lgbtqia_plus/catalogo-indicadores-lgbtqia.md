@@ -200,9 +200,20 @@ confirmar com a equipe).
 |---|---|---|---|---|---|
 | 4.0 | % por orientação sexual e nível de instrução | Nível de instrução | `lgbt_educ_pns_saeb_nivel_de_instrucao` | N | — |
 | 4.0 | "O Censo Trans" — destaque **sem base de dados** ("Sinalização CGTI") | — | — | N | n/a |
-| 4.1 | % de escolas com projeto contra LGBTQIAfobia = possui projeto / total (2021) ou / total com informação (2019) ×100 | Projetos contra homofobia 2021 / 2019 | `lgbt_educ_pns_saeb_projetos_contra_homofobia_2021` / `_2019` | N E | — |
-| 4.1 | maior/menor % de escolas com projeto, por desagregação | Projetos contra homofobia 2021 | `lgbt_educ_pns_saeb_projetos_contra_homofobia_2021` | N | — |
-| 4.1 | % de escolas com projeto por localização (urbana/rural) = escolas com projeto / total com info ×100 | projeto_homofobia_local 2021 | `lgbt_educ_pns_saeb_projeto_homofobia_local_2021` | N | — |
+
+**4.1. Projetos escolares de enfrentamento à LGBTQIAfobia** — `N E` — ✅ **MODELADA (formato longo)**
+
+| `indicador` (slug) | `categoria` | fórmula | N/E | Valor esperado (nacional) |
+|---|---|---|---|---|
+| `pct_escolas_com_projeto` | `2019` / `2021` | possui projeto / base ×100. base = "total com informação" (2019) ou "total" (2021) | N E | 28,52 / 22,12 |
+| `pct_escolas_com_projeto_uf_maior` | nome da UF | UF com maior % em 2021 | N | Rio Grande do Sul — 29,94 |
+| `pct_escolas_com_projeto_uf_menor` | nome da UF | UF com menor % em 2021 | N | Roraima — 9,39 |
+| `pct_escolas_com_projeto_localizacao_2021` | `Urbana` / `Rural` | escolas com projeto / total com info ×100 | N E | 24,47 / 14,36 |
+
+Abas → `raw`: `Projetos contra homofobia 2019/2021` → `lgbt_educ_pns_saeb_projetos_contra_homofobia_2019` / `_2021`;
+`projeto_homofobia_local 2021` → `lgbt_educ_pns_saeb_projeto_homofobia_local_2021`.
+Modelos: `stg_lgbtqia_plus_projetos_homofobia` (+ `_local`) → `int_lgbtqia_plus_4_1_projetos_escolares`
+→ `lgbtqia_plus_indicadores`. Validação: `tests/lgbtqia_plus_4_1_valores.sql`.
 
 ### 5. Saúde — `N E` (M = "Sem dados")
 
@@ -292,6 +303,7 @@ Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
 - ✅ **6.1 Proteção social especial** — modelada nos 3 níveis (piloto). **Formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`, uma coluna por indicador). A migrar para o formato longo.
 - ✅ **5.1 Serviços de saúde para pessoas trans** — modelada (N e E) no **formato longo**.
 - ✅ **2.5 Casamentos e uniões** — modelada (N/E/M; PNS só N) no **formato longo**.
+- ✅ **4.1 Projetos escolares contra LGBTQIAfobia** — modelada (N, E) no **formato longo**.
 - ⬜ Demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
 
 ### Formato longo — `lgbtqia_plus_indicadores`

@@ -58,6 +58,7 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Formato longo** — mart único `lgbtqia_plus_indicadores` (uma linha por nivel × recorte × seção × indicador × categoria) + views `_nacional`/`_estadual`/`_municipal`. Cada (sub)seção é um `int_lgbtqia_plus_<secao>_*`.
 - [x] **Seção 5.1 — Serviços de saúde para pessoas trans** (N, E) no formato longo. Validada contra a planilha de cálculo da equipe.
 - [x] **Seção 2.5 — Casamentos e uniões** (N, E, M; parte PNS só N) no formato longo. Validada contra a planilha de cálculo e contra o texto-base do relatório.
+- [x] **Seção 4.1 — Projetos escolares contra LGBTQIAfobia** (N, E) no formato longo. Validada contra a planilha de cálculo.
 - [x] `dbt build --select tag:lgbtqia_plus` — tudo verde.
-- [ ] Modelar as demais seções (4.1, 7/7.1, 1, 2, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
+- [ ] Modelar as demais seções (7/7.1, 1, 2, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
 - [ ] Migrar a 6.1 do formato largo para o `lgbtqia_plus_indicadores`.

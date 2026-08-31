@@ -18,3 +18,6 @@ select * from {{ ref('int_lgbtqia_plus_2_5_casamentos_registro_civil') }}
 
 union all
 select * from {{ ref('int_lgbtqia_plus_2_5_perfil_conjugal_pns') }}
+
+union all
+select * from {{ ref('int_lgbtqia_plus_4_1_projetos_escolares') }}
