@@ -50,14 +50,12 @@ Conexão com o banco: variáveis `OBSERVADH_DB_HOST/_PORT/_NAME/_USER/_PASSWORD`
 (a ingestão também aceita `DATABASE_URL`) e `transform/profiles.yml.example`
 copiado para `~/.dbt/profiles.yml`.
 
-## Status do piloto LGBTQIA+ — categoria 6.1 (Proteção Social Especial)
+## Status LGBTQIA+
 
 - [x] **Todas as 8 planilhas ingeridas** — 54 tabelas no schema `raw` (toda aba de todo arquivo), 234.557 linhas, via descoberta automática (`ingestion/ingest.py`)
-- [x] Ingestão Python rodando de verdade contra um Postgres
-- [x] Sources dbt declaradas (`_lgbtqia_plus_assistencia_social__sources.yml`) — apontam para o schema `raw` via `identifier`
-- [x] Modelos de staging (5 — PAEFI, CREAS orientação, CREAS identidade, Centros POP, Unidades de Acolhimento)
-- [x] Modelos intermediate (5 — cálculo dos indicadores por município)
-- [x] Marts finais (nacional / estadual / municipal)
-- [x] Testes de validação (fonte vs. calculado) — percentuais calculados batem com os pré-calculados da planilha (diferença máxima ~0,004 p.p.)
-- [x] Rodar `dbt build` de verdade contra um Postgres real — `dbt build --select tag:lgbtqia_plus`: 13 modelos + 11 testes, tudo verde. Bug de fan-out no `int_lgbtqia_plus_acolhimento_por_municipio` (agregava por nome de município em texto livre) encontrado e corrigido na primeira execução real.
-- [ ] Modelar as demais 6 categorias do LGBTQIA+ (2.5, 5.1, 4.1, 7/7.1, 1, 2) — dado bruto já está no banco
+- [x] Sources dbt (`_lgbtqia_plus__sources.yml`) — apontam para o schema `raw` via `identifier`
+- [x] **Seção 6.1 — Proteção Social Especial** (piloto) — staging + intermediate + marts nos 3 níveis, no **formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`). Testes de validação contra o % pré-calculado da planilha. *A migrar para o formato longo.*
+- [x] **Seção 5.1 — Serviços de saúde para pessoas trans** (N e E) — no **formato longo**: mart único `lgbtqia_plus_indicadores` (uma linha por nivel × recorte × seção × indicador × categoria) + views `_nacional`/`_estadual`/`_municipal`. Validada contra a planilha de cálculo da equipe.
+- [x] `dbt build --select tag:lgbtqia_plus` — tudo verde.
+- [ ] Modelar as demais seções (2.5, 4.1, 7/7.1, 1, 2, 3) no formato longo — dado bruto já está no banco. Ver [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md).
+- [ ] Migrar a 6.1 do formato largo para o `lgbtqia_plus_indicadores`.

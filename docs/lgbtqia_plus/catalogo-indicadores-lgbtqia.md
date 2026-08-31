@@ -195,9 +195,21 @@ No **E**: "Número percentual por tipo X de orientação sexual" · aba `Orienta
 | 5.0 | % por tipo de autoavaliação da saúde, por orientação sexual (junta "muito boa+boa", "muito ruim+ruim") | Autoavaliacao_saude_PNS | `lgbt_saude_pns_cnes_autoavaliacao_saude_pns` | N | — |
 | 5.0 | % por autoavaliação x atividade esportiva, por orientação sexual | Atividade_Esportiva_PNS | `lgbt_saude_pns_cnes_atividade_esportiva_pns` | N | — |
 | 5.0 | % com/sem diagnóstico de depressão, por orientação sexual | Taxa_Depressao_PNS | `lgbt_saude_pns_cnes_taxa_depressao_pns` | N | — |
-| 5.1 | Nº de estabelecimentos no país/estado | Estabelecimento_CNES | `lgbt_saude_pns_cnes_estabelecimento_cnes` | N E | — |
-| 5.1 | Nº de estabelecimentos com habilitação ambulatorial / hospitalar / ambos | Estabelecimento_CNES | idem | N E | — |
-| 5.1 | contagem de estados com habilitação hospitalar / só ambulatorial / sem nenhuma | Estabelecimento_CNES | idem | N | — |
+
+**5.1. Serviços de saúde para pessoas trans** — `N E` — ✅ **MODELADA (formato longo)**
+
+| Indicador | `indicador` (slug) | `categoria` | N/E | Valor esperado (nacional) |
+|---|---|---|---|---|
+| Nº total de estabelecimentos | `estabelecimentos_total` | — | N E | 26 |
+| Nº de estabelecimentos por tipo de habilitação | `estabelecimentos_por_habilitacao` | `Ambulatorial` / `Hospitalar` / `Ambulatorial/Hospitalar` | N E | 16 / 3 / 7 |
+| Nº de UFs com habilitação hospitalar (Hospitalar ou Ambulatorial/Hospitalar) | `estados_com_habilitacao_hospitalar` | — | N | 8 |
+| Nº de UFs só com habilitação ambulatorial | `estados_apenas_ambulatorial` | — | N | 7 |
+| Nº de UFs sem nenhum serviço | `estados_sem_servico` | — | N | 12 |
+
+Aba `Estabelecimento_CNES` → `lgbt_saude_pns_cnes_estabelecimento_cnes` →
+`stg_lgbtqia_plus_estabelecimentos_saude_trans` →
+`int_lgbtqia_plus_5_1_servicos_saude_trans` → mart `lgbtqia_plus_indicadores`.
+Validação: `tests/lgbtqia_plus_5_1_valores_nacionais.sql` (contra a planilha de cálculo da equipe).
 
 ### 6. Assistência social — `N E M`
 
@@ -261,9 +273,26 @@ Marts: `lgbtqia_plus_relatorio_nacional` / `_estadual` / `_municipal`.
 
 ## 3. Situação atual
 
-- ✅ **6.1 Proteção social especial** — modelada nos 3 níveis (piloto). Ver `transform/models/*/lgbtqia_plus/`.
-- ⬜ Todas as demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
-- Ordem sugerida pela equipe (README): próximas mais "limpas" são **2.5** (Casamentos e uniões) e **5.1** (Serviços de saúde para pessoas trans).
+- ✅ **6.1 Proteção social especial** — modelada nos 3 níveis (piloto). **Formato largo** (`lgbtqia_plus_relatorio_nacional/_estadual/_municipal`, uma coluna por indicador). A migrar para o formato longo.
+- ✅ **5.1 Serviços de saúde para pessoas trans** — modelada (N e E) no **formato longo**.
+- ⬜ Demais seções — dado bruto **já está no schema `raw`** (54 tabelas), falta modelar.
+
+### Formato longo — `lgbtqia_plus_indicadores`
+
+Mart único, uma linha por `(nivel, recorte_codigo, secao, indicador, categoria)`:
+
+| coluna | conteúdo |
+|---|---|
+| `nivel` | `nacional` / `estadual` / `municipal` |
+| `recorte_codigo` / `recorte_nome` | `null`/`Brasil` · `codigo_uf`/nome · `cod_ibge`/nome |
+| `secao` / `secao_nome` | ex. `5.1` / `Saúde — Serviços de saúde para pessoas trans` |
+| `indicador` | slug estável (ex. `estabelecimentos_total`) |
+| `categoria` | quebra dentro do indicador (`null` se não houver) |
+| `valor` / `valor_tipo` | numérico · `numero_absoluto` / `percentual` / `variacao_pp` |
+| `ano_referencia` | |
+
+Views de conveniência: `lgbtqia_plus_indicadores_{nacional,estadual,municipal}`.
+Cada (sub)seção é um `int_lgbtqia_plus_<secao>_*` que já devolve nesse formato; o mart só faz `union all`.
 
 ## 4. Observações e inconsistências
 

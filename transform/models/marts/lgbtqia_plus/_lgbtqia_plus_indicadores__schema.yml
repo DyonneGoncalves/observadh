@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: lgbtqia_plus_indicadores
+    description: >
+      Todos os indicadores do relatório LGBTQIA+ no formato longo — uma linha
+      por (nivel, recorte_codigo, secao, indicador, categoria). União dos
+      modelos int_lgbtqia_plus_<secao>_*.
+    columns:
+      - name: nivel
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["nacional", "estadual", "municipal"]
+      - name: secao
+        tests:
+          - not_null
+      - name: indicador
+        tests:
+          - not_null
+      - name: valor
+        tests:
+          - not_null
+      - name: valor_tipo
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["numero_absoluto", "percentual", "variacao_pp"]
+
+  - name: lgbtqia_plus_indicadores_nacional
+    description: Recorte nacional (nivel = 'nacional') do mart longo.
+
+  - name: lgbtqia_plus_indicadores_estadual
+    description: Recorte estadual (nivel = 'estadual') do mart longo.
+
+  - name: lgbtqia_plus_indicadores_municipal
+    description: Recorte municipal (nivel = 'municipal') do mart longo.
