@@ -20,6 +20,9 @@ union all
 select * from {{ ref('int_lgbtqia_plus_2_perfil_pns') }}
 
 union all
+select * from {{ ref('int_lgbtqia_plus_3_trabalho_renda') }}
+
+union all
 select * from {{ ref('int_lgbtqia_plus_2_5_casamentos_registro_civil') }}
 
 union all

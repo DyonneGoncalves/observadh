@@ -212,3 +212,14 @@ sources:
           Censo 2022 — pessoas por tipo de relação no domicílio, por município.
           Colunas de contagem vêm como TEXTO com "-" onde não há dado. Aba
           "Cônjuges do mesmo sexo 2022".
+
+      # --- 3 — Trabalho e renda (PNS 2019, só Brasil) ---
+      - name: raw_lgbtqia_plus_taxa_ocupacao_orient_sexual
+        identifier: lgbt_trab_pns_taxa_de_ocupacao_por_orient_sex
+        description: PNS 2019 — % de pessoas ocupadas (18+) por orientação sexual, Brasil. Aba "Taxa de ocupação por orient sex".
+      - name: raw_lgbtqia_plus_renda_per_capita
+        identifier: lgbt_trab_pns_renda_per_capta
+        description: >
+          PNS 2019 — população 18+ por orientação sexual e faixa de renda
+          domiciliar per capita (5 faixas), Brasil. Cada faixa tem coluna de
+          contagem e coluna "_1" com o % pré-calculado. Aba "Renda per capta".

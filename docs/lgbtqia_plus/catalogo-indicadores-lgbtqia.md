@@ -192,13 +192,18 @@ confirmar com a equipe).
 
 > No corpo dos docs Estadual e Municipal a subseção aparece renumerada como **"2.1. Casamentos e uniões"** (o índice mantém 2.5). É a mesma coisa.
 
-### 3. Trabalho e renda — `N` apenas (E e M = "Sem dados")
+### 3. Trabalho e renda — `N` apenas — ✅ **MODELADA (formato longo)**
 
-| Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | Modelo dbt |
-|---|---|---|---|---|
-| 3.0 | % total Brasil por orientação sexual, 18+ | Taxa de ocupação por orient sex | `lgbt_trab_pns_taxa_de_ocupacao_por_orient_sex` | — |
-| 3.0 | % 18+ por orientação sexual com renda per capita > 5 salários mínimos | Renda per capta | `lgbt_trab_pns_renda_per_capta` | — |
-| 3.1 | **Pessoas Trans** — destaque de estudo do Ipea (2025), **sem base de dados** ("Sinalização CGTI") | — | — | n/a |
+Modelo: `int_lgbtqia_plus_3_trabalho_renda`. Validação: `tests/lgbtqia_plus_3_valores.sql`.
+
+| `indicador` (slug) | `categoria` | Aba Excel | esperado (nacional) |
+|---|---|---|---|
+| `pct_pessoas_ocupadas_por_orientacao` | orientação | Taxa de ocupação por orient sex | Het 92,3 · Homo 89,6 · Bi 84,8 |
+| `pct_renda_per_capita_por_orientacao` | `<orientação> / <faixa de renda>` (5 faixas) | Renda per capta | Homossexual / +5 SM = 11,99 |
+
+| Sub | | |
+|---|---|---|
+| 3.1 | **Pessoas Trans** — destaque de estudo do Ipea (2025), **sem base de dados** ("Sinalização CGTI") | n/a |
 
 ### 4. Educação — `N E` (M = "Sem dados")
 
@@ -327,7 +332,7 @@ para as quebras). Validação: `tests/lgbtqia_plus_7_1_valores.sql`.
 - ✅ **7.0 Notificações de violência (SINAN)** — N/E/M, formato longo (falta local e perfil do agressor).
 - ✅ **7.1 Denúncias de violações de DH (ONDH)** — N/E/M, formato longo (falta local e relação do suspeito).
 - ✅ **6.1 Proteção social especial** — N/E/M (piloto). Ainda no **formato largo** (`lgbtqia_plus_relatorio_*`). A migrar para o formato longo.
-- ⬜ **3 Trabalho e renda** — só N. Falta modelar.
+- ✅ **3 Trabalho e renda** — só N, formato longo.
 - ⬜ **2.6 / 3.1 / "Censo Trans"** — sem base de dados ("Sinalização CGTI"), não viram modelo.
 
 ### Formato longo — `lgbtqia_plus_indicadores`
