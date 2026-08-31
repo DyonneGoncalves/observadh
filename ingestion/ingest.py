@@ -6,9 +6,14 @@ gravar o conteúdo, SEM transformação de negócio, em tabelas RAW no Postgres.
 
 Descoberta automática: cada aba de cada arquivo .xlsx/.xls em
     ingestion/input/<tema>/<ano>/
-vira uma tabela  <schema_raw>.<prefixo>_<arquivo>_<aba>  com nomes
-normalizados (sem acento, snake_case, abreviados, limite de 63 caracteres do
-Postgres). Nenhum mapeamento manual de aba é necessário.
+vira uma tabela  <schema_raw>.<prefixo>_<planilha>_<aba>.
+  - <prefixo>   = prefixo_tabela do config (ex.: lgbt)
+  - <planilha>  = prefixos_planilha[arquivo] do config, ou abreviação
+                  automática do nome do arquivo (sem ano/versão)
+  - <aba>       = nome da aba INTEIRO, só normalizado (sem acento, snake_case);
+                  não é abreviado
+Só a parte <planilha> é encurtada se o total passar de 63 caracteres.
+Nenhum mapeamento manual de aba é necessário.
 
 Cada execução RECRIA as tabelas do zero (carga limpa — sem histórico de
 linhas). O histórico das EXECUÇÕES fica em  <schema_raw>.etl_importacao_arquivos.
@@ -128,15 +133,46 @@ def abreviar(nome: str) -> str:
     return re.sub(r"_+", "_", "_".join(partes)).strip("_")
 
 
-def normalizar_nome_tabela(nome: str, limite: int = 63) -> str:
-    nome = abreviar(normalizar_nome(nome))
-    nome = re.sub(r"_+", "_", nome).strip("_")
+# Abreviações aplicadas SÓ à parte "nome da planilha" do nome da tabela.
+# O nome da ABA é mantido inteiro (normalizado, sem abreviar) para facilitar
+# a leitura no cliente do banco. Ver docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md.
+PLANILHA_ABREV = {
+    "assistencia": "assist", "estatisticas": "est", "estatistica": "est",
+    "registro": "reg", "educacao": "educ", "trabalho": "trab",
+    "violencia": "viol", "violencias": "viol", "quantas": "qtas",
+    "orientacao": "orient", "identidade": "ident",
+}
+
+
+def abreviar_base_planilha(nome_base: str) -> str:
+    """Abrevia a parte derivada do NOME DO ARQUIVO: normaliza, remove tokens
+    de ano (19xx/20xx) e de versão (v2, v3...) e aplica PLANILHA_ABREV.
+    Não trunca — o controle de 63 chars fica em montar_nome_tabela()."""
+    tokens = []
+    for t in normalizar_nome(nome_base).split("_"):
+        if not t or re.fullmatch(r"(19|20)\d{2}", t) or re.fullmatch(r"v\d+", t):
+            continue
+        tokens.append(PLANILHA_ABREV.get(t, t))
+    return re.sub(r"_+", "_", "_".join(tokens)).strip("_")
+
+
+def montar_nome_tabela(prefixo: str, base_planilha: str, aba: str, limite: int = 63) -> str:
+    """<prefixo>_<base_planilha>_<aba>. Se passar de `limite`, encurta APENAS
+    a base_planilha (nunca o prefixo do tema nem o nome da aba)."""
+    aba_norm = normalizar_nome(aba)
+    nome = f"{prefixo}_{base_planilha}_{aba_norm}"
     if len(nome) <= limite:
         return nome
-    # mantém começo e fim para não perder contexto
-    ini = 42
-    fim = limite - ini - 1
-    return f"{nome[:ini].rstrip('_')}_{nome[-fim:].lstrip('_')}"
+    espaco_base = limite - len(prefixo) - len(aba_norm) - 2  # 2 underscores
+    if espaco_base >= 3:
+        base_curta = base_planilha[:espaco_base].rstrip("_")
+        nome = f"{prefixo}_{base_curta}_{aba_norm}"
+        log.warning("base da planilha encurtada p/ caber em %d chars: %s", limite, nome)
+        return nome
+    # caso extremo: aba sozinha já estoura o limite -> trunca o todo
+    nome = nome[:limite].rstrip("_")
+    log.warning("nome de tabela truncado (aba muito longa): %s", nome)
+    return nome
 
 
 def normalizar_colunas_dataframe(df: pd.DataFrame, limite: int = 55) -> pd.DataFrame:
@@ -250,9 +286,13 @@ def processar_arquivo(engine, cfg: dict, caminho: Path, dry_run: bool) -> int:
     schema = cfg.get("schema_raw", "raw")
     ignorar_abas = {normalizar_nome(a) for a in cfg.get("ignorar_abas", [])}
 
+    # Prefixo da tabela derivado do arquivo: usa o override explícito do
+    # config (prefixos_planilha) e, se não houver, abrevia automaticamente.
+    prefixos_planilha = cfg.get("prefixos_planilha") or {}
     nome_arquivo = caminho.name
-    nome_base = nome_base_arquivo(nome_arquivo)
-    log.info("Arquivo: %s  (base: %s)", nome_arquivo, nome_base)
+    base_planilha = prefixos_planilha.get(nome_arquivo) or \
+        abreviar_base_planilha(nome_base_arquivo(nome_arquivo))
+    log.info("Arquivo: %s  (base: %s)", nome_arquivo, base_planilha)
 
     total = 0
     xls = pd.ExcelFile(caminho)
@@ -274,7 +314,7 @@ def processar_arquivo(engine, cfg: dict, caminho: Path, dry_run: bool) -> int:
             df["nm_aba_origem"] = aba
             df["dt_importacao"] = datetime.now()
 
-            tabela = normalizar_nome_tabela(f"{prefixo}_{nome_base}_{normalizar_nome(aba)}")
+            tabela = montar_nome_tabela(prefixo, base_planilha, aba)
 
             if dry_run:
                 log.info("  [dry-run] %s.%s <- aba '%s' (%d linhas, %d colunas)",

@@ -15,14 +15,14 @@ sources:
     loaded_at_field: dt_importacao
     tables:
       - name: raw_lgbtqia_plus_serie_atendimentos_paefi
-        identifier: lgbt_assist_social_rma_censo_suas_2017_2024_serie_atend_paefi
+        identifier: lgbt_assist_social_serie_atendimentos_paefi
         description: >
           Pessoas vítimas de discriminação por orientação sexual que
           ingressaram no PAEFI, por município e mês/ano de referência
           (série 2017-2024). Aba original "Série atendimentos PAEFI".
 
       - name: raw_lgbtqia_plus_creas_discriminacao_orientacao
-        identifier: lgbt_assist_social_rma_censo_suas_2017_202_as_discri_orient_sex
+        identifier: lgbt_assist_social_atendim_creas_discri_orient_sex
         description: >
           CREAS por município: se atendem casos de discriminação por
           orientação sexual no PAEFI. Aba original "Atendim CREAS discri
@@ -30,19 +30,19 @@ sources:
           usada como golden value para validar nosso próprio cálculo.
 
       - name: raw_lgbtqia_plus_creas_discriminacao_identidade
-        identifier: lgbt_assist_social_rma_censo_suas_2017_202_eas_discri_ident_gen
+        identifier: lgbt_assist_social_atendim_creas_discri_ident_gen
         description: >
           Mesma estrutura da anterior, para discriminação por identidade
           de gênero. Aba original "Atendim CREAS discri ident gên".
 
       - name: raw_lgbtqia_plus_centros_pop
-        identifier: lgbt_assist_social_rma_censo_suas_2017_2024_centros_pop
+        identifier: lgbt_assist_social_centros_pop
         description: >
           Centros POP por município: se atenderam pessoas LGBTQIA+. Aba
           original "Centros Pop".
 
       - name: raw_lgbtqia_plus_unidades_acolhimento
-        identifier: lgbt_assist_social_rma_censo_suas_2017_202_idades_de_acolh_2024
+        identifier: lgbt_assist_social_unidades_de_acolhimento_2024
         description: >
           Unidades de acolhimento (grão = UNIDADE, não município — várias
           unidades por município). Aba original "Unidades de Acolhimento
