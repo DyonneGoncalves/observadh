@@ -24,7 +24,7 @@ observadh/
 
 Ver a proposta completa de arquitetura em `proposta-arquitetura-observadh.md` (na raiz do projeto Claude) para o racional por trás dessas decisões.
 
-O mapeamento completo **seção do relatório → fórmula → aba do Excel → tabela `raw` → modelo dbt** está em [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md), junto com os 6 documentos-fonte da equipe (3 de cálculo + 3 de texto-base do relatório) e as inconsistências pendentes de decisão.
+O mapeamento completo **seção do relatório → fórmula → aba do Excel → tabela `raw` → modelo dbt** está em [`docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md`](docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md), junto com os 6 documentos-fonte da equipe (3 de cálculo + 3 de texto-base do relatório) e as inconsistências pendentes de decisão. Para a aplicação, o guia de consumo da tabela final está em [`docs/lgbtqia_plus/consumo-lgbtqia_plus_indicadores.md`](docs/lgbtqia_plus/consumo-lgbtqia_plus_indicadores.md).
 
 ## Como rodar um ciclo (quando os dados do tema estiverem prontos)
 

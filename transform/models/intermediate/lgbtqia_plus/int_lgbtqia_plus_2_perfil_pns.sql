@@ -23,14 +23,19 @@ total_geral as (
     select total_pop from sexo_total where orientacao ilike 'total%'
 ),
 
+-- as abas trazem uma linha "Total com info de Orientação Sexual" que não é
+-- uma orientação — descartada aqui.
 faixa as (
     select * from {{ source('raw_lgbtqia_plus', 'raw_lgbtqia_plus_pessoas_faixa_etaria') }}
+    where tipo_de_orient_sexual not ilike 'total%'
 ),
 raca as (
     select * from {{ source('raw_lgbtqia_plus', 'raw_lgbtqia_plus_pessoas_cor_ou_raca') }}
+    where tipo_de_orient_sexual not ilike 'total%'
 ),
 localidade as (
     select * from {{ source('raw_lgbtqia_plus', 'raw_lgbtqia_plus_pessoas_area_localidade') }}
+    where tipo_de_orient_sexual not ilike 'total%'
 ),
 
 linhas as (
