@@ -10,7 +10,7 @@ with esperado (indicador, categoria, valor) as (
         ('estabelecimentos_por_habilitacao',     'Ambulatorial/Hospitalar',  7),
         ('estabelecimentos_por_habilitacao',     'Hospitalar',               3),
         ('estados_com_habilitacao_hospitalar',   null,                       8),
-        ('estados_apenas_ambulatorial',          null,                       7),
+        ('estados_com_habilitacao_ambulatorial', null,                     14),
         ('estados_sem_servico',                  null,                      12)
 ),
 

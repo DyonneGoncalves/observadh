@@ -4,7 +4,7 @@
 
 with esperado (indicador, valor) as (
     values
-        ('vitimas_paefi',                              1528.0),
+        ('vitimas_paefi',                              1517.0),
         ('pct_creas_nao_atende_orientacao',              60.60),
         ('pct_creas_nao_atende_identidade',              69.61),
         ('pct_centros_pop_atenderam_lgbt',            97.25),

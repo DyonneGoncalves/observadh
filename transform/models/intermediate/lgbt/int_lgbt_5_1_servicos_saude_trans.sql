@@ -41,7 +41,8 @@ uf_capacidade as (
     select
         uf_codigo,
         count(*)                                                                              as qtd_estab,
-        count(*) filter (where tipo_habilitacao in ('Hospitalar', 'Ambulatorial/Hospitalar')) as qtd_hospitalar
+        count(*) filter (where tipo_habilitacao in ('Hospitalar', 'Ambulatorial/Hospitalar')) as qtd_hospitalar,
+        count(*) filter (where tipo_habilitacao in ('Ambulatorial', 'Ambulatorial/Hospitalar')) as qtd_ambulatorial
     from com_servico
     group by 1
 ),
@@ -63,8 +64,10 @@ nacional as (
            (select count(*) from uf_capacidade where qtd_hospitalar > 0)::numeric
 
     union all
-    select 'estados_apenas_ambulatorial', null,
-           (select count(*) from uf_capacidade where qtd_hospitalar = 0)::numeric
+    -- estados com habilitação ambulatorial (inclui os que também têm hospitalar);
+    -- é o número que o relatório publica como "apenas ambulatorial".
+    select 'estados_com_habilitacao_ambulatorial', null,
+           (select count(*) from uf_capacidade where qtd_ambulatorial > 0)::numeric
 
     union all
     select 'estados_sem_servico', null,

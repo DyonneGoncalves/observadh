@@ -27,15 +27,15 @@ total_geral as (
 -- uma orientação — descartada aqui.
 faixa as (
     select * from {{ source('raw_lgbt', 'raw_lgbt_pessoas_faixa_etaria') }}
-    where tipo_de_orient_sexual not ilike 'total%'
+    where tipo_de_orient_sexual not ilike 'total%' and coalesce(trim(tipo_de_orient_sexual), '') <> ''
 ),
 raca as (
     select * from {{ source('raw_lgbt', 'raw_lgbt_pessoas_cor_ou_raca') }}
-    where tipo_de_orient_sexual not ilike 'total%'
+    where tipo_de_orient_sexual not ilike 'total%' and coalesce(trim(tipo_de_orient_sexual), '') <> ''
 ),
 localidade as (
     select * from {{ source('raw_lgbt', 'raw_lgbt_pessoas_area_localidade') }}
-    where tipo_de_orient_sexual not ilike 'total%'
+    where tipo_de_orient_sexual not ilike 'total%' and coalesce(trim(tipo_de_orient_sexual), '') <> ''
 ),
 
 linhas as (

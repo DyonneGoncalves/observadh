@@ -5,16 +5,14 @@
 -- os marts largos lgbt_relatorio_{nacional,estadual,municipal}.
 --
 -- Percentuais são recalculados a partir dos totais agregados por nível (nunca
--- como média dos percentuais municipais). PAEFI usa o ano mais recente por
--- município (o relatório mostra o valor "atual" — TODO da equipe: série?).
+-- como média dos percentuais municipais). PAEFI = somente o ano mais recente
+-- disponível (2024) — bate com o relatório publicado (1.517). Não é "o último
+-- ano de cada município": municípios sem registro em 2024 ficam de fora.
 
 with paefi_recente as (
     select municipio_codigo_ibge, uf_codigo, qtd_vitimas_paefi
-    from (
-        select *, row_number() over (partition by municipio_codigo_ibge order by ano_referencia desc) as rn
-        from {{ ref('int_lgbt_paefi_por_municipio') }}
-    ) t
-    where rn = 1
+    from {{ ref('int_lgbt_paefi_por_municipio') }}
+    where ano_referencia = (select max(ano_referencia) from {{ ref('int_lgbt_paefi_por_municipio') }})
 ),
 creas_o as ( select * from {{ ref('int_lgbt_creas_orientacao_por_municipio') }} ),
 creas_i as ( select * from {{ ref('int_lgbt_creas_identidade_por_municipio') }} ),
