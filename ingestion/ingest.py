@@ -22,8 +22,8 @@ Toda a lógica de normalização/cálculo de indicador fica no projeto dbt
 (transform/), não aqui.
 
 Uso:
-    python ingest.py --tema lgbtqia_plus --ano 2026
-    python ingest.py --tema lgbtqia_plus --ano 2026 --dry-run
+    python ingest.py --tema lgbt --ano 2026
+    python ingest.py --tema lgbt --ano 2026 --dry-run
 
 Conexão com o banco (ordem de precedência):
     DATABASE_URL   ex.: postgresql+psycopg2://user:senha@host:5432/db
@@ -135,7 +135,7 @@ def abreviar(nome: str) -> str:
 
 # Abreviações aplicadas SÓ à parte "nome da planilha" do nome da tabela.
 # O nome da ABA é mantido inteiro (normalizado, sem abreviar) para facilitar
-# a leitura no cliente do banco. Ver docs/lgbtqia_plus/catalogo-indicadores-lgbtqia.md.
+# a leitura no cliente do banco. Ver docs/lgbt/catalogo-indicadores-lgbt.md.
 PLANILHA_ABREV = {
     "assistencia": "assist", "estatisticas": "est", "estatistica": "est",
     "registro": "reg", "educacao": "educ", "trabalho": "trab",
@@ -274,7 +274,7 @@ def importar_dataframe(engine, schema: str, df: pd.DataFrame, tabela: str):
 
 def nome_base_arquivo(nome_arquivo: str) -> str:
     base = normalizar_nome(re.sub(r"\.(xlsx|xls)$", "", nome_arquivo, flags=re.I))
-    for prefixo in ("lgbtqia_", "lgbt_"):
+    for prefixo in ("lgbt_", "lgbt_"):
         if base.startswith(prefixo):
             return base[len(prefixo):]
     return base
@@ -375,7 +375,7 @@ def ingerir_tema(tema: str, ano: int, dry_run: bool = False, recriar_log: bool =
 
 def main():
     parser = argparse.ArgumentParser(description="Ingestão de planilhas do ObservaDH")
-    parser.add_argument("--tema", required=True, help="ex.: lgbtqia_plus")
+    parser.add_argument("--tema", required=True, help="ex.: lgbt")
     parser.add_argument("--ano", type=int, required=True, help="ano do ciclo de recebimento das planilhas")
     parser.add_argument("--dry-run", action="store_true",
                         help="lê e normaliza as planilhas sem gravar no banco")
