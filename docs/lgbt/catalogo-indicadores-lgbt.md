@@ -186,9 +186,15 @@ Modelos: `stg_lgbt_{casamentos_mesmo_sexo, total_casamentos_uf, pessoas_estado_c
 natureza_juridica_uniao}` → `int_lgbt_2_5_{casamentos_registro_civil, perfil_conjugal_pns}`
 → `lgbt_indicadores`. Validação: `tests/lgbt_2_5_valores.sql`.
 
-Ainda **não modelado** da 2.5: "% de casamentos do mesmo sexo por estado" (indicador
-nacional que se sobrepõe a `pct_casamentos_lesbohomoafetivos` e tem denominador ambíguo —
-confirmar com a equipe).
+Sobre "% de casamentos do mesmo sexo por estado" (o ranking do corpo do relatório,
+ex. "SC 1,2% e SP 1,1%"): **é o mesmo indicador `pct_casamentos_lesbohomoafetivos`**.
+Nosso valor por UF bate **exatamente** com a aba de cálculo da equipe
+`Cálculo_Casamento_Sexo_Ano` (SC 1,488544% → 1,49; SP 1,848139% → 1,85; MA 0,32;
+RO 0,47; TO 0,41; Brasil 1,204603% → 1,20). Os números do **texto** do relatório
+(SC 1,2% / SP 1,1% / MA-RO-TO 0,2%) **não conferem com a própria planilha de cálculo
+da equipe** — parece transcrição do valor Brasil (1,2%) para o estado, ou rascunho
+antigo. Mantido o cálculo (confere com a planilha); divergência é no texto-base,
+sinalizar para a equipe.
 
 > No corpo dos docs Estadual e Municipal a subseção aparece renumerada como **"2.1. Casamentos e uniões"** (o índice mantém 2.5). É a mesma coisa.
 
@@ -364,4 +370,6 @@ Cada (sub)seção é um `int_lgbt_<secao>_*` que já devolve nesse formato; o ma
 - **Aba "ONDH - Identidade de gênero" dentro do arquivo SINAN**: duplica parte do arquivo ONDH separado. Ingerida como `lgbt_viol_sinan_ondh_identidade_de_genero`. Confirmar com a equipe se é intencional.
 - **Nomes de aba divergentes entre "V2" e o citado nos docs**: ex. doc diz "Unidade de Acolhimento 2024" (singular) e "Unidades de Acolhimento 2024" (plural) na mesma página; "Conjuges" vs "Cônjuges". Usar sempre o nome real da aba no arquivo `.xlsx`.
 - **Ano de referência**: alguns docs dizem "2024" onde a planilha traz série histórica (PAEFI 2017–2024). O piloto 6.1 usa o ano mais recente por município e deixou TODO para a equipe confirmar se o relatório quer o valor pontual ou a série.
+- **Aba "Unidades de Acolhimento 2024" com linhas duplicadas**: a aba que veio no arquivo de Assistência Social tem 7.465 linhas, mas só 6.568 distintas — 897 linhas são cópias exatas (arquivo montado concatenando dois extratos que se sobrepõem; concentração SP/RS/MG/PR/RJ). `stg_lgbt_unidades_acolhimento` faz `select distinct`. Pós-dedup: 6.568 unidades / 492 com pessoas trans / **1.124** pessoas trans acolhidas. A equipe conta pelo campo `NU_IDENTIFICADOR_UNIDADE` (ausente nesta aba) e chega a 6.538 / 485 / **1.126**. Gap residual ~0,2% (2 unidades genuínas com atributos idênticos que o `distinct` também colapsa) — resolve quando a equipe mandar a aba com o identificador da unidade.
+- **"% de casamentos do mesmo sexo por estado" (2.5)**: o texto do relatório (SC 1,2% / SP 1,1% / MA-RO-TO 0,2%) **não bate com a planilha de cálculo da própria equipe** (`Cálculo_Casamento_Sexo_Ano`: SC 1,49 / SP 1,85 / MA 0,32 / RO 0,47 / TO 0,41). Nosso `pct_casamentos_lesbohomoafetivos` bate com a planilha, não com o texto. Divergência é no texto-base do relatório — sinalizar para a equipe.
 - As 11 inconsistências mencionadas no README vêm deste conjunto de observações + do catálogo original da equipe.

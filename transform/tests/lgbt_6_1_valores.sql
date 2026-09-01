@@ -8,8 +8,14 @@ with esperado (indicador, valor) as (
         ('pct_creas_nao_atende_orientacao',              60.60),
         ('pct_creas_nao_atende_identidade',              69.61),
         ('pct_centros_pop_atenderam_lgbt',            97.25),
-        ('unidades_acolhimento_total',                 7465.0),
-        ('pct_unidades_acolhimento_com_pessoas_trans',    7.11)
+        -- Acolhimento: a aba ingerida tinha 897 linhas 100% duplicadas
+        -- (stg_lgbt_unidades_acolhimento faz `select distinct`). Pós-dedup:
+        -- 6.568 unidades / 492 com pessoas trans / 1.124 pessoas trans acolhidas.
+        -- Referência da equipe (conta NU_IDENTIFICADOR_UNIDADE, coluna ausente
+        -- nesta aba): 6.538 / 485 / 1.126. Gap residual ~0,5% — some quando
+        -- a aba com o identificador da unidade chegar.
+        ('unidades_acolhimento_total',                 6568.0),
+        ('pct_unidades_acolhimento_com_pessoas_trans',    7.49)
 ),
 
 obtido as (
