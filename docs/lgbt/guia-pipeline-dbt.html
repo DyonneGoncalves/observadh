@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Pipeline dbt do ObservaDH</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --bg:#f6f7f7; --surface:#ffffff; --surface-2:#f0f2f2;
+    --ink:#182123; --muted:#5b6a6e; --faint:#8a999d;
+    --border:#e0e5e5; --border-strong:#cdd5d5;
+    --accent:#0c7a6e; --accent-ink:#0a5f56; --accent-soft:#e4f1ef;
+    --warn:#a75510; --warn-soft:#fbeede;
+    --code-bg:#f4f6f6; --code-ink:#1c2b2b;
+    --shadow:0 1px 2px rgba(20,40,40,.04),0 6px 20px rgba(20,40,40,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#10161a; --surface:#161e22; --surface-2:#1c262b;
+      --ink:#e7edee; --muted:#9fb0b4; --faint:#6f8388;
+      --border:#26333a; --border-strong:#33454d;
+      --accent:#4bbfae; --accent-ink:#7dd4c6; --accent-soft:#16302d;
+      --warn:#e0a35e; --warn-soft:#2e2417;
+      --code-bg:#111a1e; --code-ink:#cfe0e0;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10161a; --surface:#161e22; --surface-2:#1c262b;
+    --ink:#e7edee; --muted:#9fb0b4; --faint:#6f8388;
+    --border:#26333a; --border-strong:#33454d;
+    --accent:#4bbfae; --accent-ink:#7dd4c6; --accent-soft:#16302d;
+    --warn:#e0a35e; --warn-soft:#2e2417;
+    --code-bg:#111a1e; --code-ink:#cfe0e0;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:0 clamp(16px,4vw,40px)}
+  .layout{display:grid; grid-template-columns:1fr; gap:0}
+  @media(min-width:1000px){ .layout{grid-template-columns:230px 1fr; gap:48px; align-items:start} }
+
+  /* ---- nav ---- */
+  nav.toc{
+    position:sticky; top:0; align-self:start;
+    font-size:13.5px; line-height:1.5;
+    padding:24px 0; max-height:100vh; overflow-y:auto;
+  }
+  nav.toc .lbl{font-family:"IBM Plex Mono",monospace; text-transform:uppercase;
+    letter-spacing:.09em; font-size:11px; color:var(--faint); margin:0 0 10px}
+  nav.toc ol{list-style:none; margin:0; padding:0; counter-reset:toc}
+  nav.toc li{counter-increment:toc; margin:2px 0}
+  nav.toc a{
+    display:block; color:var(--muted); text-decoration:none; padding:3px 8px;
+    border-left:2px solid transparent; border-radius:0 4px 4px 0;
+  }
+  nav.toc a::before{content:counter(toc,decimal-leading-zero) "  "; color:var(--faint);
+    font-family:"IBM Plex Mono",monospace; font-size:11px}
+  nav.toc a:hover{color:var(--ink); background:var(--surface-2)}
+  @media(max-width:999px){ nav.toc{display:none} }
+
+  /* ---- header ---- */
+  header.hero{padding:56px 0 34px; border-bottom:1px solid var(--border)}
+  .kicker{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--accent-ink); margin:0 0 14px}
+  h1{font-family:"Newsreader",Georgia,serif; font-weight:500; font-size:clamp(2rem,5vw,3rem);
+    line-height:1.08; letter-spacing:-.01em; margin:0 0 16px; text-wrap:balance}
+  .lede{font-size:1.12rem; color:var(--muted); max-width:60ch; margin:0}
+
+  main{padding:8px 0 90px}
+  section{padding:38px 0; border-bottom:1px solid var(--border); scroll-margin-top:16px}
+  section:last-child{border-bottom:0}
+  h2{font-family:"Newsreader",Georgia,serif; font-weight:500; font-size:1.7rem;
+    line-height:1.15; margin:0 0 6px; letter-spacing:-.005em}
+  h2 .n{font-family:"IBM Plex Mono",monospace; font-size:.8rem; color:var(--accent-ink);
+    display:inline-block; margin-right:12px; vertical-align:.18em}
+  h3{font-size:1.02rem; font-weight:600; margin:26px 0 8px; letter-spacing:.005em}
+  h4{font-size:.95rem; font-weight:600; margin:18px 0 4px; color:var(--ink)}
+  p{margin:12px 0} .lead{color:var(--muted); margin-top:2px}
+  a{color:var(--accent-ink); text-decoration-thickness:1px; text-underline-offset:2px}
+  strong{font-weight:600}
+  ul,ol{margin:12px 0; padding-left:22px} li{margin:5px 0}
+  hr.soft{border:0; border-top:1px solid var(--border); margin:26px 0}
+
+  code{font-family:"IBM Plex Mono",monospace; font-size:.86em;
+    background:var(--code-bg); color:var(--code-ink); padding:.12em .38em; border-radius:4px;
+    border:1px solid var(--border)}
+  pre{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px; overflow-x:auto; margin:14px 0; box-shadow:var(--shadow);
+  }
+  pre code{background:none; border:0; padding:0; font-size:13px; line-height:1.62; color:var(--code-ink)}
+  .cap{font-size:12.5px; color:var(--faint); margin:-6px 0 18px; font-family:"IBM Plex Mono",monospace}
+
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14px}
+  .scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top}
+  th{font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); font-weight:600;
+    border-bottom:1px solid var(--border-strong)}
+  td code{white-space:nowrap}
+  tbody tr:hover{background:var(--surface-2)}
+
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:20px 22px; margin:16px 0; box-shadow:var(--shadow)}
+
+  .callout{border:1px solid var(--border); border-left:3px solid var(--accent);
+    background:var(--accent-soft); border-radius:8px; padding:14px 18px; margin:16px 0}
+  .callout.warn{border-left-color:var(--warn); background:var(--warn-soft)}
+  .callout p{margin:6px 0} .callout p:first-child{margin-top:0} .callout p:last-child{margin-bottom:0}
+  .callout .tag{font-family:"IBM Plex Mono",monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--accent-ink); font-weight:600}
+  .callout.warn .tag{color:var(--warn)}
+
+  /* pipeline rail */
+  .rail{display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 8px; align-items:stretch}
+  .stage{flex:1 1 140px; min-width:140px; background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:10px; padding:13px 14px; position:relative; box-shadow:var(--shadow)}
+  .stage .s-n{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--faint); letter-spacing:.08em}
+  .stage .s-t{font-weight:600; font-size:14px; margin:3px 0 4px}
+  .stage .s-d{font-size:12px; color:var(--muted); line-height:1.45}
+  .stage .s-tool{margin-top:8px; font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+    color:var(--accent-ink); background:var(--accent-soft); border-radius:4px; padding:2px 6px; display:inline-block}
+  .stage.raw .s-tool{color:var(--warn); background:var(--warn-soft)}
+
+  /* trace steps */
+  .trace{counter-reset:tr; margin:20px 0; border-left:2px solid var(--border-strong); padding-left:0}
+  .step{position:relative; padding:0 0 22px 30px; counter-increment:tr}
+  .step::before{content:counter(tr); position:absolute; left:-13px; top:0;
+    width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
+    font-family:"IBM Plex Mono",monospace; font-size:12px; display:grid; place-items:center; font-weight:500}
+  :root[data-theme="dark"] .step::before,
+  :root:not([data-theme="light"]) .step::before{color:#0a1614}
+  .step h4{margin:0 0 3px} .step p{margin:4px 0}
+  .step .where{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--faint)}
+
+  .foot{padding:34px 0 0; color:var(--faint); font-size:13px}
+  .pill{font-family:"IBM Plex Mono",monospace; font-size:11px; border:1px solid var(--border-strong);
+    border-radius:20px; padding:2px 10px; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <p class="kicker">ObservaDH · Camada de dados</p>
+  <h1>Pipeline dbt do ObservaDH</h1>
+  <p class="lede">Como o tema LGBTQIA+ sai de oito planilhas de Excel e vira uma tabela de indicadores pronta para a aplicação — cada etapa, cada pasta, cada convenção, com um exemplo rastreado de ponta a ponta.</p>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice">
+  <p class="lbl">Índice</p>
+  <ol>
+    <li><a href="#mental">O modelo mental do dbt</a></li>
+    <li><a href="#pipeline">O pipeline inteiro</a></li>
+    <li><a href="#ingestao">Etapa 0 — Ingestão (Python)</a></li>
+    <li><a href="#projeto">O projeto dbt: mapa de pastas</a></li>
+    <li><a href="#conceitos">Conceitos-chave do dbt</a></li>
+    <li><a href="#staging">Camada 1 — Staging</a></li>
+    <li><a href="#intermediate">Camada 2 — Intermediate</a></li>
+    <li><a href="#marts">Camada 3 — Marts</a></li>
+    <li><a href="#macros">Macros</a></li>
+    <li><a href="#testes">Testes</a></li>
+    <li><a href="#seeds">Seeds</a></li>
+    <li><a href="#rastreio">Rastreando um indicador</a></li>
+    <li><a href="#rodar">Como rodar</a></li>
+    <li><a href="#entrega">A entrega</a></li>
+    <li><a href="#glossario">Glossário</a></li>
+    <li><a href="#arquivos">Mapa de arquivos</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="mental">
+  <h2><span class="n">01</span>O modelo mental do dbt</h2>
+  <p class="lead">Antes de qualquer detalhe, a ideia central.</p>
+  <p><strong>dbt é a camada de transformação.</strong> Ele não extrai dado e não carrega dado de fora — isso é a ingestão (Python). O dbt pega o que já está no banco em estado bruto e vira, só com <code>SELECT</code>, as tabelas que a aplicação vai usar.</p>
+  <p>Três ideias bastam para entender tudo que foi feito:</p>
+  <ul>
+    <li><strong>Um modelo é um arquivo <code>.sql</code> com um <code>SELECT</code>.</strong> O dbt embrulha esse <code>SELECT</code> num <code>CREATE VIEW</code> ou <code>CREATE TABLE</code> e roda no banco. O nome do arquivo vira o nome da tabela/view. Sem <code>INSERT</code>, sem <code>UPDATE</code>, sem DDL na mão.</li>
+    <li><strong>Modelos referenciam outros modelos com <code>{{ ref('nome') }}</code>.</strong> Disso o dbt monta sozinho o grafo de dependências (DAG) e descobre a ordem de execução. Você nunca escreve "roda A antes de B".</li>
+    <li><strong>O mesmo SQL serve de documentação e de teste.</strong> Um teste é um <code>SELECT</code> que <em>não pode</em> devolver linhas; se devolver, falhou.</li>
+  </ul>
+  <p>O resto — camadas, macros, tags, seeds — é organização em cima desses três pilares.</p>
+</section>
+
+<section id="pipeline">
+  <h2><span class="n">02</span>O pipeline inteiro</h2>
+  <p class="lead">Da planilha recebida ao dump que o dev carrega.</p>
+
+  <div class="scroll">
+  <div class="rail">
+    <div class="stage raw">
+      <div class="s-n">FONTE</div>
+      <div class="s-t">Planilhas .xlsx</div>
+      <div class="s-d">8 arquivos da equipe, organizados por tema/ano.</div>
+      <div class="s-tool">ingestion/input/lgbt/2026/</div>
+    </div>
+    <div class="stage raw">
+      <div class="s-n">ETAPA 0</div>
+      <div class="s-t">Ingestão</div>
+      <div class="s-d">Lê toda aba de todo arquivo, sem transformar. Drop-and-reload.</div>
+      <div class="s-tool">Python · ingest.py</div>
+    </div>
+    <div class="stage raw">
+      <div class="s-n">SCHEMA</div>
+      <div class="s-t">raw</div>
+      <div class="s-d">1 tabela por aba. 54 tabelas, ~234 mil linhas. Cópia fiel do Excel.</div>
+      <div class="s-tool">raw.lgbt_*</div>
+    </div>
+    <div class="stage">
+      <div class="s-n">CAMADA 1</div>
+      <div class="s-t">staging</div>
+      <div class="s-d">1 modelo por tabela raw. Renomeia, tipa, limpa. Zero regra de negócio.</div>
+      <div class="s-tool">dbt · stg_lgbt_*</div>
+    </div>
+    <div class="stage">
+      <div class="s-n">CAMADA 2</div>
+      <div class="s-t">intermediate</div>
+      <div class="s-d">O cálculo dos indicadores. 1 modelo por (sub)seção do relatório.</div>
+      <div class="s-tool">dbt · int_lgbt_*</div>
+    </div>
+    <div class="stage">
+      <div class="s-n">CAMADA 3</div>
+      <div class="s-t">marts</div>
+      <div class="s-d">União de tudo no formato longo + 3 tabelas por nível.</div>
+      <div class="s-tool">dbt · lgbt_indicadores</div>
+    </div>
+    <div class="stage">
+      <div class="s-n">ENTREGA</div>
+      <div class="s-t">dump + dicionário</div>
+      <div class="s-d">3 .sql (CREATE TABLE + COPY) + o CSV de-para. O dev gera as migrations.</div>
+      <div class="s-tool">scripts/exporta_entrega_lgbt.sh</div>
+    </div>
+  </div>
+  </div>
+  <p class="cap">laranja = fora do dbt (Python/Excel) · verde = dentro do dbt</p>
+
+  <p>As três camadas do dbt (<code>staging → intermediate → marts</code>) são a convenção padrão da comunidade. A regra de ouro: <strong>cada camada só lê a anterior</strong>. Um mart nunca lê <code>raw</code> direto; um staging nunca faz conta de indicador.</p>
+</section>
+
+<section id="ingestao">
+  <h2><span class="n">03</span>Etapa 0 — Ingestão <span class="pill">não é dbt</span></h2>
+  <p class="lead"><code>ingestion/ingest.py</code> — Python puro com pandas + SQLAlchemy.</p>
+  <p>Responsabilidade única: <strong>ler toda aba de toda planilha e gravar no schema <code>raw</code>, sem nenhuma transformação de negócio</strong>. Descoberta automática — não há mapeamento manual de aba para tabela.</p>
+
+  <h3>O que ele faz</h3>
+  <ul>
+    <li>Varre <code>ingestion/input/lgbt/&lt;ano&gt;/*.xlsx</code>.</li>
+    <li>Para cada aba, cria <code>raw.&lt;prefixo&gt;_&lt;planilha&gt;_&lt;aba&gt;</code> — ex.: <code>raw.lgbt_perfil_pns_est_reg_civil_total_casamentos_uf</code>.
+      <ul>
+        <li><code>&lt;prefixo&gt;</code> = <code>lgbt</code> (do config do tema).</li>
+        <li><code>&lt;planilha&gt;</code> = abreviação curta do nome do arquivo (mapa <code>prefixos_planilha</code> em <code>ingestion/temas/lgbt_config.yml</code>).</li>
+        <li><code>&lt;aba&gt;</code> = nome inteiro da aba, só normalizado (sem acento, <code>snake_case</code>) — nunca abreviado.</li>
+      </ul>
+    </li>
+    <li>Nomes de coluna são normalizados e truncados em 55 caracteres.</li>
+    <li><strong>Drop-and-reload</strong>: cada execução recria as tabelas do zero. Não há histórico de linhas.</li>
+    <li>O histórico das <em>execuções</em> fica em <code>raw.etl_importacao_arquivos</code> (arquivo, aba, tabela, nº de linhas, data).</li>
+  </ul>
+
+  <pre><code># joga os .xlsx do ciclo aqui
+ingestion/input/lgbt/2026/
+
+# roda (recria todo o schema raw)
+python ingestion/ingest.py --tema lgbt --ano 2026
+
+# só ver os nomes de tabela que sairiam, sem gravar
+python ingestion/ingest.py --tema lgbt --ano 2026 --dry-run</code></pre>
+
+  <div class="callout">
+    <p class="tag">Por que separar</p>
+    <p>A ingestão é "burra" de propósito. Se a planilha muda de formato, o conserto é num lugar só (aqui ou nos <code>identifier</code> dos sources). Toda regra que exige entender o relatório vive no dbt, versionada e testada.</p>
+  </div>
+</section>
+
+<section id="projeto">
+  <h2><span class="n">04</span>O projeto dbt: mapa de pastas</h2>
+  <p class="lead">Tudo em <code>transform/</code>.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Caminho</th><th>O que é</th></tr></thead>
+    <tbody>
+      <tr><td><code>dbt_project.yml</code></td><td>Config do projeto: onde ficam os modelos, materialização padrão por camada, schema de cada camada, tags.</td></tr>
+      <tr><td><code>packages.yml</code></td><td>Dependências. Só uma: <code>dbt_utils</code> (usada nos testes de schema).</td></tr>
+      <tr><td><code>~/.dbt/profiles.yml</code></td><td>Fora do git. Como conectar no banco (host, user, dbname). O <code>target</code> local se chama <code>dev</code> → os schemas viram <code>dev_staging</code>, <code>dev_marts</code>…</td></tr>
+      <tr><td><code>models/staging/lgbt/</code></td><td>12 <code>stg_lgbt_*.sql</code> + <code>_lgbt__sources.yml</code> (declara as tabelas <code>raw</code>).</td></tr>
+      <tr><td><code>models/intermediate/lgbt/</code></td><td>18 <code>int_lgbt_*.sql</code> — o cálculo dos indicadores.</td></tr>
+      <tr><td><code>models/marts/lgbt/</code></td><td><code>lgbt_indicadores.sql</code> + as 3 por nível + <code>_lgbt_indicadores__schema.yml</code> (testes + descrições).</td></tr>
+      <tr><td><code>macros/</code></td><td>5 macros — trechos de SQL reutilizáveis (cálculo de %, coerção de código…).</td></tr>
+      <tr><td><code>seeds/</code></td><td><code>dim_municipio.csv</code> (5.597 municípios), <code>dim_uf.csv</code> — tabelas de referência.</td></tr>
+      <tr><td><code>tests/</code></td><td>12 testes "singulares" — comparam o valor calculado com o valor da planilha de cálculo da equipe.</td></tr>
+      <tr><td><code>target/</code></td><td>Gerado pelo dbt (SQL compilado, artefatos da doc). Fora do git.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>O <code>dbt_project.yml</code>, na parte que importa</h3>
+  <pre><code>models:
+  observadh:
+    staging:       { +materialized: view,  +schema: staging }
+    intermediate:  { +materialized: view,  +schema: intermediate }
+    marts:         { +materialized: table, +schema: marts }
+      lgbt:
+        +tags: ["lgbt"]        # permite rodar só o tema: --select tag:lgbt</code></pre>
+  <p>staging e intermediate são <strong>view</strong> (baratas, sempre refletem o <code>raw</code> mais recente, fáceis de depurar). marts é <strong>table</strong> (é o que a aplicação lê — precisa ser rápido).</p>
+</section>
+
+<section id="conceitos">
+  <h2><span class="n">05</span>Conceitos-chave do dbt</h2>
+  <p class="lead">Os sete que aparecem o tempo todo neste projeto.</p>
+
+  <h3><code>{{ source(...) }}</code> — a porta de entrada</h3>
+  <p>Referencia uma tabela que o dbt <em>não</em> criou (as <code>raw</code>). Declarada em <code>_lgbt__sources.yml</code>. Cada entrada tem <code>name</code> (apelido estável usado nos modelos) e <code>identifier</code> (o nome real no banco, que muda a cada carga se a aba mudar de nome).</p>
+  <pre><code>sources:
+  - name: raw_lgbt
+    schema: raw
+    tables:
+      - name: raw_lgbt_total_casamentos_uf          # apelido estável
+        identifier: lgbt_perfil_pns_est_reg_civil_total_casamentos_uf  # nome real</code></pre>
+
+  <h3><code>{{ ref('outro_modelo') }}</code> — a cola entre modelos</h3>
+  <p>Referencia outro modelo dbt pelo nome do arquivo (sem <code>.sql</code>). O dbt substitui pelo nome real da tabela/view <em>e</em> registra a dependência. É isso que constrói o DAG.</p>
+
+  <h3>Materialização — view ou table</h3>
+  <table>
+    <thead><tr><th></th><th>view</th><th>table</th></tr></thead>
+    <tbody>
+      <tr><td>O que o dbt cria</td><td><code>CREATE VIEW</code></td><td><code>CREATE TABLE AS</code></td></tr>
+      <tr><td>Ocupa disco?</td><td>não</td><td>sim</td></tr>
+      <tr><td>Sempre atualizada?</td><td>sim (recalcula na consulta)</td><td>só depois de <code>dbt run</code></td></tr>
+      <tr><td>Usada em</td><td>staging, intermediate</td><td>marts</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Jinja + macros</h3>
+  <p>Todo <code>.sql</code> do dbt passa por um pré-processador de template (Jinja). O que está entre <code>{{ }}</code> é código que gera SQL. Uma <strong>macro</strong> é uma função que devolve um pedaço de SQL — como uma função no Excel, mas para texto de query.</p>
+
+  <h3>Tags</h3>
+  <p>Rótulo em um modelo. Todos os modelos do tema têm <code>tag:lgbt</code>, então <code>dbt build --select tag:lgbt</code> roda só o tema (os temas antigos PSR/PI/PCD vão conviver no mesmo projeto).</p>
+
+  <h3>Seeds</h3>
+  <p>CSV versionado no repo que o dbt carrega como tabela (<code>dbt seed</code>). Para dados de referência pequenos e estáveis — aqui, o de-para de código IBGE ↔ nome de município/UF.</p>
+
+  <h3>Testes</h3>
+  <p>Dois tipos. <strong>De schema</strong> (declarados em YAML: <code>not_null</code>, <code>unique</code>, <code>accepted_values</code>…). <strong>Singulares</strong> (um arquivo <code>.sql</code> em <code>tests/</code> que devolve as linhas problemáticas — zero linhas = passou).</p>
+</section>
+
+<section id="staging">
+  <h2><span class="n">06</span>Camada 1 — Staging</h2>
+  <p class="lead"><code>models/staging/lgbt/stg_lgbt_*.sql</code> — uma por tabela <code>raw</code> consumida.</p>
+  <p>Trabalho do staging, e <strong>só</strong> isso:</p>
+  <ul>
+    <li>ler <em>uma</em> tabela <code>raw</code> via <code>{{ source() }}</code>;</li>
+    <li>renomear colunas para nomes estáveis e legíveis;</li>
+    <li>converter tipo (<code>::int</code>, <code>::bigint</code>, <code>::numeric</code>) — no <code>raw</code> quase tudo é texto ou <code>double</code>;</li>
+    <li>limpeza mecânica (trim, padronizar rótulo, tratar <code>"-"</code> como 0).</li>
+  </ul>
+  <p>Nunca junta duas fontes, nunca calcula percentual, nunca agrega. Se você precisa de um <code>JOIN</code> entre fontes, isso é intermediate.</p>
+
+  <h4>Exemplo — <code>stg_lgbt_total_casamentos_uf.sql</code></h4>
+  <pre><code>with origem as (
+    select * from {{ source('raw_lgbt', 'raw_lgbt_total_casamentos_uf') }}
+)
+select
+    cod_uf::int                                   as uf_codigo,
+    uf                                            as uf_sigla,
+    unid_da_federacao                             as uf_nome,
+    ano_de_referencia::int                        as ano_referencia,
+    total_de_casam_entre_conj_masc_e_fem::bigint  as qtd_casamentos_masc_fem,
+    total_de_casam_lesbohomoafetivos::bigint      as qtd_casamentos_lesbohomoafetivos
+from origem</code></pre>
+  <p class="cap">grão: 1 linha por UF · vira a view dev_staging.stg_lgbt_total_casamentos_uf</p>
+</section>
+
+<section id="intermediate">
+  <h2><span class="n">07</span>Camada 2 — Intermediate</h2>
+  <p class="lead"><code>models/intermediate/lgbt/int_lgbt_*.sql</code> — aqui mora o cálculo.</p>
+  <p>Há um modelo por (sub)seção do relatório: <code>int_lgbt_1_populacao</code>, <code>int_lgbt_2_5_casamentos_registro_civil</code>, <code>int_lgbt_7_1_denuncias_ondh</code>… Cada um lê um ou mais <code>stg_lgbt_*</code> (e os seeds), aplica as fórmulas do documento de cálculo da equipe, e <strong>devolve todo mundo no mesmo formato</strong> — o "contrato longo":</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Coluna</th><th>Conteúdo</th></tr></thead>
+    <tbody>
+      <tr><td><code>nivel</code></td><td><code>nacional</code> | <code>estadual</code> | <code>municipal</code></td></tr>
+      <tr><td><code>recorte_codigo</code></td><td><code>null</code> (nacional) · código IBGE da UF (estadual) · do município (municipal)</td></tr>
+      <tr><td><code>recorte_nome</code></td><td><code>Brasil</code> · nome da UF · nome do município</td></tr>
+      <tr><td><code>secao</code> / <code>secao_nome</code></td><td>número e nome da (sub)seção</td></tr>
+      <tr><td><code>indicador</code></td><td>slug estável (ex.: <code>pct_casamentos_lesbohomoafetivos</code>)</td></tr>
+      <tr><td><code>categoria</code></td><td>quebra dentro do indicador (ex.: <code>2023</code>, <code>Negra</code>) — <code>null</code> se não houver</td></tr>
+      <tr><td><code>valor</code></td><td>numérico</td></tr>
+      <tr><td><code>valor_tipo</code></td><td><code>numero_absoluto</code> | <code>percentual</code> | <code>variacao_percentual</code></td></tr>
+      <tr><td><code>ano_referencia</code></td><td>ano do dado</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Como todos os <code>int_lgbt_*</code> têm exatamente essas colunas, o mart só precisa empilhar (<code>union all</code>).</p>
+
+  <h3>Padrões de SQL que se repetem aqui</h3>
+  <ul>
+    <li><strong><code>with … as (…)</code> (CTEs) em cadeia</strong> — cada passo do cálculo é uma CTE nomeada. Lê-se de cima para baixo.</li>
+    <li><strong><code>cross join lateral (values …)</code></strong> — para "desvirar" colunas: a planilha traz um ano por coluna (2013, 2014…), e isso vira uma linha por ano.</li>
+    <li><strong><code>union all</code> por nível</strong> — o mesmo cálculo agregado 3 vezes (sem <code>group by</code> recorte = nacional; por UF = estadual; por município = municipal).</li>
+    <li><strong>macros</strong> para o que repetiria — sobretudo <code>calcula_percentual()</code>.</li>
+  </ul>
+
+  <h4>Sub-modelos auxiliares da 6.1</h4>
+  <p>A seção 6.1 tem cinco <code>int_lgbt_*_por_municipio</code> (PAEFI, CREAS×2, Centros POP, acolhimento) que fazem a agregação municipal fina. O <code>int_lgbt_6_1_protecao_social_especial</code> reagrupa esses cinco nos 3 níveis e devolve no contrato longo. É a única seção com essa camada extra — herança do piloto.</p>
+</section>
+
+<section id="marts">
+  <h2><span class="n">08</span>Camada 3 — Marts</h2>
+  <p class="lead"><code>models/marts/lgbt/</code> — o que a aplicação consulta.</p>
+
+  <h3><code>lgbt_indicadores.sql</code> — a união</h3>
+  <p>Literalmente empilha todos os intermediate:</p>
+  <pre><code>select * from {{ ref('int_lgbt_5_1_servicos_saude_trans') }}
+union all
+select * from {{ ref('int_lgbt_1_populacao') }}
+union all
+select * from {{ ref('int_lgbt_2_5_casamentos_registro_civil') }}
+-- … mais 10 …</code></pre>
+  <p>Resultado: ~595 mil linhas, 73 indicadores, os 3 níveis, materializado como <strong>tabela</strong> no schema <code>dev_marts</code>.</p>
+
+  <h3>As 3 tabelas por nível</h3>
+  <p><code>lgbt_indicadores_nacional</code>, <code>_estadual</code>, <code>_municipal</code> — cada uma é um recorte fino do mart longo, com as colunas de recorte renomeadas (<code>recorte_codigo</code> → <code>uf_codigo</code> / <code>municipio_codigo_ibge</code>). São <strong>table</strong> também, porque é o que entra no dump da entrega.</p>
+
+  <h3><code>_lgbt_indicadores__schema.yml</code> — testes e descrição</h3>
+  <p>Declara o grão (teste <code>dbt_utils.unique_combination_of_columns</code>), o <code>not_null</code> das colunas-chave, os <code>accepted_values</code> de <code>nivel</code> e <code>valor_tipo</code>, e a descrição de cada coluna (vira a doc gerada).</p>
+</section>
+
+<section id="macros">
+  <h2><span class="n">09</span>Macros</h2>
+  <p class="lead"><code>transform/macros/</code> — SQL reutilizável, compartilhável entre temas.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Macro</th><th>Para quê</th></tr></thead>
+    <tbody>
+      <tr><td><code>calcula_percentual(num, den, casas=2, sem_denominador=0)</code></td><td>Percentual arredondado e protegido contra divisão por zero. Denominador 0 ou nulo → devolve <code>0</code> ("sem casos" = 0%). Indicadores de variação passam <code>sem_denominador='null'</code>.</td></tr>
+      <tr><td><code>codigo_num(col)</code></td><td>Converte código de UF/IBGE para <code>int</code> com segurança — o Excel manda <code>"33"</code>, <code>"33.0"</code>, e às vezes um hash de anonimização (denúncias do exterior). Não-numérico → <code>NULL</code>.</td></tr>
+      <tr><td><code>orientacao_canonica(col)</code></td><td>Padroniza rótulo de orientação sexual ("Heterosexual" vs "Heterossexual", "gay" → "Homossexual"…).</td></tr>
+      <tr><td><code>ondh_breakdown_percentual(...)</code></td><td>Gera a quebra percentual de um indicador ONDH; denominador = soma das categorias do par.</td></tr>
+      <tr><td><code>sinan_breakdown_percentual(...)</code></td><td>Idem para SINAN; denominador = uma coluna de total explícita.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <pre><code>{% macro calcula_percentual(numerador, denominador, casas_decimais=2, sem_denominador=0) %}
+    case
+        when {{ denominador }} is null or {{ denominador }} = 0 then {{ sem_denominador }}
+        else round(100.0 * {{ numerador }} / {{ denominador }}, {{ casas_decimais }})
+    end
+{% endmacro %}</code></pre>
+  <p class="cap">no modelo: {{ calcula_percentual('lesbo', 'masc_fem') }} → vira o CASE inteiro</p>
+</section>
+
+<section id="testes">
+  <h2><span class="n">10</span>Testes</h2>
+  <p class="lead">A rede de segurança. Rodam junto com <code>dbt build</code>.</p>
+
+  <h3>De schema — em <code>_lgbt_indicadores__schema.yml</code></h3>
+  <p>Garantem a forma da tabela: nenhum <code>indicador</code> nulo, combinação <code>(nivel, recorte, secao, indicador, categoria, ano)</code> única, <code>valor_tipo</code> só com os 3 valores aceitos, etc.</p>
+
+  <h3>Singulares — os 12 arquivos em <code>tests/</code></h3>
+  <p>Cada um compara o <strong>valor calculado</strong> pelo nosso pipeline com o <strong>valor da planilha de cálculo da equipe</strong> (o "golden value", escrito na mão no teste). Se divergir, o teste devolve a linha e o <code>build</code> falha.</p>
+  <pre><code>with esperado (indicador, categoria, valor) as (
+    values
+        ('estabelecimentos_total',           null,           26),
+        ('estabelecimentos_por_habilitacao', 'Ambulatorial', 16),
+        ('estados_sem_servico',              null,           12)
+),
+obtido as (
+    select indicador, categoria, valor from {{ ref('lgbt_indicadores') }}
+    where nivel = 'nacional' and secao = '5.1'
+)
+select e.indicador, e.valor as esperado, o.valor as obtido
+from esperado e
+left join obtido o on o.indicador = e.indicador
+                   and o.categoria is not distinct from e.categoria
+where o.valor is null or o.valor &lt;&gt; e.valor          -- devolve linha = falhou</code></pre>
+  <div class="callout warn">
+    <p class="tag">Consequência prática</p>
+    <p>Numa carga de dados nova, esses testes <strong>vão falhar de propósito</strong> até alguém atualizar os golden values contra as novas planilhas de cálculo. É o comportamento desejado — é assim que você percebe que um número mudou.</p>
+  </div>
+</section>
+
+<section id="seeds">
+  <h2><span class="n">11</span>Seeds</h2>
+  <p class="lead"><code>transform/seeds/</code> — carregados com <code>dbt seed</code>.</p>
+  <ul>
+    <li><code>dim_municipio.csv</code> — 5.597 municípios: código IBGE (7 e 6 dígitos), nome, código da UF. É a fonte de verdade do nome do município — os modelos <strong>não</strong> confiam no nome que vem do Excel (grafias inconsistentes: "Belem"/"Belém").</li>
+    <li><code>dim_uf.csv</code> — 27 UFs: código, sigla, nome, região.</li>
+  </ul>
+  <p>Viram <code>dev_referencia.dim_municipio</code> / <code>dim_uf</code> e são referenciados com <code>{{ ref('dim_municipio') }}</code> como qualquer modelo.</p>
+</section>
+
+<section id="rastreio">
+  <h2><span class="n">12</span>Rastreando um indicador de ponta a ponta</h2>
+  <p class="lead">Um número — <code>pct_casamentos_lesbohomoafetivos</code> de São Paulo = <strong>1,85%</strong> — do Excel ao <code>SELECT</code> do dev.</p>
+
+  <div class="trace">
+    <div class="step">
+      <h4>Planilha</h4>
+      <p class="where">LGBTQIA+ · Perfil PNS · aba "Total_Casamentos_UF"</p>
+      <p>Uma linha por UF com <code>Total de casamentos entre cônjuges masculino e feminino</code> e <code>Total de Casamentos Lesbohomoafetivos</code>. Para SP: 230.935 e 4.268.</p>
+    </div>
+    <div class="step">
+      <h4>Ingestão → schema <code>raw</code></h4>
+      <p class="where">python ingest.py → raw.lgbt_perfil_pns_est_reg_civil_total_casamentos_uf</p>
+      <p>Cópia fiel da aba. Colunas com nomes normalizados/truncados: <code>total_de_casam_entre_conj_masc_e_fem</code>, <code>total_de_casam_lesbohomoafetivos</code>. Tudo como texto/<code>double</code>.</p>
+    </div>
+    <div class="step">
+      <h4>Source declarado</h4>
+      <p class="where">models/staging/lgbt/_lgbt__sources.yml</p>
+      <p><code>name: raw_lgbt_total_casamentos_uf</code> (apelido estável) → <code>identifier:</code> a tabela real acima.</p>
+    </div>
+    <div class="step">
+      <h4>Camada 1 — staging</h4>
+      <p class="where">stg_lgbt_total_casamentos_uf.sql → view dev_staging.stg_lgbt_total_casamentos_uf</p>
+      <p>Renomeia e tipa: <code>cod_uf::int as uf_codigo</code>, <code>…lesbohomoafetivos::bigint as qtd_casamentos_lesbohomoafetivos</code>. Nenhuma conta.</p>
+    </div>
+    <div class="step">
+      <h4>Camada 2 — intermediate</h4>
+      <p class="where">int_lgbt_2_5_casamentos_registro_civil.sql</p>
+      <p>CTE <code>lesbo</code> lê o staging e monta as linhas por nível. Para o estadual, uma linha por UF com <code>lesbo</code> e <code>masc_fem</code>. O percentual sai da macro:</p>
+      <pre><code>select 'estadual', uf_codigo,
+       {{ calcula_percentual('lesbo', 'masc_fem') }} as valor,
+       'percentual' as valor_tipo, 2022 as ano_referencia
+from lesbo
+-- SP: round(100.0 * 4268 / 230935, 2) = 1.85</code></pre>
+      <p>Sai no contrato longo: <code>nivel=estadual, recorte_codigo=35, indicador='pct_casamentos_lesbohomoafetivos', categoria=null, valor=1.85</code>.</p>
+    </div>
+    <div class="step">
+      <h4>Camada 3 — mart</h4>
+      <p class="where">lgbt_indicadores.sql (union all) → dev_marts.lgbt_indicadores</p>
+      <p>A linha entra na pilha junto com as dos outros 72 indicadores. Depois <code>lgbt_indicadores_estadual</code> a expõe com <code>recorte_codigo</code> renomeado para <code>uf_codigo</code>.</p>
+    </div>
+    <div class="step">
+      <h4>Dicionário</h4>
+      <p class="where">docs/lgbt/dicionario-lgbt_indicadores.csv</p>
+      <p>Uma linha descreve a chave: <code>pct_casamentos_lesbohomoafetivos · sem quebra · percentual · N/E · 2022 · "casamentos lesbohomoafetivos como % dos casamentos masc-fem"</code>.</p>
+    </div>
+    <div class="step">
+      <h4>A aplicação</h4>
+      <p class="where">query do dev</p>
+      <pre><code>select indicador, categoria, valor, valor_tipo, ano_referencia
+from lgbt_indicadores_estadual
+where uf_codigo = 35;
+-- … pct_casamentos_lesbohomoafetivos | (null) | 1.85 | percentual | 2022 …</code></pre>
+      <p>Vira <code>mapa["pct_casamentos_lesbohomoafetivos"] = 1.85</code> e o template do relatório faz o bind.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p class="tag">Ver isso no dbt</p>
+    <p><code>dbt docs generate &amp;&amp; dbt docs serve</code> abre um site com o grafo (DAG) clicável — dá para navegar exatamente essa cadeia de <code>ref()</code> em <code>ref()</code>, ver o SQL compilado de cada modelo e as descrições de coluna.</p>
+  </div>
+</section>
+
+<section id="rodar">
+  <h2><span class="n">13</span>Como rodar</h2>
+  <p class="lead">Um ciclo completo, na ordem.</p>
+  <pre><code># 0. planilhas do ciclo em ingestion/input/lgbt/&lt;ano&gt;/
+
+# 1. ingestão (Python) — recria o schema raw
+python ingestion/ingest.py --tema lgbt --ano 2026
+
+# 2. transformação (dbt) — sempre a partir de transform/
+cd transform
+dbt deps                       # baixa dbt_utils (1x, ou quando packages.yml muda)
+dbt seed                       # carrega dim_municipio / dim_uf
+dbt build --select tag:lgbt    # roda staging→intermediate→marts + TODOS os testes
+
+# 3. conferir o grafo e a doc
+dbt docs generate && dbt docs serve
+
+# 4. gerar o pacote de entrega
+python ../scripts/gera_dicionario_lgbt.py
+../scripts/exporta_entrega_lgbt.sh</code></pre>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Comando</th><th>Faz</th></tr></thead>
+    <tbody>
+      <tr><td><code>dbt run</code></td><td>Cria/atualiza as views e tabelas dos modelos. Não roda teste.</td></tr>
+      <tr><td><code>dbt test</code></td><td>Só os testes, contra o que já está no banco.</td></tr>
+      <tr><td><code>dbt build</code></td><td><code>seed</code> + <code>run</code> + <code>test</code> + <code>snapshot</code>, na ordem do DAG. É o que você usa no dia a dia.</td></tr>
+      <tr><td><code>dbt build --select tag:lgbt</code></td><td>Só os nós com a tag <code>lgbt</code> (56 hoje).</td></tr>
+      <tr><td><code>--select stg_lgbt_paefi+</code></td><td>Um modelo <em>e tudo que depende dele</em> (o <code>+</code> à direita). <code>+modelo</code> = ele e os ancestrais.</td></tr>
+      <tr><td><code>dbt compile</code></td><td>Gera o SQL final (com <code>ref</code>/macros resolvidos) em <code>target/compiled/</code> sem rodar.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="entrega">
+  <h2><span class="n">14</span>A entrega</h2>
+  <p class="lead">Formato longo + dicionário. Decidido em setembro/2026.</p>
+  <p>A aplicação recebe as 3 tabelas por nível <strong>como estão</strong> (formato longo, ~9 colunas) — não uma tabela larga pivotada. O dev roda uma query por relatório, monta um mapa <code>chave → valor</code> e faz o bind no template.</p>
+  <ul>
+    <li><strong>Por que longo:</strong> indicador novo no relatório = linha nova, não coluna nova. O schema do banco nunca muda; nada de <code>ALTER TABLE</code> coordenado entre os dois lados.</li>
+    <li><code>scripts/exporta_entrega_lgbt.sh</code> → 3 <code>.sql</code> (<code>CREATE TABLE</code> + <code>COPY</code>, sem schema/owner), <code>_schema.sql</code>, <code>MANIFEST.txt</code> (contagem + md5), o dicionário e o guia de consumo.</li>
+    <li><code>scripts/gera_dicionario_lgbt.py</code> → <code>dicionario-lgbt_indicadores.csv</code>: uma linha por indicador (chave de bind, categorias, tipo, unidade, níveis, ano, descrição).</li>
+    <li>Detalhe da entrega e receita de bind: <code>docs/lgbt/consumo-lgbt_indicadores.md</code>.</li>
+  </ul>
+</section>
+
+<section id="glossario">
+  <h2><span class="n">15</span>Glossário</h2>
+  <div class="scroll">
+  <table>
+    <tbody>
+      <tr><td><strong>modelo</strong></td><td>Um <code>.sql</code> com um <code>SELECT</code>. O dbt o materializa como view ou table.</td></tr>
+      <tr><td><strong>source</strong></td><td>Tabela que o dbt não criou (as <code>raw</code>), declarada em YAML e referenciada com <code>{{ source() }}</code>.</td></tr>
+      <tr><td><strong>seed</strong></td><td>CSV do repo carregado como tabela por <code>dbt seed</code>.</td></tr>
+      <tr><td><strong>ref</strong></td><td><code>{{ ref('x') }}</code> — referência a outro modelo; constrói o DAG.</td></tr>
+      <tr><td><strong>DAG / lineage</strong></td><td>Grafo de dependências entre modelos. O dbt deriva a ordem de execução dele.</td></tr>
+      <tr><td><strong>materialização</strong></td><td>Como o modelo vira objeto no banco: <code>view</code>, <code>table</code>, <code>incremental</code>, <code>ephemeral</code>. Aqui só view e table.</td></tr>
+      <tr><td><strong>staging / intermediate / marts</strong></td><td>As 3 camadas convencionais: limpeza / cálculo / entrega.</td></tr>
+      <tr><td><strong>macro</strong></td><td>Função Jinja que devolve um trecho de SQL. Fica em <code>macros/</code>.</td></tr>
+      <tr><td><strong>tag</strong></td><td>Rótulo de modelo para seleção (<code>--select tag:lgbt</code>).</td></tr>
+      <tr><td><strong>teste de schema</strong></td><td>Regra declarada em YAML (<code>not_null</code>, <code>unique</code>…).</td></tr>
+      <tr><td><strong>teste singular</strong></td><td><code>.sql</code> em <code>tests/</code> que passa quando devolve zero linhas.</td></tr>
+      <tr><td><strong>target</strong></td><td>Ambiente do <code>profiles.yml</code> (aqui <code>dev</code>) — define conexão e prefixo de schema.</td></tr>
+      <tr><td><strong>grão</strong></td><td>O que uma linha da tabela representa (ex.: "1 linha por UF").</td></tr>
+      <tr><td><strong>formato longo</strong></td><td>Uma linha por indicador/categoria, em vez de uma coluna por indicador.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="arquivos">
+  <h2><span class="n">16</span>Mapa de arquivos — onde olhar para quê</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Quero entender…</th><th>Abro…</th></tr></thead>
+    <tbody>
+      <tr><td>Como a planilha vira <code>raw</code></td><td><code>ingestion/ingest.py</code> · <code>ingestion/temas/lgbt_config.yml</code></td></tr>
+      <tr><td>Quais tabelas <code>raw</code> os modelos usam</td><td><code>transform/models/staging/lgbt/_lgbt__sources.yml</code></td></tr>
+      <tr><td>A fórmula de um indicador</td><td>o <code>int_lgbt_&lt;secao&gt;_*.sql</code> da seção</td></tr>
+      <tr><td>De onde vêm os números esperados</td><td><code>transform/tests/lgbt_*_valores.sql</code></td></tr>
+      <tr><td>O de-para seção → fórmula → aba → tabela → modelo</td><td><code>docs/lgbt/catalogo-indicadores-lgbt.md</code></td></tr>
+      <tr><td>Como a aplicação consome</td><td><code>docs/lgbt/consumo-lgbt_indicadores.md</code> + <code>dicionario-lgbt_indicadores.csv</code></td></tr>
+      <tr><td>Config do dbt (camadas, schemas, tags)</td><td><code>transform/dbt_project.yml</code></td></tr>
+      <tr><td>O grafo visual</td><td><code>dbt docs generate &amp;&amp; dbt docs serve</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="foot">Para estudar dbt além deste projeto: a documentação oficial em <code>docs.getdbt.com</code> (guia "dbt Fundamentals") e o guia de estilo de projeto "How we structure our dbt projects" cobrem exatamente as convenções staging/intermediate/marts usadas aqui.</p>
+</section>
+
+</main>
+</div>
+</div>
+</body>
+</html>
