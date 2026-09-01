@@ -253,3 +253,22 @@ sources:
           PNS 2019 — população 18+ por orientação sexual e faixa de renda
           domiciliar per capita (5 faixas), Brasil. Cada faixa tem coluna de
           contagem e coluna "_1" com o % pré-calculado. Aba "Renda per capta".
+
+      # --- 4 (abertura) — Educação / Nível de instrução (PNS 2019, Brasil) ---
+      - name: raw_lgbt_nivel_instrucao
+        identifier: lgbt_educ_pns_saeb_nivel_de_instrucao
+        description: >
+          PNS 2019 — população 18+ por orientação sexual e nível de instrução
+          (7 níveis), Brasil. Sem coluna de total: o denominador é a soma dos
+          7 níveis. Aba "Nível de instrução".
+
+      # --- 5 (abertura) — Saúde / Perfil de saúde (PNS 2019, Brasil) ---
+      - name: raw_lgbt_autoavaliacao_saude
+        identifier: lgbt_saude_pns_cnes_autoavaliacao_saude_pns
+        description: PNS 2019 — autoavaliação da própria saúde por orientação sexual, Brasil. Aba "Autoavaliacao_saude_PNS".
+      - name: raw_lgbt_atividade_esportiva
+        identifier: lgbt_saude_pns_cnes_atividade_esportiva_pns
+        description: PNS 2019 — frequência de atividade física/esportiva por orientação sexual, Brasil. Aba "Atividade_Esportiva_PNS".
+      - name: raw_lgbt_taxa_depressao
+        identifier: lgbt_saude_pns_cnes_taxa_depressao_pns
+        description: PNS 2019 — diagnóstico de depressão por orientação sexual, Brasil. Aba "Taxa_Depressao_PNS".

@@ -23,6 +23,12 @@ union all
 select * from {{ ref('int_lgbt_3_trabalho_renda') }}
 
 union all
+select * from {{ ref('int_lgbt_4_0_educacao') }}
+
+union all
+select * from {{ ref('int_lgbt_5_0_saude') }}
+
+union all
 select * from {{ ref('int_lgbt_2_5_casamentos_registro_civil') }}
 
 union all

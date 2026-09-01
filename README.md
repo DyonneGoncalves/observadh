@@ -61,6 +61,6 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Seção 4.1 — Projetos escolares contra LGBTQIAfobia** (N, E) no formato longo. Validada contra a planilha de cálculo.
 - [x] **Seção 7.1 — Denúncias de violações de DH (ONDH)** (N, E, M) no formato longo. Validada contra a planilha de cálculo. Falta local e relação do suspeito.
 - [x] **Seção 7.0 — Notificações de violência (SINAN)** (N, E, M) no formato longo. Validada. Falta local e perfil do agressor.
-- [x] **Seções 1, 2.0–2.4 e 3 — População, Perfil e Trabalho (PNS 2019 / Censo)** no formato longo. Validadas contra a planilha de cálculo e o texto-base.
+- [x] **Seções 1, 2, 3, 4 e 5 (PNS 2019 / Censo)** no formato longo, só nacional para as partes de perfil. Validadas contra a planilha de cálculo e o texto-base do relatório.
 - [x] **Abertura da seção 6** (CRAS/Centros de Convivência) + **extras de 7.0/7.1** (local de ocorrência, perfil do agressor, relação do suspeito) no formato longo. Validados contra a planilha de cálculo.
 - [x] `dbt build --select tag:lgbt` — tudo verde (49 nós). **`lgbt_indicadores`: ~595k linhas.** O relatório LGBTQIA+ está completo no formato longo (falta só a 2.5 "% casamentos mesmo sexo por estado", de denominador ambíguo).

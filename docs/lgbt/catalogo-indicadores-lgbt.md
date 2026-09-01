@@ -209,7 +209,7 @@ Modelo: `int_lgbt_3_trabalho_renda`. Validação: `tests/lgbt_3_valores.sql`.
 
 | Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E | Modelo dbt |
 |---|---|---|---|---|---|
-| 4.0 | % por orientação sexual e nível de instrução | Nível de instrução | `lgbt_educ_pns_saeb_nivel_de_instrucao` | N | — |
+| 4.0 | % por orientação sexual e nível de instrução — `pct_nivel_instrucao_por_orientacao` | Nível de instrução | `lgbt_educ_pns_saeb_nivel_de_instrucao` | N | ✅ `int_lgbt_4_0_educacao` |
 | 4.0 | "O Censo Trans" — destaque **sem base de dados** ("Sinalização CGTI") | — | — | N | n/a |
 
 **4.1. Projetos escolares de enfrentamento à LGBTQIAfobia** — `N E` — ✅ **MODELADA (formato longo)**
@@ -230,9 +230,9 @@ Modelos: `stg_lgbt_projetos_homofobia` (+ `_local`) → `int_lgbt_4_1_projetos_e
 
 | Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E | Modelo dbt |
 |---|---|---|---|---|---|
-| 5.0 | % por tipo de autoavaliação da saúde, por orientação sexual (junta "muito boa+boa", "muito ruim+ruim") | Autoavaliacao_saude_PNS | `lgbt_saude_pns_cnes_autoavaliacao_saude_pns` | N | — |
-| 5.0 | % por autoavaliação x atividade esportiva, por orientação sexual | Atividade_Esportiva_PNS | `lgbt_saude_pns_cnes_atividade_esportiva_pns` | N | — |
-| 5.0 | % com/sem diagnóstico de depressão, por orientação sexual | Taxa_Depressao_PNS | `lgbt_saude_pns_cnes_taxa_depressao_pns` | N | — |
+| 5.0 | `pct_autoavaliacao_saude_por_orientacao` (junta "muito boa+boa" e "muito ruim+ruim") | Autoavaliacao_saude_PNS | `lgbt_saude_pns_cnes_autoavaliacao_saude_pns` | N | ✅ `int_lgbt_5_0_saude` |
+| 5.0 | `pct_atividade_esportiva_por_orientacao` (6 frequências) | Atividade_Esportiva_PNS | `lgbt_saude_pns_cnes_atividade_esportiva_pns` | N | ✅ idem |
+| 5.0 | `pct_depressao_por_orientacao` | Taxa_Depressao_PNS | `lgbt_saude_pns_cnes_taxa_depressao_pns` | N | ✅ idem |
 
 **5.1. Serviços de saúde para pessoas trans** — `N E` — ✅ **MODELADA (formato longo)**
 
