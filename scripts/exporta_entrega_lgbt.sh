@@ -61,9 +61,16 @@ pg_dump -d "$DB" --no-owner --no-privileges --no-tablespaces --schema-only \
   > "$SAIDA/_schema.sql"
 echo "  ok  $SAIDA/_schema.sql"
 
-# --- 3. contrato + leia-me ---------------------------------------------------
+# --- 3. contrato + dicionário + leia-me ------------------------------------
 cp docs/lgbt/consumo-lgbt_indicadores.md "$SAIDA/"
 echo "  ok  $SAIDA/consumo-lgbt_indicadores.md"
+
+if [ ! -f docs/lgbt/dicionario-lgbt_indicadores.csv ]; then
+  python3 scripts/gera_dicionario_lgbt.py || echo "  (aviso: não gerou o dicionário)"
+fi
+[ -f docs/lgbt/dicionario-lgbt_indicadores.csv ] && \
+  cp docs/lgbt/dicionario-lgbt_indicadores.csv "$SAIDA/" && \
+  echo "  ok  $SAIDA/dicionario-lgbt_indicadores.csv"
 
 cat > "$SAIDA/LEIA-ME.txt" <<'TXT'
 Entrega dos indicadores do relatório LGBTQIA+ — formato longo.
@@ -84,8 +91,11 @@ Carregar (exemplo):
 
 Depois confira as contagens contra o MANIFEST.txt.
 
-Semântica das colunas, lista dos ~69 indicadores e observações:
-ver consumo-lgbt_indicadores.md.
+A consulta que a aplicação roda (1 por relatório), como virar as linhas num
+mapa chave->valor e fazer o bind no template: ver consumo-lgbt_indicadores.md.
+
+dicionario-lgbt_indicadores.csv = 1 linha por indicador (seção, chave de bind,
+categorias, tipo, unidade, níveis, ano, descrição). É o de-para texto<->chave.
 
 Chave natural (para PK/índice na migration): ver MANIFEST.txt.
 TXT

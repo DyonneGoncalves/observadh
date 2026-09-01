@@ -14,7 +14,16 @@ estadual, municipal). Toda a saída da camada de dados está numa tabela só.
 
 As 3 tabelas por nível são o que vai no dump para a aplicação (uma migration
 cada). Gera o pacote com `scripts/exporta_entrega_lgbt.sh` — sai `.sql`
-(CREATE TABLE + COPY) por tabela, `_schema.sql`, `MANIFEST.txt` e este guia.
+(CREATE TABLE + COPY) por tabela, `_schema.sql`, `MANIFEST.txt`, o
+**dicionário** (`dicionario-lgbt_indicadores.csv`) e este guia.
+
+O **dicionário** (`docs/lgbt/dicionario-lgbt_indicadores.csv`, gerado por
+`scripts/gera_dicionario_lgbt.py`) tem **uma linha por indicador**:
+`secao`, `indicador`, `chave_bind` (o formato da chave do mapa —
+`indicador` ou `indicador|<categoria>`), `tem_quebra_categoria`,
+`categorias` (lista completa quando há quebra), `valor_tipo`, `unidade`,
+`niveis` (N/E/M onde existe), `ano_referencia`, `descricao`. É o de-para
+entre o texto do relatório e a chave que a aplicação lê.
 
 ## Grão e colunas
 
@@ -33,16 +42,51 @@ Uma linha por **`(nivel, recorte_codigo, secao, indicador, categoria, ano_refere
 | `valor_tipo` | `numero_absoluto` \| `percentual` \| `variacao_percentual` |
 | `ano_referencia` | ano a que o dado se refere (varia por indicador) |
 
-### Consulta típica
+### A consulta da aplicação
+
+Uma query por render de relatório. Sempre a mesma forma — muda só a tabela e o filtro:
 
 ```sql
-select indicador, categoria, valor, valor_tipo
-from lgbt_indicadores
-where nivel = :nivel
-  and recorte_codigo is not distinct from :recorte   -- NULL no nacional
-  and secao = :secao
-order by indicador, categoria;
+-- NACIONAL (1 recorte, sem filtro)
+select indicador, categoria, valor, valor_tipo, ano_referencia
+from lgbt_indicadores_nacional;
+
+-- ESTADUAL
+select indicador, categoria, valor, valor_tipo, ano_referencia
+from lgbt_indicadores_estadual
+where uf_codigo = :uf_codigo;            -- ex.: 35 (São Paulo)
+
+-- MUNICIPAL
+select indicador, categoria, valor, valor_tipo, ano_referencia
+from lgbt_indicadores_municipal
+where municipio_codigo_ibge = :cod_ibge; -- ex.: 3550308
 ```
+
+Para uma seção só, adicione `and secao = :secao`.
+
+### Do resultado ao bind no template
+
+O padrão é: carregar as linhas → montar um mapa `chave → valor` → o template
+referencia a chave. A **chave** é `indicador` quando não há quebra, e
+`indicador|categoria` quando há (ver coluna `chave_bind` no dicionário).
+
+```js
+const rows = await db.query(SQL_ESTADUAL, { uf_codigo: 35 });
+
+const ind = {};
+for (const r of rows) {
+  const chave = r.categoria ? `${r.indicador}|${r.categoria}` : r.indicador;
+  ind[chave] = r.valor;                 // null = "sem dado" (ver abaixo)
+}
+
+// no template:
+//   ${ind["pct_casamentos_lesbohomoafetivos"]}
+//   ${ind["pct_casamentos_mesmo_sexo_por_genero_23|Casamentos entre mulheres"]}
+//   ${ind["vitimas_paefi"]}
+```
+
+Indicador novo no relatório = linha nova no `lgbt_indicadores` + chave nova no
+dicionário. **O schema do banco não muda** — nada de `ALTER TABLE` nos dois lados.
 
 ### `valor` pode ser `NULL`
 
