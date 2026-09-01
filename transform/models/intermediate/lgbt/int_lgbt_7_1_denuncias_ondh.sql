@@ -58,8 +58,8 @@ serie_ind as (
 
     union all
     select nivel, recorte_codigo, 'pct_participacao_denuncias_2024', null,
-           round(100.0 * q / nullif(
-               (select sum(q) from serie_agg where metrica = 'denuncias' and ano = 2024 and nivel = 'nacional'), 0), 4),
+           coalesce(round(100.0 * q / nullif(
+               (select sum(q) from serie_agg where metrica = 'denuncias' and ano = 2024 and nivel = 'nacional'), 0), 4), 0),
            'percentual', 2024
     from serie_agg
     where metrica = 'denuncias' and ano = 2024 and nivel <> 'nacional'
@@ -195,7 +195,7 @@ tv_agg as (
 tv_ind as (
     select nivel, recorte_codigo, 'pct_denuncias_por_tipo_violacao'::text as indicador,
            categoria,
-           round(100.0 * q / nullif(sum(q) over (partition by nivel, recorte_codigo), 0), 4) as valor,
+           coalesce(round(100.0 * q / nullif(sum(q) over (partition by nivel, recorte_codigo), 0), 4), 0) as valor,
            'percentual'::text as valor_tipo, 2024 as ano_referencia
     from tv_agg
 ),

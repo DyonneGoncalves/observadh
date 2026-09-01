@@ -52,13 +52,14 @@ models:
           "Homossexual / Mulheres". NULL quando o indicador é um valor único.
       - name: valor
         description: >
-          Numérico. NULL quando o indicador não é calculável para o recorte
-          (ex.: % ou variação com denominador zero). Linhas de
-          valor_tipo = 'numero_absoluto' nunca são NULL.
+          Numérico. Denominador zero em um percentual devolve 0 ("sem casos" =
+          0%). Só linhas de valor_tipo = 'variacao_percentual' podem ser NULL —
+          quando a base (ano inicial) é zero e "variação a partir de zero" não
+          tem percentual.
         tests:
           - not_null:
               config:
-                where: "valor_tipo = 'numero_absoluto'"
+                where: "valor_tipo <> 'variacao_percentual'"
       - name: valor_tipo
         description: "'numero_absoluto' | 'percentual' | 'variacao_percentual'."
         tests:

@@ -90,7 +90,7 @@ notif_ind as (
     select m.nivel, m.recorte_codigo, 'pct_municipios_com_notificacao_2024', null,
            case m.nivel
                when 'nacional' then round(100.0 * m.n / 5570, 6)
-               when 'estadual' then round(100.0 * m.n / nullif(u.n_munis, 0), 6)
+               when 'estadual' then coalesce(round(100.0 * m.n / nullif(u.n_munis, 0), 6), 0)
            end,
            'percentual', 2024
     from munis_com_notif_2024 m

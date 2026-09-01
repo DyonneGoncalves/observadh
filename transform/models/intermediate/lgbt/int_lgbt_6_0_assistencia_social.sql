@@ -24,14 +24,14 @@ centros as (
 ),
 
 cras_agg as (
-    select 'nacional'::text as nivel, null::int as recorte_codigo, sum(abordaram) as ab, sum(ofertavam_scfv) as den from cras
-    union all select 'estadual', uf_codigo, sum(abordaram), sum(ofertavam_scfv) from cras group by uf_codigo
-    union all select 'municipal', municipio_codigo_ibge, sum(abordaram), sum(ofertavam_scfv) from cras group by municipio_codigo_ibge
+    select 'nacional'::text as nivel, null::int as recorte_codigo, coalesce(sum(abordaram),0) as ab, coalesce(sum(ofertavam_scfv),0) as den from cras
+    union all select 'estadual', uf_codigo, coalesce(sum(abordaram),0), coalesce(sum(ofertavam_scfv),0) from cras group by uf_codigo
+    union all select 'municipal', municipio_codigo_ibge, coalesce(sum(abordaram),0), coalesce(sum(ofertavam_scfv),0) from cras group by municipio_codigo_ibge
 ),
 centros_agg as (
-    select 'nacional'::text as nivel, null::int as recorte_codigo, sum(abordaram) as ab, sum(total_centros) as den from centros
-    union all select 'estadual', uf_codigo, sum(abordaram), sum(total_centros) from centros group by uf_codigo
-    union all select 'municipal', municipio_codigo_ibge, sum(abordaram), sum(total_centros) from centros group by municipio_codigo_ibge
+    select 'nacional'::text as nivel, null::int as recorte_codigo, coalesce(sum(abordaram),0) as ab, coalesce(sum(total_centros),0) as den from centros
+    union all select 'estadual', uf_codigo, coalesce(sum(abordaram),0), coalesce(sum(total_centros),0) from centros group by uf_codigo
+    union all select 'municipal', municipio_codigo_ibge, coalesce(sum(abordaram),0), coalesce(sum(total_centros),0) from centros group by municipio_codigo_ibge
 ),
 
 dim_uf  as ( select codigo_uf, nome_uf from {{ ref('dim_uf') }} ),

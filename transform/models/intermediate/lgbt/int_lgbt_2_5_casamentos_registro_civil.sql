@@ -95,7 +95,7 @@ linhas as (
     select nivel, recorte_codigo,
            'variacao_casamentos_mesmo_sexo_13_23',
            null,
-           {{ calcula_percentual('(tot_2023 - tot_2013)', 'tot_2013') }},
+           {{ calcula_percentual('(tot_2023 - tot_2013)', 'tot_2013', sem_denominador='null') }},
            'variacao_percentual',
            2023
     from variacao
