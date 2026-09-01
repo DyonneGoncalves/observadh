@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table') }}
 
 -- Relatório MUNICIPAL — recorte do mart longo lgbt_indicadores.
 -- recorte_codigo = código IBGE de 7 dígitos, recorte_nome = nome do município.

@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table') }}
 
 -- Relatório NACIONAL — recorte do mart longo lgbt_indicadores.
 select

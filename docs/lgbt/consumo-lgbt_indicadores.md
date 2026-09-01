@@ -8,9 +8,13 @@ estadual, municipal). Toda a saída da camada de dados está numa tabela só.
 | Objeto (schema `<target>_marts`) | Uso |
 |---|---|
 | `lgbt_indicadores` | tabela longa completa (todos os níveis) |
-| `lgbt_indicadores_nacional` | view: `where nivel = 'nacional'` (sem colunas de recorte) |
-| `lgbt_indicadores_estadual` | view: `nivel = 'estadual'`; `recorte_*` → `uf_codigo` / `uf_nome` |
-| `lgbt_indicadores_municipal` | view: `nivel = 'municipal'`; `recorte_*` → `municipio_codigo_ibge` / `municipio_nome` |
+| `lgbt_indicadores_nacional` | tabela: `nivel = 'nacional'` (sem colunas de recorte) |
+| `lgbt_indicadores_estadual` | tabela: `nivel = 'estadual'`; `recorte_*` → `uf_codigo` / `uf_nome` |
+| `lgbt_indicadores_municipal` | tabela: `nivel = 'municipal'`; `recorte_*` → `municipio_codigo_ibge` / `municipio_nome` |
+
+As 3 tabelas por nível são o que vai no dump para a aplicação (uma migration
+cada). Gera o pacote com `scripts/exporta_entrega_lgbt.sh` — sai `.sql`
+(CREATE TABLE + COPY) por tabela, `_schema.sql`, `MANIFEST.txt` e este guia.
 
 ## Grão e colunas
 

@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table') }}
 
 -- Relatório ESTADUAL — recorte do mart longo lgbt_indicadores.
 -- recorte_codigo = codigo_uf, recorte_nome = nome da UF.
