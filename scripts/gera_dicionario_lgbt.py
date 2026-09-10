@@ -64,7 +64,8 @@ DESCRICOES = {
     "pct_cras_abordaram_tema": ("%", "% de CRAS que abordaram o tema LGBTQIA+ (entre os que ofertavam SCFV)."),
     "pct_centros_convivencia_abordaram_tema": ("%", "% de Centros de Convivência que abordaram o tema LGBTQIA+."),
     # 6.1 — Proteção social especial
-    "vitimas_paefi": ("contagem", "Nº de pessoas vítimas de discriminação por orientação sexual acompanhadas pelo PAEFI (2024; série 2017–2024 no municipal)."),
+    "vitimas_paefi": ("contagem", "Nº de pessoas vítimas de discriminação por orientação sexual acompanhadas pelo PAEFI, ano mais recente (2024). Série histórica completa: ver vitimas_paefi_serie_historica."),
+    "vitimas_paefi_serie_historica": ("contagem", "Série histórica (2017–2024) de vítimas de discriminação por orientação sexual acompanhadas pelo PAEFI, por ano — só estadual/municipal (não pedida no relatório nacional). Alimenta o gráfico da seção 6.1 nesses 2 níveis."),
     "creas_total": ("contagem", "Nº total de CREAS."),
     "creas_nao_atende_orientacao": ("contagem", "Nº de CREAS que não registram atendimento a discriminação por orientação sexual."),
     "pct_creas_nao_atende_orientacao": ("%", "creas_nao_atende_orientacao / creas_total ×100."),

@@ -107,7 +107,7 @@ Trate `NULL` como "sem dado", não como zero.
 | `4.1` | Projetos escolares contra LGBTQIAfobia | N/E | 2019, 2021 |
 | `5.1` | Serviços de saúde para pessoas trans | N/E | 2025 |
 | `6` | CRAS e Centros de Convivência (abertura da seção 6) | N/E/M | 2024 |
-| `6.1` | Proteção social especial | N/E/M | 2024 |
+| `6.1` | Proteção social especial | N/E/M (1 indicador só E/M — ver abaixo) | 2024 (+ série 2017–2024) |
 | `7.0` | Notificações de violência (SINAN) | N/E/M | 2015–2024 |
 | `7.1` | Denúncias de violações de DH (ONDH) | N/E/M | 2020–2024 |
 
@@ -176,10 +176,16 @@ Trate `NULL` como "sem dado", não como zero.
 `vitimas_paefi`, `creas_total`, `creas_nao_atende_orientacao`,
 `creas_nao_atende_identidade`, `centros_pop_total`,
 `unidades_acolhimento_total`, `pessoas_acolhidas_total`,
-`pessoas_trans_acolhidas_total` — todos `num`, sem categoria.
+`pessoas_trans_acolhidas_total` — todos `num`, sem categoria, ano 2024.
 `pct_creas_nao_atende_orientacao`, `pct_creas_nao_atende_identidade`,
 `pct_centros_pop_atenderam_lgbt`,
 `pct_unidades_acolhimento_com_pessoas_trans` — todos `%`, sem categoria.
+
+`vitimas_paefi_serie_historica` — **só estadual/municipal** (não existe em
+nacional). Série anual 2017–2024, `categoria` = ano (`"2017"`..`"2024"`,
+mesmo padrão de `notificacoes_por_ano`). É o dado que alimenta o **gráfico**
+da seção 6.1 nos relatórios estadual e municipal — `vitimas_paefi` sozinho
+só dá o total de 2024, não a série.
 
 ### 7.0 — Notificações SINAN (N/E/M)
 | indicador | tipo | categorias |
@@ -206,6 +212,10 @@ Trate `NULL` como "sem dado", não como zero.
 - **SINAN/ONDH**: os dados de perfil são de **2024**; a série histórica cobre
   o intervalo indicado. Denúncias da ONDH com local no **exterior** entram só
   no total **nacional** (não têm UF/município).
+- **6.1 / gráfico de PAEFI**: `vitimas_paefi` é só o total de 2024 (bate com
+  o relatório nacional publicado). A série 2017–2024 para o gráfico é o
+  indicador separado `vitimas_paefi_serie_historica`, e só existe em
+  estadual/municipal — a especificação nacional não pede esse gráfico.
 - **7.0/7.1**: "Heterossexual" nas quebras por orientação sexual do SINAN é
   **derivado** (total − demais categorias) — a planilha de origem não traz a
   coluna. Os demais valores vêm direto das abas.
