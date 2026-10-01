@@ -25,16 +25,22 @@ models:
       +schema: staging
       lgbt:
         +tags: ["lgbt"]
+      ici:
+        +tags: ["ici"]
     intermediate:
       +materialized: view
       +schema: intermediate
       lgbt:
         +tags: ["lgbt"]
+      ici:
+        +tags: ["ici"]
     marts:
       +materialized: table
       +schema: marts
       lgbt:
         +tags: ["lgbt"]
+      ici:
+        +tags: ["ici"]
 
 seeds:
   observadh:

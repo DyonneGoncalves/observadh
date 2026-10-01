@@ -64,3 +64,17 @@ copiado para `~/.dbt/profiles.yml`.
 - [x] **Seções 1, 2, 3, 4 e 5 (PNS 2019 / Censo)** no formato longo, só nacional para as partes de perfil. Validadas contra a planilha de cálculo e o texto-base do relatório.
 - [x] **Abertura da seção 6** (CRAS/Centros de Convivência) + **extras de 7.0/7.1** (local de ocorrência, perfil do agressor, relação do suspeito) no formato longo. Validados contra a planilha de cálculo.
 - [x] `dbt build --select tag:lgbt` — tudo verde (49 nós). **`lgbt_indicadores`: ~595k linhas.** O relatório LGBTQIA+ está completo no formato longo (falta só a 2.5 "% casamentos mesmo sexo por estado", de denominador ambíguo).
+
+## Status ICI (Índice de Capacidade Institucional)
+
+> **Diferente do LGBTQIA+**: as planilhas do ICI já chegam com o índice final calculado (0 a 1) por território/ano/subíndice — não há regra de cálculo de indicador para implementar, só padronização de schema e cálculo das médias de comparação que o relatório pede. Ver [`docs/ici/catalogo-indicadores-ici.md`](docs/ici/catalogo-indicadores-ici.md).
+
+- [x] **Catálogo de indicadores** — mapeamento das 3 planilhas (Estadual, Municipal 2014/2019, Municipal 2023) e dos 3 `Filtro_*_V1.docx`, com 12 inconsistências documentadas.
+- [x] **Ingestão configurada** (`ingestion/temas/ici_config.yml`) e as 3 planilhas copiadas para `ingestion/input/ici/2026/`.
+- [x] **Staging** — 1 modelo por sub-índice × nível (`stg_ici_estadual_{dh,ca,lgbtqia,pcd,pi}`, `stg_ici_municipal_{dh,ca,lgbtqia,pcd,pi}`).
+- [x] **Intermediate** — `int_ici_estadual` / `int_ici_municipal`: junção com `dim_uf`/`dim_municipio`, média nacional, média do grupo de comparação (região no estadual, UF no municipal) e classificação via macro `classifica_ici`.
+- [x] **Mart** — `ici_indicadores` (formato longo) + views `ici_indicadores_estadual` / `ici_indicadores_municipal`. Guia de consumo em [`docs/ici/consumo-ici_indicadores.md`](docs/ici/consumo-ici_indicadores.md).
+- [x] **Testes** — `not_null`/`accepted_values` no schema.yml + teste estrutural de cobertura (27 UFs / 5.570 municípios por índice e ano).
+- [x] **Executado contra o Postgres real do projeto** (01/10/2026) — `ingest.py` + `dbt build --select tag:ici`: 33/33 PASS, 0 erro. `ici_indicadores` com 83.955 linhas (`ici_indicadores_estadual`: 405; `ici_indicadores_municipal`: 83.550).
+- [ ] **ICI-PSR municipal** (22 capitais) — planilha não recebida, seção não implementada.
+- [ ] **Decisão sobre peso das médias** (simples vs. ponderada por população) — implementado como simples por ora.

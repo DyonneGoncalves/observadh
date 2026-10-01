@@ -1,0 +1,106 @@
+# Sources do tema ICI — tabelas do schema `raw` usadas pelos modelos.
+#
+# A ingestão (ingestion/ingest.py --tema ici --ano 2026) importa toda aba de
+# toda planilha para o schema `raw`, exceto "Classificação valores ICI"
+# (ver ingestion/temas/ici_config.yml — é regra, não dado, reproduzida na
+# macro classifica_ici). A aba resumo "ICI Estadual 2023" também não está
+# listada aqui: é redundante com as 5 abas detalhadas (mesmos valores 2023,
+# conferido no catálogo) e nenhum modelo precisa dela.
+#
+# Nomes de tabela conferidos rodando montar_nome_tabela()/normalizar_nome()
+# do ingest.py real contra os nomes de aba das 3 planilhas (sem banco
+# disponível nesta sessão para gerar via --dry-run) — reconferir com
+# `python ingestion/ingest.py --tema ici --ano 2026 --dry-run` na primeira
+# carga real e corrigir os `identifier` abaixo se algo não bater.
+
+version: 2
+
+sources:
+  - name: raw_ici
+    schema: raw
+    loaded_at_field: dt_importacao
+    tables:
+
+      # --- Estadual — V1_ICI_Estadual_RelatoriosObservaDH.xlsx ---
+      # 1 linha por UF (27), série 2014/2019/2023 em colunas. Colunas:
+      # cod_uf, sigla_uf, nome_uf, popuf, regiao, ici_<sub>_<ano>,
+      # ici_<sub>_<ano>_classificacao (classificação descartada — ver
+      # catálogo Problema 7; reclassificado pela macro).
+      - name: raw_ici_estadual_dh
+        identifier: ici_estadual_estadual_ici_dh_2023
+        description: ICI-DH estadual, série 2014/2019/2023. Aba "Estadual ICI DH 2023".
+      - name: raw_ici_estadual_ca
+        identifier: ici_estadual_estadual_ici_ca_2023
+        description: ICI-CA estadual, série 2014/2019/2023. Aba "Estadual ICI CA 2023".
+      - name: raw_ici_estadual_lgbtqia
+        identifier: ici_estadual_estadual_ici_lgbtqia_2023
+        description: ICI-LGBTQIA+ estadual, série 2014/2019/2023. Aba "Estadual ICI LGBTQIA 2023".
+      - name: raw_ici_estadual_pcd
+        identifier: ici_estadual_estadual_ici_pcd_2023
+        description: ICI-PCD estadual, série 2014/2019/2023. Aba "Estadual ICI PCD 2023".
+      - name: raw_ici_estadual_pi
+        identifier: ici_estadual_estadual_ici_pi_2023
+        description: ICI-PI estadual, série 2014/2019/2023. Aba "Estadual ICI PI 2023".
+
+      # --- Municipal 2014/2019 — V1_ICI_Municipal_2014_2019_RelatoriosObservaDH.xlsx ---
+      # 1 linha por município (5.570), só o valor do ano da aba. Colunas de
+      # UF/Região variam de formato entre abas (ver catálogo Problema 5) —
+      # os modelos usam só cod_uf e o seed dim_uf.
+      - name: raw_ici_municipal_dh_2014
+        identifier: ici_municipal_14_19_municipal_ici_dh_2014
+        description: ICI-DH municipal 2014. Aba "Municipal ICI-DH 2014". Colunas de UF em sigla.
+      - name: raw_ici_municipal_dh_2019
+        identifier: ici_municipal_14_19_municipal_ici_dh_2019
+        description: ICI-DH municipal 2019. Aba "Municipal ICI-DH 2019". Colunas de UF em sigla.
+      - name: raw_ici_municipal_ca_2014
+        identifier: ici_municipal_14_19_municipal_ici_ca_2014
+        description: ICI-CA municipal 2014. Aba "Municipal ICI-CA 2014". UF por extenso (ex. "Rondônia").
+      - name: raw_ici_municipal_ca_2019
+        identifier: ici_municipal_14_19_municipal_ici_ca_2019
+        description: ICI-CA municipal 2019. Aba "Municipal ICI-CA 2019".
+      - name: raw_ici_municipal_lgbtqia_2014
+        identifier: ici_municipal_14_19_municipal_ici_lgbtqia_2014
+        description: >
+          ICI-LGBTQIA+ municipal 2014. Aba "Municipal ICI-LGBTQIA+ - 2014".
+          Tem 6 colunas extras totalmente vazias na origem (resíduo de
+          formatação) — descartadas pelo ingest.py (tratar_dataframe).
+      - name: raw_ici_municipal_lgbtqia_2019
+        identifier: ici_municipal_14_19_municipal_ici_lgbtqia_2019
+        description: ICI-LGBTQIA+ municipal 2019. Aba "Municipal ICI-LGBTQIA+ - 2019".
+      - name: raw_ici_municipal_pcd_2014
+        identifier: ici_municipal_14_19_municipal_ici_pcd_2014
+        description: ICI-PCD municipal 2014. Aba "Municipal ICI-PCD - 2014".
+      - name: raw_ici_municipal_pcd_2019
+        identifier: ici_municipal_14_19_municipal_ici_pcd_2019
+        description: ICI-PCD municipal 2019. Aba "Municipal ICI-PCD - 2019".
+      - name: raw_ici_municipal_pi_2014
+        identifier: ici_municipal_14_19_municipal_ici_pi_2014
+        description: ICI-PI municipal 2014. Aba "Municipal ICI-PI - 2014".
+      - name: raw_ici_municipal_pi_2019
+        identifier: ici_municipal_14_19_municipal_ici_pi_2019
+        description: ICI-PI municipal 2019. Aba "Municipal ICI-PI - 2019".
+
+      # --- Municipal 2023 — V1_ICI_Municipal_2023_RelatoriosObservaDH.xlsx ---
+      # Mesmo grão (5.570 municípios), colunas renomeadas em relação ao
+      # arquivo 2014/2019 (ver catálogo Problema 6): cod_munic, uf, cod_uf,
+      # desc_mun, popmun, fx_pop, regiao.
+      - name: raw_ici_municipal_dh_2023
+        identifier: ici_municipal_23_municipal_ici_dh_2023
+        description: ICI-DH municipal 2023. Aba "Municipal ICI-DH 2023".
+      - name: raw_ici_municipal_ca_2023
+        identifier: ici_municipal_23_municipal_ici_ca_2023
+        description: ICI-CA municipal 2023. Aba "Municipal ICI-CA 2023".
+      - name: raw_ici_municipal_pi_2023
+        identifier: ici_municipal_23_municipal_ici_pi_2023
+        description: ICI-PI municipal 2023. Aba "Municipal ICI-PI 2023".
+      - name: raw_ici_municipal_pcd_2023
+        identifier: ici_municipal_23_municipal_ici_pcd_2023
+        description: ICI-PCD municipal 2023. Aba "Municipal ICI-PCD 2023".
+      - name: raw_ici_municipal_lgbtqia_2023
+        identifier: ici_municipal_23_municipal_ici_lgbtqia_2023
+        description: ICI-LGBTQIA+ municipal 2023. Aba "Municipal ICI-LGBTQIA+ 2023".
+
+      # --- ICI-PSR ---
+      # Não há tabela: nenhuma planilha com o dado de PSR (municipal, 22
+      # capitais) foi recebida. Ver catálogo, Problema 3. Quando a planilha
+      # chegar, adicionar aqui + um stg_ici_municipal_psr_*.

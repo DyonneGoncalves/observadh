@@ -1,0 +1,36 @@
+# Configuração de ingestão do tema ICI (Índice de Capacidade Institucional)
+#
+# Igual ao LGBTQIA+: ingestão automática, uma tabela raw por aba de cada
+# planilha em ingestion/input/ici/<ano>/. Nome da tabela = <prefixo>_<planilha>_<aba>.
+#
+# Diferença deste tema: as planilhas já trazem o ÍNDICE FINAL calculado (0 a 1)
+# por território/ano/subíndice — não há regra de cálculo de indicador a
+# implementar aqui, só padronização de schema (colunas de UF/Região mudam de
+# nome e até de formato entre abas/anos/arquivos — ver catálogo). Ver
+# docs/ici/catalogo-indicadores-ici.md para o mapeamento completo e as
+# pendências (ICI-PSR municipal sem planilha, peso das médias
+# nacional/regional/estadual, textos desatualizados nos Filtros).
+
+tema: ici
+
+# Prefixo das tabelas raw (mesmo padrão dos outros temas).
+prefixo_tabela: ici
+
+# Schema onde as tabelas brutas e a tabela de log são criadas.
+schema_raw: raw
+
+# Abreviação da parte "nome da planilha" no nome da tabela. Chave = nome
+# EXATO do arquivo.
+prefixos_planilha:
+  "V1_ICI_Estadual_RelatoriosObservaDH.xlsx": estadual
+  "V1_ICI_Municipal_2014_2019_RelatoriosObservaDH.xlsx": municipal_14_19
+  "V1_ICI_Municipal_2023_RelatoriosObservaDH.xlsx": municipal_23
+
+# "Classificação valores ICI" não é dado de território — é a especificação da
+# regra de classificação (Baixa/Moderada/Alta). Reproduzida como macro dbt
+# (transform/macros/classifica_ici.sql) em vez de tabela raw, para não
+# depender de uma tabela de configuração separada e não duplicar a regra.
+ignorar_abas:
+  - Classificação valores ICI
+
+ano_padrao: 2026

@@ -1,0 +1,91 @@
+version: 2
+
+models:
+  - name: ici_indicadores
+    description: >
+      Todos os sub-índices ICI (estadual + municipal) no formato longo — uma
+      linha por (nivel, recorte_codigo, indice, ano_referencia). União de
+      int_ici_estadual e int_ici_municipal. Ver docs/ici/consumo-ici_indicadores.md.
+      Sem nível nacional (sem relatório) e sem ICI-PSR (planilha não recebida
+      — ver catálogo, Problemas 3 e 4).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - nivel
+              - recorte_codigo
+              - indice
+              - ano_referencia
+    columns:
+      - name: nivel
+        description: "'estadual' | 'municipal'."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["estadual", "municipal"]
+      - name: recorte_codigo
+        description: Código IBGE da UF (2 dígitos) no estadual; do município (7 dígitos) no municipal.
+        tests:
+          - not_null
+      - name: recorte_nome
+        description: Nome da UF ou do município.
+        tests:
+          - not_null
+      - name: uf_codigo
+        description: Código IBGE da UF (2 dígitos) — igual a recorte_codigo no nível estadual; UF do município no municipal.
+        tests:
+          - not_null
+      - name: uf_sigla
+        description: Sigla da UF (ex. "SP").
+        tests:
+          - not_null
+      - name: indice
+        description: "'ici_dh' | 'ici_ca' | 'ici_lgbtqia' | 'ici_pcd' | 'ici_pi'. Sem 'ici_psr' — ver catálogo, Problema 3."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["ici_dh", "ici_ca", "ici_lgbtqia", "ici_pcd", "ici_pi"]
+      - name: ano_referencia
+        description: "2014 | 2019 | 2023."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [2014, 2019, 2023]
+      - name: valor
+        description: Valor do índice, entre 0 e 1 (já vem calculado na planilha-fonte — ver catálogo, seção 0).
+        tests:
+          - not_null
+      - name: classificacao
+        description: >
+          'Baixa capacidade institucional' | 'Moderada capacidade institucional' |
+          'Alta capacidade institucional', sempre derivada de `valor` pela macro
+          classifica_ici (nunca lida direto da planilha — ver catálogo, Problema 7).
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "Baixa capacidade institucional"
+                  - "Moderada capacidade institucional"
+                  - "Alta capacidade institucional"
+      - name: media_nacional
+        description: Média simples de `valor` entre todos os recortes do mesmo nível, índice e ano (não ponderada por população — ver catálogo, Problema 10).
+        tests:
+          - not_null
+      - name: grupo_comparacao_nome
+        description: Nome da região (nível estadual) ou da UF (nível municipal) usada como grupo de comparação.
+        tests:
+          - not_null
+      - name: media_grupo_comparacao
+        description: Média simples de `valor` dentro do grupo_comparacao_nome, mesmo índice e ano.
+        tests:
+          - not_null
+
+  - name: ici_indicadores_estadual
+    description: Recorte estadual do mart longo. recorte_codigo/nome → uf_codigo/uf_nome; grupo_comparacao_nome → regiao.
+
+  - name: ici_indicadores_municipal
+    description: Recorte municipal do mart longo. recorte_codigo/nome → municipio_codigo_ibge/municipio_nome; grupo_comparacao_nome → uf_nome.
