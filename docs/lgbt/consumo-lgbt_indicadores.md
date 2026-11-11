@@ -39,7 +39,7 @@ Uma linha por **`(nivel, recorte_codigo, secao, indicador, categoria, ano_refere
 | `indicador` | slug estável (ex.: `pct_creas_nao_atende_orientacao`) |
 | `categoria` | quebra dentro do indicador (ex.: `Feminino`, `2023`, `Homossexual / Mulheres`). `NULL` quando o indicador é um valor único |
 | `valor` | numérico. **Pode ser `NULL`** — ver abaixo |
-| `valor_tipo` | `numero_absoluto` \| `percentual` \| `variacao_percentual` |
+| `valor_tipo` | `numero_absoluto` \| `percentual` \| `variacao_percentual` \| `sentido_variacao` \| `categoria_predominante` (os dois últimos são indicadores de texto: a palavra vem em `categoria` — ver abaixo) |
 | `ano_referencia` | ano a que o dado se refere (varia por indicador) |
 
 ### A consulta da aplicação
