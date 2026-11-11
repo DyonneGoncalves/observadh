@@ -8,6 +8,14 @@
 --             "Muito ruim e ruim" (= ruim + muito_ruim)
 --   pct_atividade_esportiva_por_orientacao    frequência X / total da orientação × 100
 --   pct_depressao_por_orientacao              diagnóstico X / total da orientação × 100
+--   autoavaliacao_saude_predominante_homossexual
+--       grupo de autoavaliação com MAIOR % entre homossexuais — é a expressão
+--       do texto ("avaliaram a própria saúde como <muito boa e boa>"), com o
+--       rótulo da planilha, na coluna `categoria`; `valor` = % de homossexuais nesse
+--       grupo. Os % de bissexuais/heterossexuais citados na mesma frase são do
+--       MESMO grupo (ver docs/lgbt/consumo-lgbt_indicadores.md).
+--       Regra de escolha (maior % entre homossexuais) é inferência do
+--       texto-base — o Cálculo_Indicadores não define. Confirmar com a área.
 
 with autoaval as (
     select {{ orientacao_canonica('tipo_de_orient_sexual') }} as orientacao, *
@@ -23,6 +31,17 @@ depressao as (
     select {{ orientacao_canonica('tipo_de_orient_sexual') }} as orientacao, *
     from {{ source('raw_lgbt', 'raw_lgbt_taxa_depressao') }}
     where tipo_de_orient_sexual not ilike 'total%'
+),
+
+autoaval_grupos as (
+    select a.orientacao, v.grupo,
+           {{ calcula_percentual('v.qtd', 'a.total::numeric') }} as valor
+    from autoaval a
+    cross join lateral (values
+        ('Muito boa e boa',   (a.muito_boa + a.boa)::numeric),
+        ('Regular',           a.regular::numeric),
+        ('Muito ruim e ruim', (a.ruim + a.muito_ruim)::numeric)
+    ) as v(grupo, qtd)
 ),
 
 linhas as (
@@ -64,6 +83,17 @@ linhas as (
     ) as v(diag, qtd)
 )
 
+, predominante as (
+    -- 1 linha: grupo com maior % entre homossexuais
+    select 'autoavaliacao_saude_predominante_homossexual'::text as indicador,
+           grupo                                                as categoria,
+           valor
+    from autoaval_grupos
+    where orientacao = 'Homossexual'
+    order by valor desc, grupo
+    limit 1
+)
+
 select
     'nacional'::text                as nivel,
     null::int                       as recorte_codigo,
@@ -74,3 +104,12 @@ select
     'percentual'::text             as valor_tipo,
     2019                           as ano_referencia
 from linhas
+
+union all
+
+select
+    'nacional', null::int, 'Brasil', '5', 'Saúde — Perfil de saúde',
+    indicador, categoria, valor,
+    'categoria_predominante',
+    2019
+from predominante

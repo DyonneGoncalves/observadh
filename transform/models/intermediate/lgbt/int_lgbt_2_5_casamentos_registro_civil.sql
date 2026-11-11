@@ -5,6 +5,10 @@
 -- Indicadores (Cálculo_Indicadores_LGBTQIA+_{Nacional,Estadual,Municipal}, 2.5):
 --   casamentos_mesmo_sexo_total_ano        série 2013..2023 (nº absoluto)   N E M
 --   variacao_casamentos_mesmo_sexo_13_23   (tot2023 - tot2013)/tot2013 *100 N E M
+--   sentido_variacao_casamentos_mesmo_sexo_13_23
+--                                          palavra do texto ("crescimento" |
+--                                          "queda" | "estabilidade") em
+--                                          `categoria`; valor = +1 | -1 | 0   N E M
 --   pct_casamentos_mesmo_sexo_por_genero_23 gênero / total 2023 * 100        N E M
 --   pct_casamentos_lesbohomoafetivos       lesbo / casamentos masc-fem *100  N E   (Total_Casamentos_UF)
 --
@@ -97,6 +101,24 @@ linhas as (
            null,
            {{ calcula_percentual('(tot_2023 - tot_2013)', 'tot_2013', sem_denominador='null') }},
            'variacao_percentual',
+           2023
+    from variacao
+
+    union all
+
+    -- sentido da variação 2013 -> 2023: a palavra que o texto usa vai em
+    -- `categoria`; `valor` = sinal (+1 crescimento, -1 queda, 0 estabilidade).
+    -- Ano sem registro conta como 0 casamentos, então o sentido existe mesmo
+    -- quando a variação % é NULL (ex.: município com 0 em 2013).
+    select nivel, recorte_codigo,
+           'sentido_variacao_casamentos_mesmo_sexo_13_23',
+           case
+               when coalesce(tot_2023, 0) > coalesce(tot_2013, 0) then 'crescimento'
+               when coalesce(tot_2023, 0) < coalesce(tot_2013, 0) then 'queda'
+               else 'estabilidade'
+           end,
+           sign(coalesce(tot_2023, 0) - coalesce(tot_2013, 0))::numeric,
+           'sentido_variacao',
            2023
     from variacao
 

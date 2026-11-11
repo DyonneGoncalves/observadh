@@ -174,6 +174,7 @@ a linha (categoria da orientação X / total da orientação X). Validação: `t
 |---|---|---|---|---|
 | `casamentos_mesmo_sexo_total_ano` | ano `2013`..`2023` | soma (entre homens + entre mulheres) no recorte/ano | N E M | numero_absoluto |
 | `variacao_casamentos_mesmo_sexo_13_23` | — | (total 2023 − total 2013) / total 2013 ×100 | N E M | variacao_percentual |
+| `sentido_variacao_casamentos_mesmo_sexo_13_23` | `crescimento` / `queda` / `estabilidade` | sinal de (total 2023 − total 2013); a palavra vai em `categoria`, `valor` = +1/−1/0 | N E M | sentido_variacao |
 | `pct_casamentos_mesmo_sexo_por_genero_23` | `Casamentos entre homens` / `... mulheres` | gênero / total do recorte em 2023 ×100 | N E M | percentual |
 | `pct_casamentos_lesbohomoafetivos` | — | lesbohomoafetivos / casamentos masc-fem ×100 (Total_Casamentos_UF, ano_ref 2022) | N E | percentual |
 | `pct_estado_civil_por_orientacao` | `<orientação> / <estado civil>` | estado civil / total com info da orientação ×100 (PNS 2019) | N | percentual |
@@ -237,6 +238,7 @@ Modelos: `stg_lgbt_projetos_homofobia` (+ `_local`) → `int_lgbt_4_1_projetos_e
 | Sub | Indicador (resumo) | Aba Excel | Tabela `raw` | N/E | Modelo dbt |
 |---|---|---|---|---|---|
 | 5.0 | `pct_autoavaliacao_saude_por_orientacao` (junta "muito boa+boa" e "muito ruim+ruim") | Autoavaliacao_saude_PNS | `lgbt_saude_pns_cnes_autoavaliacao_saude_pns` | N | ✅ `int_lgbt_5_0_saude` |
+| 5.0 | `autoavaliacao_saude_predominante_homossexual` (expressão do texto: grupo de maior % entre homossexuais, em `categoria`) | Autoavaliacao_saude_PNS | `lgbt_saude_pns_cnes_autoavaliacao_saude_pns` | N | ✅ `int_lgbt_5_0_saude` |
 | 5.0 | `pct_atividade_esportiva_por_orientacao` (6 frequências) | Atividade_Esportiva_PNS | `lgbt_saude_pns_cnes_atividade_esportiva_pns` | N | ✅ idem |
 | 5.0 | `pct_depressao_por_orientacao` | Taxa_Depressao_PNS | `lgbt_saude_pns_cnes_taxa_depressao_pns` | N | ✅ idem |
 
@@ -299,6 +301,10 @@ Validação: `tests/lgbt_7_0_valores.sql`. Dados de perfil são de 2024.
 | `pct_viol_interpessoal_por_orientacao_sexual` · `..._autoprovocada_...` | Heterossexual (derivado) / Bissexual / Homossexual / Ignorado / Não se aplica | Violências_Orientacao_Sexual | N E M | interp. Homo 52,27 · Bi 20,46 |
 | `pct_viol_interpessoal_por_identidade_genero` · `..._autoprovocada_...` | Travesti / Transexual mulher / Transexual homem / Ignorado / Não se aplica | Violencias_Identidade_Genero | N E M | interp. Trans mulher 25,62 · Travesti 4,80 |
 | `pct_viol_interpessoal_por_local` · `..._autoprovocada_...` | Residência / Via pública / … (10) | Interpessoal_Local_Ocorrencia · Autoprovocada_Local_Ocorrencia | N E M | interp. Residência 54,11 · autop. 83,19 |
+| `local_predominante_viol_interpessoal` · `..._autoprovocada` | nome do local como na planilha: `Residência` / `Via pública` / … | local de maior % (mesma base) — `categoria` = expressão, `valor` = % | N E M | ambos: Residência (54,11 · 83,19) |
+| `sexo_predominante_viol_interpessoal` · `..._autoprovocada` | `Feminino` / `Masculino` / `Indefinido` | sexo de maior % — `categoria` = rótulo, `valor` = % | N E M | ambos: Feminino (66,04 · 61,52) |
+| `raca_cor_predominante_viol_interpessoal` · `..._autoprovocada` | `Negra` / `Branca` / `Amarela` / `Indígena` | raça/cor de maior % (Negra = preta + parda) | N E M | ambos: Negra (60,02 · 52,30) |
+| `agressor_principal_{1,2,3}_viol_interpessoal` | rótulo do grupo de agressor | 1º/2º/3º maiores %, **sem** "Pessoas desconhecidas ou outros" (regra validada com a área, nov/2026) | N E M | cônjuges 32,91 · conhecidas 20,27 · familiares 16,86 |
 | `pct_viol_interpessoal_por_agressor` | 6 grupos (pai/mãe/…, conhecidos, cônjuges/…, cuidadores/patrões, polícia/institucional, desconhecidos/outros) | Interpessoal_Perfil_Agressor (`total_viol`) | N E M | Cônjuges/namorados 32,91 · Pai/mãe/… 16,86 |
 
 > "Heterossexual" não é coluna nas abas de orientação — é derivado (total − bissexual − homossexual − não se aplica − ignorado), como na planilha.
@@ -323,6 +329,8 @@ para as quebras). Validação: `tests/lgbt_7_1_valores.sql`.
 | `pct_denuncias_por_identidade_genero` | 8 categorias | ONDH_Identidade_Genero | N E M | Homem trans 6,85 · Mulher trans 10,95 |
 | `pct_denuncias_por_orientacao_sexual` | 6 categorias | ONDH_Orientacao_Sexual | N E M | Homossexual 54,97 · Bissexual 14,51 |
 | `pct_denuncias_por_tipo_violacao` | 1 por tipo (~103) | ONDH_Tipo_de_Violação (`total_com_info` = contagem do tipo) | N E M | Tortura Psíquica 12,48 · Constrangimento 10,99 |
+| `{faixa_etaria,raca_cor,local,tipo_violacao}_predominante_denuncias` | rótulo da planilha | categoria de maior % (texto: até 29 anos · negras · casa da vítima · tortura psíquica) | N E M | 48,03 · 54,98 · 35,08 · 12,48 |
+| `uf_maior_denuncias_{1,2,3}` | nome da UF | 3 estados com mais denúncias em 2024 (% do Brasil) | N | SP 27,10 · RJ 12,62 · MG 8,57 |
 
 **Ainda não modelado da 7.1** (mesma mecânica, listas de colunas longas):
 `ONDH_Local` (`lgbt_viol_ondh_ondh_local`, 32 colunas) e `ONDH_Relação_Suspeito`

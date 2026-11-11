@@ -1,15 +1,17 @@
-{% macro sinan_breakdown_percentual(src, indicador, total_col, pairs, ano=2024) %}
+{% macro sinan_breakdown_percentual(src, indicador, total_col, pairs, ano=2024, sem_denominador=0) %}
 -- Igual ao ondh_breakdown_percentual, mas o DENOMINADOR do % é uma coluna de
 -- total explícita (`total_col`), não a soma dos pares. Necessário nas tabelas
 -- SINAN porque algumas categorias do relatório se sobrepõem (ex.: "até 29
 -- anos" e "crianças e adolescentes") e o total tem sua própria coluna.
 -- `pairs` = lista [rótulo, expressão SQL] usando o alias `s`.
+-- `sem_denominador`: valor quando o recorte não tem casos (padrão 0; a seção
+-- 7.0 passa 'null' — "sem notificação" não é 0%).
     select
         cat.nivel,
         cat.recorte_codigo,
         '{{ indicador }}'::text as indicador,
         cat.categoria,
-        {{ calcula_percentual('cat.q', 'den.q_total') }} as valor,
+        {{ calcula_percentual('cat.q', 'den.q_total', sem_denominador=sem_denominador) }} as valor,
         'percentual'::text     as valor_tipo,
         {{ ano }}             as ano_referencia
     from (

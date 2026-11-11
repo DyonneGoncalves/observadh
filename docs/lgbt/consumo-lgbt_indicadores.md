@@ -96,6 +96,50 @@ casamento entre pessoas do mesmo sexo em 2013 → `variacao_casamentos_mesmo_sex
 = `NULL`). Linhas de `valor_tipo = 'numero_absoluto'` **nunca** são `NULL`.
 Trate `NULL` como "sem dado", não como zero.
 
+Na **seção 7.0 (SINAN)**, os percentuais de perfil (sexo, faixa etária,
+raça/cor, orientação, identidade de gênero, local, agressor) e o % por tipo
+vêm `NULL` quando o recorte **não teve notificação** — ex.: município sem
+nenhuma violência interpessoal. `0` significa que houve notificação, mas
+nenhuma naquela categoria. No gráfico: `NULL` → "sem notificações"; `0` → barra
+de 0%.
+
+### Indicadores de texto (`valor_tipo = 'sentido_variacao'`)
+
+Quando o texto precisa de uma **palavra** que depende do dado (ex.: "representa
+um **crescimento** de 202,6%"), a palavra vem na coluna `categoria` e `valor`
+traz o sinal (+1 / −1 / 0). Há uma única linha por recorte, então basta ler a
+`categoria` dela:
+
+```sql
+SELECT categoria FROM lgbt_indicadores
+WHERE indicador = 'sentido_variacao_casamentos_mesmo_sexo_13_23'
+  AND nivel = :nivel AND recorte_codigo IS NOT DISTINCT FROM :recorte;
+```
+
+O mesmo vale para `valor_tipo = 'categoria_predominante'` (ex.:
+`autoavaliacao_saude_predominante_homossexual`,
+`local_predominante_viol_*`, `sexo_predominante_viol_*`, `raca_cor_predominante_viol_*`,
+`agressor_principal_{1,2,3}_viol_interpessoal` — um indicador por tópico da lista;
+`*_predominante_denuncias` e `uf_maior_denuncias_{1,2,3}` da seção 7.1):
+a categoria vencedora vem em `categoria` **com o rótulo exato da planilha**
+(ex.: "Residência", "Muito boa e boa") e `valor` é o % dela. Ajustes de
+redação (caixa, "Residência" → "casa da vítima" etc.) são da aplicação. Os
+predominantes do SINAN não têm linha quando o recorte não teve notificação —
+trate como "sem dado". Os % de bissexuais e
+heterossexuais da mesma frase são do **mesmo grupo**:
+
+```sql
+SELECT split_part(o.categoria, ' / ', 1) AS orientacao, o.valor
+FROM lgbt_indicadores p
+JOIN lgbt_indicadores o
+  ON o.indicador = 'pct_autoavaliacao_saude_por_orientacao'
+ AND split_part(o.categoria, ' / ', 2) = p.categoria
+WHERE p.indicador = 'autoavaliacao_saude_predominante_homossexual';
+```
+
+Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absoluto
+("queda de 20,0%"), senão o texto fica "queda de -20,0%".
+
 ## Seções
 
 | `secao` | Nome | Níveis | Ano(s) |
@@ -141,6 +185,7 @@ Trate `NULL` como "sem dado", não como zero.
 |---|---|---|---|
 | `casamentos_mesmo_sexo_total_ano` | num | N/E/M | ano `2013`..`2023` |
 | `variacao_casamentos_mesmo_sexo_13_23` | Δ% | N/E/M | — |
+| `sentido_variacao_casamentos_mesmo_sexo_13_23` | texto | N/E/M | **a palavra em si**: `crescimento` \| `queda` \| `estabilidade` (1 linha por recorte) |
 | `pct_casamentos_mesmo_sexo_por_genero_23` | % | N/E/M | `Casamentos entre homens\|mulheres` |
 | `pct_casamentos_lesbohomoafetivos` | % | N/E | — (ano_ref 2022) |
 | `pct_estado_civil_por_orientacao` | % | N | `<orientação> / <estado civil>` |

@@ -53,20 +53,25 @@ models:
       - name: valor
         description: >
           Numérico. Denominador zero em um percentual devolve 0 ("sem casos" =
-          0%). Só linhas de valor_tipo = 'variacao_percentual' podem ser NULL —
-          quando a base (ano inicial) é zero e "variação a partir de zero" não
-          tem percentual.
+          0%). Exceções que podem ser NULL: valor_tipo = 'variacao_percentual'
+          quando a base (ano inicial) é zero ("variação a partir de zero" não
+          tem percentual); e os percentuais da seção 7.0 (SINAN) quando o
+          recorte não tem notificação ("sem dado", não 0%).
         tests:
           - not_null:
               config:
-                where: "valor_tipo <> 'variacao_percentual'"
+                where: "valor_tipo <> 'variacao_percentual' and not (secao = '7.0' and valor_tipo = 'percentual')"
       - name: valor_tipo
-        description: "'numero_absoluto' | 'percentual' | 'variacao_percentual'."
+        description: >
+          'numero_absoluto' | 'percentual' | 'variacao_percentual' |
+          'sentido_variacao' (valor = +1/-1/0; a palavra — crescimento, queda,
+          estabilidade — vem em `categoria`) | 'categoria_predominante' (a
+          expressão do texto vem em `categoria`; valor = o % dela).
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ["numero_absoluto", "percentual", "variacao_percentual"]
+                values: ["numero_absoluto", "percentual", "variacao_percentual", "sentido_variacao", "categoria_predominante"]
       - name: ano_referencia
         description: Ano a que o dado se refere (varia por indicador).
         tests:

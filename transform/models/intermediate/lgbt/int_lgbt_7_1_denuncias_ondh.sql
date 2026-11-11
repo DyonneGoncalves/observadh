@@ -11,6 +11,12 @@
 --   pct_denuncias_por_identidade_genero          8 categorias (inclui não informado)
 --   pct_denuncias_por_orientacao_sexual          6 categorias (inclui não informado)
 --   pct_denuncias_por_tipo_violacao              1 categoria por tipo
+--   {faixa_etaria,raca_cor,local,tipo_violacao}_predominante_denuncias
+--       categoria de MAIOR % — rótulo da planilha em `categoria`, valor = %
+--       (texto: "X% tinham <até 29 anos>", "são pessoas <negras>", "no local
+--       <casa da vítima>", "são de <tortura psíquica>"). N E M.
+--   uf_maior_denuncias_{1,2,3}                   1º/2º/3º estados com mais
+--       denúncias em 2024 — nome da UF em `categoria`, valor = % do Brasil. N.
 --
 -- NÃO modelados ainda (mesma mecânica, listas de colunas longas — ver catálogo):
 --   local de ocorrência (ONDH_Local, 32 colunas) e relação do suspeito
@@ -200,6 +206,49 @@ tv_ind as (
     from tv_agg
 ),
 
+-- --------------------------------------------------- PREDOMINANTES / RANKING
+-- Mesma regra do SINAN (7.0): maior %, rótulo da planilha em `categoria`, só
+-- recortes com casos (valor > 0). Empate: ordem alfabética da categoria.
+-- Raça e local: o Cálculo_Indicadores pede "maior percentual"; faixa etária e
+-- tipo de violação: o texto cita a categoria de maior %. "Não sabe informar"
+-- e "Outros" (local) entram na disputa, como no SINAN.
+{% set predominantes_ondh = [
+    ['brk_faixa', 'faixa_etaria_predominante_denuncias'],
+    ['brk_raca',  'raca_cor_predominante_denuncias'],
+    ['brk_local', 'local_predominante_denuncias'],
+    ['tv_ind',    'tipo_violacao_predominante_denuncias']
+] %}
+predominante as (
+    {% for cte, ind in predominantes_ondh %}
+    select * from (
+        select distinct on (nivel, recorte_codigo)
+            nivel, recorte_codigo, '{{ ind }}'::text as indicador, categoria, valor,
+            'categoria_predominante'::text as valor_tipo, ano_referencia
+        from {{ cte }}
+        where valor > 0
+        order by nivel, recorte_codigo, valor desc, categoria
+    ) x
+    {{ "union all" if not loop.last }}
+    {% endfor %}
+),
+
+-- ranking dos estados com mais denúncias em 2024 (Cálculo_Indicadores: "estado
+-- X com maior número de denúncias" / total Brasil). Só nacional.
+uf_ranking as (
+    select 'nacional'::text as nivel, null::int as recorte_codigo,
+           'uf_maior_denuncias_' || posicao as indicador,
+           u.nome_uf as categoria, r.valor,
+           'categoria_predominante'::text as valor_tipo, 2024 as ano_referencia
+    from (
+        select recorte_codigo, valor,
+               row_number() over (order by valor desc, recorte_codigo) as posicao
+        from serie_ind
+        where indicador = 'pct_participacao_denuncias_2024' and nivel = 'estadual' and valor > 0
+    ) r
+    join dim_uf u on u.codigo_uf = r.recorte_codigo
+    where posicao <= 3
+),
+
 -- ------------------------------------------------------------------ UNIÃO
 todos as (
     select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from serie_ind
@@ -211,6 +260,8 @@ todos as (
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_local
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from brk_relacao
     union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from tv_ind
+    union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from predominante
+    union all select nivel, recorte_codigo, indicador, categoria, valor, valor_tipo, ano_referencia from uf_ranking
 )
 
 select

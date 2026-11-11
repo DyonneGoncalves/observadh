@@ -1,4 +1,4 @@
-{% macro ondh_breakdown_percentual(src, indicador, pairs, ano=2024) %}
+{% macro ondh_breakdown_percentual(src, indicador, pairs, ano=2024, sem_denominador=0) %}
 -- Gera, no formato longo, um indicador "% de denúncias por <categoria>" a
 -- partir de uma tabela ONDH em formato largo (1 linha por município, uma
 -- coluna por categoria). `pairs` é uma lista [rótulo, expressão SQL] — a
@@ -10,7 +10,7 @@
         agg.recorte_codigo,
         '{{ indicador }}'::text as indicador,
         agg.categoria,
-        {{ calcula_percentual('agg.q', 'agg.q_total') }} as valor,
+        {{ calcula_percentual('agg.q', 'agg.q_total', sem_denominador=sem_denominador) }} as valor,
         'percentual'::text     as valor_tipo,
         {{ ano }}              as ano_referencia
     from (

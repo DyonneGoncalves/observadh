@@ -21,7 +21,16 @@ with esperado (indicador, categoria, valor) as (
         ('pct_denuncias_por_orientacao_sexual','Homossexual',  54.970689),
         ('pct_denuncias_por_orientacao_sexual','Bissexual',    14.509038),
         ('pct_denuncias_por_tipo_violacao',    'Tortura Psíquica', 12.476490),
-        ('pct_denuncias_por_tipo_violacao',    'Constrangimento',  10.988779)
+        ('pct_denuncias_por_tipo_violacao',    'Constrangimento',  10.988779),
+        -- predominantes e ranking de UFs (texto: até 29 anos 48,0 · negras 55,0 ·
+        -- casa da vítima 35,1 · tortura psíquica 12,5 · SP 27,1 · RJ 12,6 · MG 8,6)
+        ('faixa_etaria_predominante_denuncias',  'Até 29 anos',      48.033050),
+        ('raca_cor_predominante_denuncias',      'Negra',            54.980919),
+        ('local_predominante_denuncias',         'Casa da vítima',   35.081900),
+        ('tipo_violacao_predominante_denuncias', 'Tortura Psíquica', 12.476490),
+        ('uf_maior_denuncias_1',                 'São Paulo',        27.103700),
+        ('uf_maior_denuncias_2',                 'Rio de Janeiro',   12.622300),
+        ('uf_maior_denuncias_3',                 'Minas Gerais',      8.573900)
 ),
 
 obtido as (

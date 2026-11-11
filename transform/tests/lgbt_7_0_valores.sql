@@ -7,6 +7,18 @@
 with esperado (indicador, categoria, valor) as (
     values
         ('notificacoes_total_2024',                          null,          22906.0),
+        -- local predominante (texto: "... 83,2% / 54,1%")
+        ('local_predominante_viol_autoprovocada',            'Residência',          83.1922),
+        ('local_predominante_viol_interpessoal',             'Residência',          54.1109),
+        -- sexo / raça predominantes (texto: feminino 61,5 / 66,0; negras 52,3 / 60,0)
+        ('sexo_predominante_viol_autoprovocada',             'Feminino',            61.5218),
+        ('sexo_predominante_viol_interpessoal',              'Feminino',            66.0367),
+        ('raca_cor_predominante_viol_autoprovocada',         'Negra',               52.3033),
+        ('raca_cor_predominante_viol_interpessoal',          'Negra',               60.0226),
+        -- ranking de agressores, sem "desconhecidas ou outros" (Cálculo_Perfil_Agressor)
+        ('agressor_principal_1_viol_interpessoal', 'Cônjuges, namorados, ex-cônjuges ou ex-namorados', 32.9056),
+        ('agressor_principal_2_viol_interpessoal', 'Pessoas conhecidas ou amigas',                     20.2734),
+        ('agressor_principal_3_viol_interpessoal', 'Pai, mãe, padrasto, madrasta, irmão(ã) ou filho(a)', 16.8596),
         ('pct_notificacoes_por_tipo_2024',                   'Interpessoal',        55.208242),
         ('pct_notificacoes_por_tipo_2024',                   'Autoprovocada',       42.285864),
         ('pct_notificacoes_por_tipo_2024',                   'Origem desconhecida',  2.505894),

@@ -8,11 +8,15 @@ with esperado (nivel, recorte_codigo, indicador, categoria, valor) as (
         ('estadual', 21, 'casamentos_mesmo_sexo_total_ano',        '2013', 16.0),
         ('estadual', 21, 'casamentos_mesmo_sexo_total_ano',        '2023', 78.0),
         ('estadual', 21, 'variacao_casamentos_mesmo_sexo_13_23',   null,   387.5),
+        ('estadual', 21, 'sentido_variacao_casamentos_mesmo_sexo_13_23', 'crescimento', 1.0),
         ('estadual', 21, 'pct_casamentos_mesmo_sexo_por_genero_23', 'Casamentos entre mulheres', 64.102564),
         ('estadual', 21, 'pct_casamentos_mesmo_sexo_por_genero_23', 'Casamentos entre homens',   35.897436),
         -- Brasil
         ('nacional', null, 'casamentos_mesmo_sexo_total_ano',       '2013', 3700.0),
         ('nacional', null, 'casamentos_mesmo_sexo_total_ano',       '2023', 11198.0),
+        -- (11198 - 3700) / 3700 = 202,6486% -> exibido 202,6 (antes: 202,65 -> 202,7)
+        ('nacional', null, 'variacao_casamentos_mesmo_sexo_13_23',  null,   202.6486),
+        ('nacional', null, 'sentido_variacao_casamentos_mesmo_sexo_13_23', 'crescimento', 1.0),
         ('nacional', null, 'pct_casamentos_lesbohomoafetivos',      null,   1.204603),
         -- % lesbohomoafetivos por UF (AC 12, SP 35)
         ('estadual', 12, 'pct_casamentos_lesbohomoafetivos',        null,   0.440367),

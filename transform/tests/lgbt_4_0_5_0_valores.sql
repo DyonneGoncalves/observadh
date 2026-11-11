@@ -7,6 +7,8 @@ with esperado (indicador, categoria, valor) as (
         ('pct_autoavaliacao_saude_por_orientacao', 'Homossexual / Muito boa e boa',   76.8),
         ('pct_autoavaliacao_saude_por_orientacao', 'Bissexual / Muito boa e boa',     67.3),
         ('pct_autoavaliacao_saude_por_orientacao', 'Heterossexual / Muito boa e boa', 66.1),
+        -- 5.0 expressão do texto ("avaliaram a própria saúde como muito boa e boa")
+        ('autoavaliacao_saude_predominante_homossexual', 'Muito boa e boa',            76.8),
         -- 5.0 diagnóstico de depressão (texto do relatório)
         ('pct_depressao_por_orientacao', 'Bissexual / Já teve diagnóstico de depressão',     20.1),
         ('pct_depressao_por_orientacao', 'Homossexual / Já teve diagnóstico de depressão',   13.2),
