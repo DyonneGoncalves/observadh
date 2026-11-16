@@ -109,6 +109,25 @@ DESCRICOES = {
     "pct_denuncias_por_tipo_violacao": ("%", "Denúncias 2024: % de denúncias que citam cada tipo de violação (~103 tipos; uma denúncia pode citar vários)."),
     "pct_denuncias_por_local": ("%", "Denúncias 2024: distribuição por local da violação (~31 categorias)."),
     "pct_denuncias_por_relacao_suspeito": ("%", "Denúncias 2024: distribuição pelo vínculo do suspeito com a vítima (~46 categorias)."),
+    # indicadores de texto (validação CGTI, commit dcb64c0) — descrições que só existiam no CSV
+    "sentido_variacao_casamentos_mesmo_sexo_13_23": ("texto", "Palavra do texto para a variação 2013→2023 (\"representa um <crescimento|queda> de X%\"): vem em categoria; valor = +1 / -1 / 0. Uma linha por recorte."),
+    "autoavaliacao_saude_predominante_homossexual": ("texto", "Expressão do texto (\"avaliaram a própria saúde como <muito boa e boa>\"): grupo de autoavaliação com maior % entre homossexuais, em categoria (rótulo da planilha); valor = % de homossexuais nesse grupo. Os % de bissexuais e heterossexuais da mesma frase vêm de pct_autoavaliacao_saude_por_orientacao no mesmo grupo. Só nacional."),
+    "agressor_principal_1_viol_interpessoal": ("texto", "1º tópico de \"Perfil dos agressores\" (\"X% eram YYYY\"): 1º maior grupo de agressor, SEM \"Pessoas desconhecidas ou outros\"; rótulo em categoria, valor = %. Sem linha se o recorte não tem 1 grupos com casos."),
+    "agressor_principal_2_viol_interpessoal": ("texto", "2º tópico de \"Perfil dos agressores\" (\"X% eram YYYY\"): 2º maior grupo de agressor, SEM \"Pessoas desconhecidas ou outros\"; rótulo em categoria, valor = %. Sem linha se o recorte não tem 2 grupos com casos."),
+    "agressor_principal_3_viol_interpessoal": ("texto", "3º tópico de \"Perfil dos agressores\" (\"X% eram YYYY\"): 3º maior grupo de agressor, SEM \"Pessoas desconhecidas ou outros\"; rótulo em categoria, valor = %. Sem linha se o recorte não tem 3 grupos com casos."),
+    "local_predominante_viol_autoprovocada": ("texto", "Expressão do texto (\"<local> foi o local em que ocorreram X% das notificações de violência autoprovocada\"): local de maior %, em categoria (nome exato da planilha); valor = esse %. Sem linha quando o recorte não tem notificação."),
+    "local_predominante_viol_interpessoal": ("texto", "Expressão do texto (\"<local> foi o local onde ocorreram X% das violências interpessoais\"): local de maior %, em categoria (nome exato da planilha); valor = esse %. Sem linha quando o recorte não tem notificação."),
+    "raca_cor_predominante_viol_autoprovocada": ("texto", "Expressão do texto (\"X% eram pessoas da raça/cor <YYYY>\", vítimas de violência autoprovocada): raça/cor de maior % (Negra = preta + parda), em categoria; valor = esse %. Sem linha quando o recorte não tem notificação."),
+    "raca_cor_predominante_viol_interpessoal": ("texto", "Expressão do texto (\"X% eram pessoas da raça/cor <YYYY>\", vítimas de violência interpessoal): raça/cor de maior % (Negra = preta + parda), em categoria; valor = esse %. Sem linha quando o recorte não tem notificação."),
+    "sexo_predominante_viol_autoprovocada": ("texto", "Expressão do texto (\"X% eram do sexo <YYYY>\", vítimas de violência autoprovocada): sexo de maior %, em categoria (rótulo da planilha); valor = esse %. Sem linha quando o recorte não tem notificação."),
+    "sexo_predominante_viol_interpessoal": ("texto", "Expressão do texto (\"X% eram do sexo <YYYY>\", vítimas de violência interpessoal): sexo de maior %, em categoria (rótulo da planilha); valor = esse %. Sem linha quando o recorte não tem notificação."),
+    "faixa_etaria_predominante_denuncias": ("texto", "Expressão do texto (\"X% tinham <até 29 anos>\"): faixa de maior %, em categoria (rótulo da planilha); valor = esse %."),
+    "local_predominante_denuncias": ("texto", "Expressão do texto (\"X% das violações ocorreram no local <casa da vítima>\"): local de maior %, em categoria (rótulo da planilha); valor = esse %."),
+    "raca_cor_predominante_denuncias": ("texto", "Expressão do texto (\"X% são pessoas <negras>\"): raça/cor de maior % (Negra = parda + preta), em categoria; valor = esse %."),
+    "tipo_violacao_predominante_denuncias": ("texto", "Expressão do texto (\"X% das violações são de <tortura psíquica>\"): tipo de violação de maior %, em categoria (rótulo da planilha); valor = esse %."),
+    "uf_maior_denuncias_1": ("texto", "1º estado com mais denúncias em 2024 (\"os estados com maior número de denúncias foram: <UF> (X%)...\"): nome da UF em categoria; valor = % das denúncias do Brasil."),
+    "uf_maior_denuncias_2": ("texto", "2º estado com mais denúncias em 2024 (\"os estados com maior número de denúncias foram: <UF> (X%)...\"): nome da UF em categoria; valor = % das denúncias do Brasil."),
+    "uf_maior_denuncias_3": ("texto", "3º estado com mais denúncias em 2024 (\"os estados com maior número de denúncias foram: <UF> (X%)...\"): nome da UF em categoria; valor = % das denúncias do Brasil."),
 }
 
 SQL = f"""
