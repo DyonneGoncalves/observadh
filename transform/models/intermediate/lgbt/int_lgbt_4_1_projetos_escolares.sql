@@ -9,6 +9,9 @@
 --   pct_escolas_com_projeto_uf_menor   UF com menor % em 2021 (categoria = UF)      N
 --   pct_escolas_com_projeto_localizacao_2021  com_projeto / total_com_info * 100     N E
 --     por localização (Urbana / Rural)
+--   escolas_avaliadas_saeb             nº de escolas na base do %, por ano          N E
+--     (chamado 27607, item 3) é o "XXXX" de "X% das XXXX escolas avaliadas".
+--     Mesmo denominador do pct_escolas_com_projeto do ano — o relatório usa 2021.
 -- base = "total com informação" em 2019, "total" em 2021 (ver staging).
 
 with proj as (
@@ -71,6 +74,13 @@ linhas as (
            {{ calcula_percentual('possui', 'base') }} as valor,
            'percentual'::text                         as valor_tipo,
            ano                                        as ano_referencia
+    from pct_ano
+
+    union all
+
+    select nivel, recorte_codigo,
+           'escolas_avaliadas_saeb', ano::text,
+           coalesce(base, 0)::numeric, 'numero_absoluto', ano
     from pct_ano
 
     union all

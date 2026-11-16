@@ -145,7 +145,7 @@ Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absolut
 | `secao` | Nome | Níveis | Ano(s) |
 |---|---|---|---|
 | `1` | População LGBTQIA+ no Brasil | N/E, e M (só cônjuges 2022) | 2010, 2019, 2022 |
-| `2` | Perfil das pessoas LGBTQIA+ (2.0–2.4) | N | 2019 |
+| `2` | Perfil das pessoas LGBTQIA+ (2.0–2.4) | N/E (E só 2.0) | 2019 |
 | `2.5` | Casamentos e uniões | N/E/M (parte PNS só N) | 2013–2023, 2019 |
 | `3` | Trabalho e renda | N | 2019 |
 | `4.1` | Projetos escolares contra LGBTQIAfobia | N/E | 2019, 2021 |
@@ -171,10 +171,10 @@ Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absolut
 | `conjuges_mesmo_sexo_2022` | num | N/E/M | — |
 | `pessoas_uniao_mesmo_sexo_estimativa` | num | N | — |
 
-### 2 — Perfil (PNS 2019, só nacional)
+### 2 — Perfil (PNS 2019; 2.0 nacional e estadual, 2.1–2.4 só nacional)
 | indicador | tipo | categorias |
 |---|---|---|
-| `pct_populacao_por_orientacao` | % | orientação sexual |
+| `pct_populacao_por_orientacao` | % | orientação sexual — **N/E** (as 6 categorias; no estadual alimenta "2. Perfil das pessoas LGBTQIA+ no estado") |
 | `pct_orientacao_por_sexo` | % | `<orientação> / Homens\|Mulheres` |
 | `pct_orientacao_por_faixa_etaria` | % | `<orientação> / <faixa>` |
 | `pct_orientacao_por_raca_cor` | % | `<orientação> / <cor>` |
@@ -201,6 +201,7 @@ Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absolut
 | indicador | tipo | níveis | categorias |
 |---|---|---|---|
 | `pct_escolas_com_projeto` | % | N/E | ano `2019` / `2021` |
+| `escolas_avaliadas_saeb` | num | N/E | ano `2019` / `2021` — o "XXXX escolas avaliadas" do texto usa `2021` |
 | `pct_escolas_com_projeto_localizacao_2021` | % | N/E | `Urbana` / `Rural` |
 | `pct_escolas_com_projeto_uf_maior` / `_uf_menor` | % | N | nome da UF |
 
@@ -208,7 +209,7 @@ Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absolut
 | indicador | tipo | níveis | categorias |
 |---|---|---|---|
 | `estabelecimentos_total` | num | N/E | — |
-| `estabelecimentos_por_habilitacao` | num | N/E | `Ambulatorial` / `Hospitalar` / `Ambulatorial/Hospitalar` |
+| `estabelecimentos_por_habilitacao` | num | N/E | `Ambulatorial` / `Hospitalar` / `Ambulatorial/Hospitalar` — sempre as 3, com `0` quando não há |
 | `estados_com_habilitacao_hospitalar` / `estados_apenas_ambulatorial` / `estados_sem_servico` | num | N | — |
 
 ### 6 — CRAS e Centros de Convivência

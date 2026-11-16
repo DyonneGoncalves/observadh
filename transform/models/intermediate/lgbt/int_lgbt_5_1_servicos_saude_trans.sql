@@ -19,6 +19,11 @@
 --   - contagem de UFs com habilitação hospitalar / só ambulatorial / sem serviço
 -- Tipos de habilitação são mutuamente exclusivos: 'Ambulatorial',
 -- 'Hospitalar', 'Ambulatorial/Hospitalar' (16 + 3 + 7 = 26, ver test).
+--
+-- estabelecimentos_por_habilitacao é DENSO (chamado 27607, item 4): toda UF
+-- (e o Brasil) tem as 3 categorias, com 0 quando não há estabelecimento.
+-- Antes só saía linha para tipo com contagem > 0, e o relatório mostrava "XX"
+-- (ex.: Alagoas, que não tem nenhum estabelecimento habilitado).
 
 with estab as (
     select * from {{ ref('stg_lgbt_estabelecimentos_saude_trans') }}
@@ -30,6 +35,11 @@ com_servico as (
 
 ufs as (
     select codigo_uf, nome_uf from {{ ref('dim_uf') }}
+),
+
+tipos_habilitacao as (
+    select tipo_habilitacao
+    from (values ('Ambulatorial'), ('Hospitalar'), ('Ambulatorial/Hospitalar')) as t(tipo_habilitacao)
 ),
 
 ano as (
@@ -55,9 +65,9 @@ nacional as (
            (select count(*) from com_servico)::numeric as valor
 
     union all
-    select 'estabelecimentos_por_habilitacao', tipo_habilitacao, count(*)::numeric
-    from com_servico
-    group by tipo_habilitacao
+    select 'estabelecimentos_por_habilitacao', t.tipo_habilitacao,
+           (select count(*) from com_servico s where s.tipo_habilitacao = t.tipo_habilitacao)::numeric
+    from tipos_habilitacao t
 
     union all
     select 'estados_com_habilitacao_hospitalar', null,
@@ -89,11 +99,14 @@ est_por_hab as (
     select
         u.codigo_uf, u.nome_uf,
         'estabelecimentos_por_habilitacao'::text as indicador,
-        s.tipo_habilitacao                       as categoria,
-        count(*)::numeric                        as valor
-    from com_servico s
-    join ufs u on u.codigo_uf = s.uf_codigo
-    group by u.codigo_uf, u.nome_uf, s.tipo_habilitacao
+        t.tipo_habilitacao                       as categoria,
+        count(s.uf_codigo)::numeric              as valor
+    from ufs u
+    cross join tipos_habilitacao t
+    left join com_servico s
+        on s.uf_codigo = u.codigo_uf
+       and s.tipo_habilitacao = t.tipo_habilitacao
+    group by u.codigo_uf, u.nome_uf, t.tipo_habilitacao
 ),
 
 estadual as (

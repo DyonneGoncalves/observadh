@@ -29,8 +29,8 @@ DESCRICOES = {
     "conjuges_mesmo_sexo_2010": ("contagem", "Nº de pessoas em união com cônjuge do mesmo sexo, Censo 2010."),
     "conjuges_mesmo_sexo_2022": ("contagem", "Nº de pessoas em união com cônjuge do mesmo sexo, Censo 2022."),
     "pessoas_uniao_mesmo_sexo_estimativa": ("contagem", "Estimativa de pessoas em união do mesmo sexo (cônjuges 2022 × 2)."),
-    # 2 — Perfil (PNS 2019, só nacional)
-    "pct_populacao_por_orientacao": ("%", "Composição da população 18+ por orientação sexual."),
+    # 2 — Perfil (PNS 2019; 2.0 nacional e estadual, 2.1–2.4 só nacional)
+    "pct_populacao_por_orientacao": ("%", "Composição da população 18+ por orientação sexual (6 categorias). Nacional e estadual."),
     "pct_orientacao_por_sexo": ("%", "Dentro de cada orientação, distribuição por sexo (homens/mulheres)."),
     "pct_orientacao_por_faixa_etaria": ("%", "Dentro de cada orientação, distribuição por faixa etária."),
     "pct_orientacao_por_raca_cor": ("%", "Dentro de cada orientação, distribuição por raça/cor."),
@@ -48,6 +48,7 @@ DESCRICOES = {
     # 4 — Educação
     "pct_nivel_instrucao_por_orientacao": ("%", "Dentro de cada orientação, distribuição por nível de instrução (7 níveis, PNS 2019). Só nacional."),
     "pct_escolas_com_projeto": ("%", "% de escolas com projeto de enfrentamento à LGBTQIAfobia, por ano (2019 / 2021)."),
+    "escolas_avaliadas_saeb": ("contagem", "Nº de escolas avaliadas pelo Saeb (base do % de escolas com projeto), por ano (2019 = total com informação / 2021 = total)."),
     "pct_escolas_com_projeto_uf_maior": ("%", "UF com o maior % de escolas com projeto em 2021 (categoria = nome da UF). Só nacional."),
     "pct_escolas_com_projeto_uf_menor": ("%", "UF com o menor % de escolas com projeto em 2021 (categoria = nome da UF). Só nacional."),
     "pct_escolas_com_projeto_localizacao_2021": ("%", "% de escolas com projeto em 2021, por localização (urbana / rural)."),
@@ -56,7 +57,7 @@ DESCRICOES = {
     "pct_atividade_esportiva_por_orientacao": ("%", "Dentro de cada orientação, frequência de atividade esportiva (6 faixas). Só nacional."),
     "pct_depressao_por_orientacao": ("%", "Dentro de cada orientação, % com/sem diagnóstico de depressão. Só nacional."),
     "estabelecimentos_total": ("contagem", "Nº total de estabelecimentos de saúde habilitados para pessoas trans (CNES)."),
-    "estabelecimentos_por_habilitacao": ("contagem", "Nº de estabelecimentos por tipo de habilitação (Ambulatorial / Hospitalar / Ambulatorial-Hospitalar)."),
+    "estabelecimentos_por_habilitacao": ("contagem", "Nº de estabelecimentos por tipo de habilitação (Ambulatorial / Hospitalar / Ambulatorial-Hospitalar). Sempre as 3 categorias, com 0 quando não há."),
     "estados_com_habilitacao_hospitalar": ("contagem", "Nº de UFs com pelo menos um estabelecimento de habilitação hospitalar. Só nacional."),
     "estados_com_habilitacao_ambulatorial": ("contagem", "Nº de UFs com pelo menos um estabelecimento de habilitação ambulatorial. Só nacional."),
     "estados_sem_servico": ("contagem", "Nº de UFs sem nenhum estabelecimento habilitado. Só nacional."),

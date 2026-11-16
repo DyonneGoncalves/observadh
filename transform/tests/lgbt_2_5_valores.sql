@@ -11,6 +11,14 @@ with esperado (nivel, recorte_codigo, indicador, categoria, valor) as (
         ('estadual', 21, 'sentido_variacao_casamentos_mesmo_sexo_13_23', 'crescimento', 1.0),
         ('estadual', 21, 'pct_casamentos_mesmo_sexo_por_genero_23', 'Casamentos entre mulheres', 64.102564),
         ('estadual', 21, 'pct_casamentos_mesmo_sexo_por_genero_23', 'Casamentos entre homens',   35.897436),
+        -- Alagoas (cod_uf 27) — valores do relatório estadual (chamado 27607):
+        -- 17 em 2013, 81 em 2023, crescimento de 376,5%, 69,1% mulheres / 30,9% homens
+        ('estadual', 27, 'casamentos_mesmo_sexo_total_ano',        '2013', 17.0),
+        ('estadual', 27, 'casamentos_mesmo_sexo_total_ano',        '2023', 81.0),
+        ('estadual', 27, 'variacao_casamentos_mesmo_sexo_13_23',   null,   376.4706),
+        ('estadual', 27, 'sentido_variacao_casamentos_mesmo_sexo_13_23', 'crescimento', 1.0),
+        ('estadual', 27, 'pct_casamentos_mesmo_sexo_por_genero_23', 'Casamentos entre mulheres', 69.135802),
+        ('estadual', 27, 'pct_casamentos_mesmo_sexo_por_genero_23', 'Casamentos entre homens',   30.864198),
         -- Brasil
         ('nacional', null, 'casamentos_mesmo_sexo_total_ano',       '2013', 3700.0),
         ('nacional', null, 'casamentos_mesmo_sexo_total_ano',       '2023', 11198.0),

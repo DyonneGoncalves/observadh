@@ -1,5 +1,16 @@
 -- Intermediate: seção 2 — Perfil das pessoas LGBTQIA+ (PNS 2019). Formato LONGO.
--- Nível NACIONAL apenas (a PNS só publica esse recorte por orientação sexual).
+-- 2.0 (% por orientação) existe em NACIONAL e ESTADUAL; 2.1–2.4 só NACIONAL
+-- (a PNS não publica esses cruzamentos por UF).
+--
+-- ESTADUAL (chamado 27607, item 1): a aba "Orientação sexual por UF" já traz
+-- os percentuais prontos, 1 linha por UF e 1 coluna por orientação — não há
+-- recálculo, só "despivotamos" as colunas. As colunas são lidas de forma
+-- genérica (to_jsonb + jsonb_each_text) e mapeadas pelo prefixo do nome,
+-- porque a ingestão normaliza os cabeçalhos ("homosexual", "outra_orient"...)
+-- e só 3 deles eram usados até aqui. As 6 categorias de saída são as mesmas
+-- do nacional (Heterossexual, Bissexual, Homossexual, Outra orientação,
+-- Não sabe, Recusou-se a responder). O teste lgbt_2_valores_estadual
+-- garante as 6 categorias por UF e confere Alagoas.
 --
 -- As tabelas de origem já estão no nível Brasil: 1 linha por orientação sexual
 -- + 1 linha "Total com info". O % é calculado LINHA A LINHA (categoria da
@@ -36,6 +47,34 @@ raca as (
 localidade as (
     select * from {{ source('raw_lgbt', 'raw_lgbt_pessoas_area_localidade') }}
     where tipo_de_orient_sexual not ilike 'total%' and coalesce(trim(tipo_de_orient_sexual), '') <> ''
+),
+
+-- 2.0 estadual — colunas da aba por UF -> linhas
+orient_uf as (
+    select
+        (j.linha ->> 'cod_uf')::numeric::int as uf_codigo,
+        kv.key                               as coluna,
+        nullif(trim(kv.value), '')           as valor_txt
+    from (
+        select to_jsonb(t) as linha
+        from {{ source('raw_lgbt', 'raw_lgbt_orientacao_sexual_por_uf') }} t
+    ) j
+    cross join lateral jsonb_each_text(j.linha) as kv
+),
+orient_uf_canonica as (
+    select
+        uf_codigo,
+        case
+            when coluna like 'hetero%'                          then 'Heterossexual'
+            when coluna like 'homo%'                            then 'Homossexual'
+            when coluna like 'bi%'                              then 'Bissexual'
+            when coluna like 'outra%'                           then 'Outra orientação'
+            when coluna like 'n%o_sab%' or coluna like 'nao%'   then 'Não sabe'
+            when coluna like 'recus%'                           then 'Recusou-se a responder'
+        end                                                     as orientacao,
+        valor_txt
+    from orient_uf
+    where uf_codigo is not null
 ),
 
 linhas as (
@@ -100,3 +139,21 @@ select
     'percentual'::text                      as valor_tipo,
     2019                                    as ano_referencia
 from linhas
+
+union all
+
+-- 2.0 — % da população por orientação, ESTADUAL (valor já é % na origem)
+select
+    'estadual'::text,
+    o.uf_codigo,
+    u.nome_uf,
+    '2'::text,
+    'Perfil das pessoas LGBTQIA+'::text,
+    'pct_populacao_por_orientacao'::text,
+    o.orientacao,
+    round(coalesce(o.valor_txt::numeric, 0), 4),
+    'percentual'::text,
+    2019
+from orient_uf_canonica o
+join {{ ref('dim_uf') }} u on u.codigo_uf = o.uf_codigo
+where o.orientacao is not null
