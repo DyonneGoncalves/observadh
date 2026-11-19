@@ -18,6 +18,15 @@
 -- para esses dois níveis. Uma linha por ano, com o ano em `categoria`
 -- (seguindo o mesmo padrão de quebra usado nas demais seções) e também em
 -- `ano_referencia`, diferente do restante da seção 6.1 (que é sempre 2024).
+--
+-- CHAMADO 27607:
+--   vitimas_paefi_2017_2024 (E/M): o texto estadual/municipal diz "entre 2017
+--     e 2024, XXXX pessoas..." — é a SOMA da série (Alagoas = 141). Antes o
+--     template usava vitimas_paefi (só 2024 = 9). vitimas_paefi segue igual
+--     (nacional usa o valor de 2024, que bate com o relatório publicado).
+--   pct_unidades_acolhimento_com_pessoas_trans: denominador passa a ser as
+--     unidades que responderam Sim ou Não (fórmula da especificação), não o
+--     total de unidades. Alagoas: 7,1% -> 7,55%.
 
 with paefi_recente as (
     select municipio_codigo_ibge, uf_codigo, qtd_vitimas_paefi
@@ -42,6 +51,16 @@ paefi_agg as (
     union all select 'municipal', municipio_codigo_ibge, sum(qtd_vitimas_paefi) from paefi_recente group by municipio_codigo_ibge
 ),
 -- só estadual/municipal — a série histórica não é pedida no relatório nacional.
+-- soma 2017-2024 (o número do texto estadual/municipal)
+paefi_periodo_agg as (
+    select 'estadual'::text as nivel, uf_codigo as recorte_codigo,
+           sum(qtd_vitimas_paefi) as vitimas, min(ano_referencia) as ano_ini, max(ano_referencia) as ano_fim
+    from paefi_serie group by uf_codigo
+    union all
+    select 'municipal', municipio_codigo_ibge,
+           sum(qtd_vitimas_paefi), min(ano_referencia), max(ano_referencia)
+    from paefi_serie group by municipio_codigo_ibge
+),
 paefi_serie_agg as (
     select 'estadual'::text as nivel, uf_codigo as recorte_codigo, ano_referencia, sum(qtd_vitimas_paefi) as vitimas
     from paefi_serie
@@ -72,11 +91,14 @@ cpop_agg as (
 acolh_agg as (
     select 'nacional'::text as nivel, null::int as recorte_codigo,
            sum(qtd_unidades_acolhimento) as unidades, sum(qtd_unidades_com_pessoas_trans) as unidades_trans,
+           sum(qtd_unidades_responderam_trans) as unidades_responderam,
            sum(qtd_pessoas_acolhidas_total) as pessoas, sum(qtd_pessoas_trans_acolhidas_total) as pessoas_trans
     from acolh
     union all select 'estadual', uf_codigo, sum(qtd_unidades_acolhimento), sum(qtd_unidades_com_pessoas_trans),
+                     sum(qtd_unidades_responderam_trans),
                      sum(qtd_pessoas_acolhidas_total), sum(qtd_pessoas_trans_acolhidas_total) from acolh group by uf_codigo
     union all select 'municipal', municipio_codigo_ibge, sum(qtd_unidades_acolhimento), sum(qtd_unidades_com_pessoas_trans),
+                     sum(qtd_unidades_responderam_trans),
                      sum(qtd_pessoas_acolhidas_total), sum(qtd_pessoas_trans_acolhidas_total) from acolh group by municipio_codigo_ibge
 ),
 
@@ -86,6 +108,10 @@ dim_mun as ( select codigo_municipio, nome_municipio from {{ ref('dim_municipio'
 linhas as (
     select nivel, recorte_codigo, 'vitimas_paefi'::text as indicador, null::text as categoria,
            vitimas::numeric as valor, 'numero_absoluto'::text as valor_tipo, 2024 as ano_referencia from paefi_agg
+
+    -- soma 2017-2024, o "XXXX pessoas" do texto estadual/municipal.
+    union all select nivel, recorte_codigo, 'vitimas_paefi_2017_2024', null,
+                     vitimas::numeric, 'numero_absoluto', ano_fim from paefi_periodo_agg
 
     -- série histórica 2017-2024, só para o gráfico de 6.1 em estadual/municipal.
     union all select nivel, recorte_codigo, 'vitimas_paefi_serie_historica', ano_referencia::text,
@@ -106,7 +132,7 @@ linhas as (
 
     union all select nivel, recorte_codigo, 'unidades_acolhimento_total', null, unidades::numeric, 'numero_absoluto', 2024 from acolh_agg
     union all select nivel, recorte_codigo, 'pct_unidades_acolhimento_com_pessoas_trans', null,
-                     {{ calcula_percentual('unidades_trans', 'unidades') }}, 'percentual', 2024 from acolh_agg
+                     {{ calcula_percentual('unidades_trans', 'unidades_responderam') }}, 'percentual', 2024 from acolh_agg
     union all select nivel, recorte_codigo, 'pessoas_acolhidas_total', null, pessoas::numeric, 'numero_absoluto', 2024 from acolh_agg
     union all select nivel, recorte_codigo, 'pessoas_trans_acolhidas_total', null, pessoas_trans::numeric, 'numero_absoluto', 2024 from acolh_agg
 )

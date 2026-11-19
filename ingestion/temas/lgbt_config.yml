@@ -35,12 +35,24 @@ prefixos_planilha:
   "LGBTQIA_Trabalho_PNS_2019.xlsx": trab_pns
   "LGBTQIA_Violência_ONDH_2020_2024.xlsx": viol_ondh
   "LGBTQIA_Violências_Sinan_2015_2024.xlsx": viol_sinan
+  # Reenvio da aba de Unidades de Acolhimento COM o identificador da unidade
+  # (NU_IDENTIFICADOR_UNIDADE), Cod_IBGE_7 e Ano de referência — substitui a
+  # aba "Unidades de Acolhimento 2024" do arquivo de Assistência social, que
+  # vinha sem identificador e com 897 linhas duplicadas.
+  "Cálculo_Assistência social_Unidade Acolhimento_2024.xlsx": assist_social_unid_acolh
 
 # Abas a NÃO importar (comparação por nome normalizado, vale para qualquer
 # arquivo do tema). "dLocalizacao" é uma tabela de referência
 # município/UF/região — já extraída para transform/seeds/dim_municipio.csv e
 # carregada via seed do dbt, não faz sentido duplicar como raw.
+#
+# "Dados completos" (microdado do Censo SUAS com ~700 colunas q0_1..qN) e
+# "Cálculo_Atendimentos Trans" (tabela dinâmica de conferência da equipe) vêm
+# no arquivo de Unidades de Acolhimento e não são consumidas pelo pipeline —
+# só a aba "Atendimentos Trans" é usada.
 ignorar_abas:
   - dLocalizacao
+  - Dados completos
+  - Cálculo_Atendimentos Trans
 
 ano_padrao: 2026

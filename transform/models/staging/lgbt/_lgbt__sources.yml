@@ -58,12 +58,19 @@ sources:
           original "Centros Pop".
 
       - name: raw_lgbt_unidades_acolhimento
-        identifier: lgbt_assist_social_unidades_de_acolhimento_2024
+        identifier: lgbt_assist_social_unid_acolh_atendimentos_trans
         description: >
           Unidades de acolhimento (grão = UNIDADE, não município — várias
-          unidades por município). Aba original "Unidades de Acolhimento
-          2024". Não tem coluna de ano de referência (implícito: 2024, ver
-          nome da aba) nem código IBGE de 7 dígitos (só 6).
+          unidades por município). Aba "Atendimentos Trans" do arquivo
+          "Cálculo_Assistência social_Unidade Acolhimento_2024.xlsx", reenviado
+          pela equipe com o identificador da unidade (nu_identificador_unid),
+          código IBGE de 7 dígitos e ano de referência. Substitui a aba antiga
+          "Unidades de Acolhimento 2024" do arquivo de Assistência social
+          (tabela lgbt_assist_social_unidades_de_acolhimento_2024), que não
+          tinha identificador e vinha com linhas duplicadas.
+        columns:
+          - name: nu_identificador_unid
+            tests: [not_null, unique]
 
       # --- 5 / 5.1 — Saúde / Serviços de saúde para pessoas trans ---
       - name: raw_lgbt_estabelecimento_cnes
