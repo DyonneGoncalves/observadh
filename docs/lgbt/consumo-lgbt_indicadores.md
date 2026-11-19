@@ -227,6 +227,14 @@ Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absolut
 `pct_centros_pop_atenderam_lgbt`,
 `pct_unidades_acolhimento_com_pessoas_trans` — todos `%`, sem categoria.
 
+`vitimas_paefi_2017_2024` — **só estadual/municipal**. Soma 2017–2024: é o
+número de "entre 2017 e 2024, XXXX pessoas vítimas..." do texto desses dois
+relatórios (ex.: Alagoas = 141). **Não use `vitimas_paefi` nessa frase** — ele
+é só o ano de 2024 (Alagoas = 9).
+
+`pct_unidades_acolhimento_com_pessoas_trans` — denominador = unidades que
+responderam Sim ou Não (unidades sem resposta ficam fora), conforme a fórmula.
+
 `vitimas_paefi_serie_historica` — **só estadual/municipal** (não existe em
 nacional). Série anual 2017–2024, `categoria` = ano (`"2017"`..`"2024"`,
 mesmo padrão de `notificacoes_por_ano`). É o dado que alimenta o **gráfico**

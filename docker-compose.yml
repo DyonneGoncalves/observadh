@@ -1,0 +1,58 @@
+# Pipeline do ObservaDH em container.
+#   db        Postgres 17 local (dados persistem no volume "pgdata")
+#   pipeline  Python + dbt + pg_dump; roda um comando e sai
+#
+# Uso rápido (ver README, seção "Rodando com Docker"):
+#   make ciclo TEMA=lgbt ANO=2026
+# ou, sem make:
+#   docker compose run --rm pipeline ciclo lgbt 2026
+name: observadh
+
+x-conexao: &conexao
+  # usada pela ingestão (Python) e pelo dbt
+  OBSERVADH_DB_HOST: db
+  OBSERVADH_DB_PORT: "5432"
+  OBSERVADH_DB_NAME: observadh
+  OBSERVADH_DB_USER: ${OBSERVADH_DB_USER:-observadh}
+  OBSERVADH_DB_PASSWORD: ${OBSERVADH_DB_PASSWORD:-observadh}
+  # usada por psql / pg_dump / scripts de exportação
+  PGHOST: db
+  PGPORT: "5432"
+  PGDATABASE: observadh
+  PGUSER: ${OBSERVADH_DB_USER:-observadh}
+  PGPASSWORD: ${OBSERVADH_DB_PASSWORD:-observadh}
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: observadh
+      POSTGRES_USER: ${OBSERVADH_DB_USER:-observadh}
+      POSTGRES_PASSWORD: ${OBSERVADH_DB_PASSWORD:-observadh}
+    ports:
+      - "${OBSERVADH_DB_PORTA_LOCAL:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d observadh"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  pipeline:
+    build: .
+    image: observadh-pipeline:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *conexao
+    # O repositório inteiro é montado em /app: planilhas em ingestion/input,
+    # ajustes nos modelos dbt e a pasta entrega/ ficam direto no seu computador
+    # — editou um .sql, é só rodar de novo, sem reconstruir a imagem.
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"   # dbt docs (só com: docker compose run --service-ports)
+
+volumes:
+  pgdata:

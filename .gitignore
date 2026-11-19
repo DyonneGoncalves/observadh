@@ -14,3 +14,13 @@ ingestion/input/**/*.xlsx
 ingestion/input/**/*.xls
 ingestion/input/**/*.csv
 !ingestion/input/**/.gitkeep
+
+# docker
+.env
+
+# entregas geradas (dumps grandes — vão para o dev, não para o git)
+/entrega/
+
+# logs locais e lixo do macOS
+/logs/
+.DS_Store

@@ -50,6 +50,52 @@ Conexão com o banco: variáveis `OBSERVADH_DB_HOST/_PORT/_NAME/_USER/_PASSWORD`
 (a ingestão também aceita `DATABASE_URL`) e `transform/profiles.yml.example`
 copiado para `~/.dbt/profiles.yml`.
 
+## Rodando com Docker (forma recomendada)
+
+Não precisa instalar Python, dbt nem Postgres — só o **Docker Desktop**. O
+container traz tudo (Python + dbt + cliente Postgres 17) e sobe um **Postgres
+local** só para o pipeline. O produto final continua sendo o pacote em
+`entrega/<tema>/<data>/` (dump das tabelas finais), que vai para produção.
+
+```bash
+# uma vez só: construir a imagem (refazer só se mudar Dockerfile/requirements)
+make imagem
+
+# a cada ciclo:
+# 1. colocar as planilhas em ingestion/input/<tema>/<ano>/
+# 2. rodar tudo: ingestão → dbt seed/build (com testes) → exportação
+make ciclo TEMA=lgbt ANO=2026
+```
+
+Os testes do dbt rodam dentro do `build`: se algum falhar, o ciclo para antes
+da exportação. Ajuste o modelo `.sql` (no seu editor, normalmente — o
+repositório está montado dentro do container), rode `make transforma TEMA=lgbt`
+até ficar verde, depois `make exporta TEMA=lgbt` e comite o ajuste.
+
+| Comando | O que faz |
+|---|---|
+| `make ciclo TEMA= ANO=` | ingestão + build + exportação |
+| `make dry-run TEMA= ANO=` | mostra as tabelas `raw` que seriam criadas, sem gravar |
+| `make ingest TEMA= ANO=` | só a ingestão |
+| `make transforma TEMA=` | `dbt seed` + `dbt build --select tag:<tema>` |
+| `make exporta TEMA=` | gera `entrega/<tema>/<data>/` |
+| `make docs` | linhagem/documentação dbt em http://localhost:8080 |
+| `make psql` / `make shell` | psql no banco local / terminal no container |
+| `make parar` / `make zerar-banco` | desliga o banco / apaga o banco para recomeçar |
+
+Sem `make`: `docker compose run --rm pipeline ciclo lgbt 2026` (o comando
+`docker compose run --rm pipeline` sem argumentos lista as opções).
+
+A exportação é a mesma para todos os temas (`scripts/exporta_entrega.sh <tema>`).
+O que muda por tema (níveis, documentos que vão junto, LEIA-ME e notas do
+MANIFEST) fica em `scripts/entrega/<tema>.*`; para um tema novo, basta criar
+esses arquivos.
+
+Para abrir o banco no DBeaver: `localhost:5433`, banco `observadh`, usuário e
+senha `observadh` (padrões em `.env.example`; copie para `.env` para mudar).
+Os dados ficam no volume `pgdata` entre execuções. Arquivos do container:
+`Dockerfile`, `docker-compose.yml`, `Makefile`, `docker/`.
+
 ## Status LGBTQIA+
 
 - [x] **Todas as 8 planilhas ingeridas** — 54 tabelas no schema `raw` (toda aba de todo arquivo), 234.557 linhas, via descoberta automática (`ingestion/ingest.py`)

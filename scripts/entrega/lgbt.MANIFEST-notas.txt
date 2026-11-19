@@ -1,0 +1,6 @@
+## Chave natural de cada tabela (para PK/índice na migration)
+  nacional : (secao, indicador, categoria, ano_referencia)
+  estadual : (uf_codigo, secao, indicador, categoria, ano_referencia)
+  municipal: (municipio_codigo_ibge, secao, indicador, categoria, ano_referencia)
+  categoria pode ser NULL -> use um índice único com NULLS NOT DISTINCT (PG15+)
+  ou trate NULL como '' na PK.

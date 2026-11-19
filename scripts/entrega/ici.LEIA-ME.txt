@@ -1,0 +1,53 @@
+Entrega dos indicadores do relatório ICI (Índice de Capacidade
+Institucional) — formato longo.
+
+2 tabelas (uma linha por índice x território x ano), SEM tabela nacional
+(o ICI não tem relatório nacional — Filtro_Nacional_V1 é só texto
+institucional):
+  ici_indicadores_estadual   — uf_codigo + uf_nome + uf_sigla
+  ici_indicadores_municipal  — municipio_codigo_ibge + municipio_nome + uf_codigo + uf_sigla
+
+Colunas de cada tabela:
+  indice            'ici_dh' | 'ici_ca' | 'ici_lgbtqia' | 'ici_pcd' | 'ici_pi'
+                    (sem 'ici_psr' nesta entrega — ver abaixo)
+  ano_referencia    2014 | 2019 | 2023
+  valor             o índice em si, entre 0 e 1 (já vem calculado na fonte)
+  classificacao     'Baixa capacidade institucional' | 'Moderada capacidade
+                    institucional' | 'Alta capacidade institucional'
+                    (derivada do valor: <=0,59 baixa / 0,6-0,79 moderada / >=0,8 alta)
+  media_nacional    média simples do valor entre todos os territórios do
+                    mesmo nível/índice/ano (ver nota sobre peso abaixo)
+  regiao / media_regiao            (só na tabela estadual — grupo de comparação é a Região)
+  uf_nome / media_estado           (só na tabela municipal — grupo de comparação é o Estado)
+
+Cada .sql tem o CREATE TABLE + os dados (COPY ... FROM stdin). Sem schema
+qualificado: as tabelas entram no search_path de destino (public por
+padrão). Sem OWNER, sem GRANT. As DDLs também estão isoladas em _schema.sql.
+
+Carregar (exemplo):
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f ici_indicadores_estadual.sql
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f ici_indicadores_municipal.sql
+
+Depois confira as contagens contra o MANIFEST.txt.
+
+A consulta que a aplicação roda (1 série histórica + 1 resumo por
+relatório): ver consumo-ici_indicadores.md. Tem também 2 queries prontas,
+já testadas contra o dado real, em query-relatorio-estadual.sql e
+query-relatorio-municipal.sql (incluídas nesta pasta).
+
+dicionario-ici_indicadores.csv = 1 linha por índice (nome, nº de
+componentes, níveis em que existe, anos disponíveis, descrição, fonte).
+Inclui também uma linha pro ICI-PSR mesmo sem dado, documentando o que
+falta.
+
+Chave natural (para PK/índice na migration): ver MANIFEST.txt.
+
+IMPORTANTE — duas pendências que ainda não foram fechadas com a equipe:
+1. ICI-PSR municipal (22 capitais) não está nesta entrega — a
+   planilha-fonte nunca foi recebida. A seção do relatório municipal
+   referente a isso deve, por enquanto, SEMPRE usar a versão de texto
+   "não há ICI-PSR disponível" (nunca a versão com tabela), mesmo pros
+   municípios que são uma das 22 capitais — ver dicionario-ici_indicadores.csv.
+2. media_nacional e media_regiao/media_estado são médias SIMPLES (cada
+   território = 1 voto), não ponderadas por população. Ainda não
+   confirmado com a equipe se deveria ser ponderada.

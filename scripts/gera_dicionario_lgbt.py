@@ -67,6 +67,7 @@ DESCRICOES = {
     # 6.1 — Proteção social especial
     "vitimas_paefi": ("contagem", "Nº de pessoas vítimas de discriminação por orientação sexual acompanhadas pelo PAEFI, ano mais recente (2024). Série histórica completa: ver vitimas_paefi_serie_historica."),
     "vitimas_paefi_serie_historica": ("contagem", "Série histórica (2017–2024) de vítimas de discriminação por orientação sexual acompanhadas pelo PAEFI, por ano — só estadual/municipal (não pedida no relatório nacional). Alimenta o gráfico da seção 6.1 nesses 2 níveis."),
+    "vitimas_paefi_2017_2024": ("contagem", "Soma 2017–2024 de vítimas de discriminação por orientação sexual que ingressaram no PAEFI — o \"entre 2017 e 2024, XXXX pessoas\" do texto. Só estadual e municipal."),
     "creas_total": ("contagem", "Nº total de CREAS."),
     "creas_nao_atende_orientacao": ("contagem", "Nº de CREAS que não registram atendimento a discriminação por orientação sexual."),
     "pct_creas_nao_atende_orientacao": ("%", "creas_nao_atende_orientacao / creas_total ×100."),
@@ -75,7 +76,7 @@ DESCRICOES = {
     "centros_pop_total": ("contagem", "Nº total de Centros POP."),
     "pct_centros_pop_atenderam_lgbt": ("%", "% de Centros POP que atenderam pessoas LGBTQIA+."),
     "unidades_acolhimento_total": ("contagem", "Nº total de unidades de acolhimento (após remoção de linhas duplicadas na base)."),
-    "pct_unidades_acolhimento_com_pessoas_trans": ("%", "% de unidades de acolhimento com pessoas trans/travestis acolhidas."),
+    "pct_unidades_acolhimento_com_pessoas_trans": ("%", "% de unidades de acolhimento com pessoas trans/travestis acolhidas, sobre as unidades que responderam Sim ou Não."),
     "pessoas_acolhidas_total": ("contagem", "Nº total de pessoas acolhidas (todas)."),
     "pessoas_trans_acolhidas_total": ("contagem", "Nº de pessoas trans/travestis acolhidas."),
     # 7.0 — SINAN

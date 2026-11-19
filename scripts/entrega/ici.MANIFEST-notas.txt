@@ -1,0 +1,14 @@
+## Chave natural de cada tabela (para PK/índice na migration)
+  estadual : (uf_codigo, indice, ano_referencia)
+  municipal: (municipio_codigo_ibge, indice, ano_referencia)
+  Nenhuma coluna da chave aceita NULL (diferente do LGBTQIA+, que tem
+  categoria opcional) — pode usar UNIQUE/PK direto, sem tratamento especial.
+
+## Sem tabela "nacional"
+  O ICI não tem relatório nacional (Filtro_Nacional_V1 é só texto
+  institucional, sem indicador). Só estadual e municipal.
+
+## ICI-PSR não está nesta entrega
+  Planilha-fonte nunca foi recebida (ver catálogo, Problema 3). A coluna
+  "indice" não tem valor 'ici_psr' em nenhuma linha desta entrega — ver
+  dicionario-ici_indicadores.csv pra contexto de quando o dado chegar.

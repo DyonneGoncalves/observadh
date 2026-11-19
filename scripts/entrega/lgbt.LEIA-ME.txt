@@ -1,0 +1,25 @@
+Entrega dos indicadores do relatório LGBTQIA+ — formato longo.
+
+3 tabelas (uma linha por indicador x recorte x categoria x ano):
+  lgbt_indicadores_nacional   — sem coluna de recorte
+  lgbt_indicadores_estadual   — uf_codigo (IBGE 2 díg) + uf_nome
+  lgbt_indicadores_municipal  — municipio_codigo_ibge (IBGE 7 díg) + municipio_nome
+
+Cada .sql tem o CREATE TABLE + os dados (COPY ... FROM stdin). Sem schema
+qualificado: as tabelas entram no search_path de destino (public por padrão).
+Sem OWNER, sem GRANT. As DDLs também estão isoladas em _schema.sql.
+
+Carregar (exemplo):
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f lgbt_indicadores_nacional.sql
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f lgbt_indicadores_estadual.sql
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f lgbt_indicadores_municipal.sql
+
+Depois confira as contagens contra o MANIFEST.txt.
+
+A consulta que a aplicação roda (1 por relatório), como virar as linhas num
+mapa chave->valor e fazer o bind no template: ver consumo-lgbt_indicadores.md.
+
+dicionario-lgbt_indicadores.csv = 1 linha por indicador (seção, chave de bind,
+categorias, tipo, unidade, níveis, ano, descrição). É o de-para texto<->chave.
+
+Chave natural (para PK/índice na migration): ver MANIFEST.txt.

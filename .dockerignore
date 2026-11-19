@@ -1,0 +1,21 @@
+.git
+.venv
+**/__pycache__
+**/*.pyc
+.DS_Store
+**/.DS_Store
+.env
+
+# dados e saídas nunca vão para dentro da imagem
+ingestion/input/**/*.xlsx
+ingestion/input/**/*.xls
+ingestion/input/**/*.csv
+entrega/
+evidencias/
+logs/
+
+# artefatos do dbt (são recriados)
+transform/target/
+transform/dbt_packages/
+transform/logs/
+transform/profiles.yml
