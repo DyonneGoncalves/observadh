@@ -167,7 +167,7 @@ Com **queda**, a variação % vem negativa (ex.: −20,0): exiba o valor absolut
 | indicador | tipo | níveis | categorias |
 |---|---|---|---|
 | `pct_populacao_lgbt_18_mais` | % | N/E | — |
-| `conjuges_mesmo_sexo_2010` | num | N/E | — |
+| `conjuges_mesmo_sexo_2010` | num | N/E/M | — |
 | `conjuges_mesmo_sexo_2022` | num | N/E/M | — |
 | `pessoas_uniao_mesmo_sexo_estimativa` | num | N | — |
 

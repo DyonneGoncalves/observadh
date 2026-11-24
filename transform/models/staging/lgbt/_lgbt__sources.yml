@@ -243,6 +243,12 @@ sources:
       - name: raw_lgbt_censo_2010_uf
         identifier: lgbt_quantas_sao_pns_censo_censo_2010_uf
         description: Censo 2010 — pessoas por tipo de relação no domicílio, por UF. Aba "Censo_2010_UF".
+      - name: raw_lgbt_censo_2010_munic
+        identifier: lgbt_quantas_sao_pns_censo_censo_2010_munic
+        description: >
+          Censo 2010 — pessoas por tipo de relação no domicílio, por município.
+          Colunas de contagem vêm como TEXTO com "-" onde não há dado. Aba
+          "Censo_2010_Munic".
       - name: raw_lgbt_conjuges_mesmo_sexo_2022
         identifier: lgbt_quantas_sao_pns_censo_conjuges_do_mesmo_sexo_2022
         description: >

@@ -144,7 +144,7 @@ Modelo: `int_lgbt_1_populacao`. Validação: `tests/lgbt_1_2_valores.sql`.
 | `indicador` (slug) | `categoria` | fórmula | N/E/M | esperado (nacional) |
 |---|---|---|---|---|
 | `pct_populacao_lgbt_18_mais` | — | (homossexual + bissexual + outra) / total ×100 (E: soma das 3 colunas de % de `Orientação sexual por UF`) | N E | 1,89% |
-| `conjuges_mesmo_sexo_2010` | — | nº absoluto, Censo 2010 (`Censo_2010_Reg` linha Brasil / `Censo_2010_UF`) | N E | 60.035 |
+| `conjuges_mesmo_sexo_2010` | — | nº absoluto, Censo 2010 (`Censo_2010_Reg` linha Brasil / `Censo_2010_UF` / `Censo_2010_Munic`; "-" = 0) | N E M | 60.035 |
 | `conjuges_mesmo_sexo_2022` | — | nº absoluto, Censo 2022 (`Cônjuges do mesmo sexo 2022`; "-" = 0) | N E M | 391.080 |
 | `pessoas_uniao_mesmo_sexo_estimativa` | — | cônjuges 2022 × 2 | N | 782.160 |
 

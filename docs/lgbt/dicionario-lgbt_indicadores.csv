@@ -1,5 +1,5 @@
 secao,secao_nome,indicador,chave_bind,tem_quebra_categoria,categorias,valor_tipo,unidade,niveis,ano_referencia,descricao
-1,População LGBTQIA+ no Brasil,conjuges_mesmo_sexo_2010,conjuges_mesmo_sexo_2010,nao,,numero_absoluto,contagem,NE,2010,"Nº de pessoas em união com cônjuge do mesmo sexo, Censo 2010."
+1,População LGBTQIA+ no Brasil,conjuges_mesmo_sexo_2010,conjuges_mesmo_sexo_2010,nao,,numero_absoluto,contagem,NEM,2010,"Nº de pessoas em união com cônjuge do mesmo sexo, Censo 2010."
 1,População LGBTQIA+ no Brasil,conjuges_mesmo_sexo_2022,conjuges_mesmo_sexo_2022,nao,,numero_absoluto,contagem,NEM,2022,"Nº de pessoas em união com cônjuge do mesmo sexo, Censo 2022."
 1,População LGBTQIA+ no Brasil,pct_populacao_lgbt_18_mais,pct_populacao_lgbt_18_mais,nao,,percentual,%,NE,2019,"% da população de 18+ que se declara LGBTQIA+ (homo + bi + outra orientação), PNS 2019."
 1,População LGBTQIA+ no Brasil,pessoas_uniao_mesmo_sexo_estimativa,pessoas_uniao_mesmo_sexo_estimativa,nao,,numero_absoluto,contagem,N,2022,Estimativa de pessoas em união do mesmo sexo (cônjuges 2022 × 2).

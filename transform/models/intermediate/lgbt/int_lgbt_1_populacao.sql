@@ -2,7 +2,7 @@
 --
 -- Indicadores (Cálculo_Indicadores_LGBTQIA+, 1):
 --   pct_populacao_lgbt_18_mais        (homossexual + bissexual + outra) / pop 18+ × 100   N E
---   conjuges_mesmo_sexo_2010             nº absoluto de cônjuges do mesmo sexo, Censo 2010     N E
+--   conjuges_mesmo_sexo_2010             nº absoluto de cônjuges do mesmo sexo, Censo 2010     N E M
 --   conjuges_mesmo_sexo_2022             nº absoluto de cônjuges do mesmo sexo, Censo 2022     N E M
 --   pessoas_uniao_mesmo_sexo_estimativa  conjuges 2022 × 2 (pessoas em união do mesmo sexo)    N
 
@@ -25,6 +25,12 @@ censo2010_br as (
 censo2010_uf as (
     select cod_uf::int as uf_codigo, conjuge_ou_companheiro_a_de_mesmo_sexo::numeric as qtd
     from {{ source('raw_lgbt', 'raw_lgbt_censo_2010_uf') }}
+),
+censo2010_mun as (
+    select
+        cod_ibge_7::int as municipio_codigo_ibge,
+        nullif(conjuge_ou_companheiro_a_de_mesmo_sexo::text, '-')::numeric as qtd
+    from {{ source('raw_lgbt', 'raw_lgbt_censo_2010_munic') }}
 ),
 
 censo2022 as (
@@ -60,6 +66,13 @@ linhas as (
     -- cônjuges do mesmo sexo 2010 — ESTADUAL
     select 'estadual', uf_codigo, 'conjuges_mesmo_sexo_2010', null, qtd, 'numero_absoluto', 2010
     from censo2010_uf
+
+    union all
+    -- cônjuges do mesmo sexo 2010 — MUNICIPAL (aba Censo_2010_Munic;
+    -- "-" na origem conta como 0, mesma regra do Censo 2022)
+    select 'municipal', municipio_codigo_ibge, 'conjuges_mesmo_sexo_2010', null,
+           coalesce(sum(qtd), 0), 'numero_absoluto', 2010
+    from censo2010_mun group by municipio_codigo_ibge
 
     union all
     -- cônjuges do mesmo sexo 2022 — NACIONAL / ESTADUAL / MUNICIPAL
