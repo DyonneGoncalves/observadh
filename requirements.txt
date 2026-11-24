@@ -1,3 +1,5 @@
+# Dependências do pipeline (ingestão + dbt) — ÚNICA lista do projeto, usada
+# pela imagem Docker e por quem roda fora do container (pip install -r requirements.txt).
 # Versões fixadas = as mesmas do ambiente onde o pipeline foi validado.
 # Para atualizar: mude aqui, rode `make imagem` e `make ciclo` e confira os testes.
 dbt-core==1.12.3

@@ -29,6 +29,9 @@ O mapeamento completo **seção do relatório → fórmula → aba do Excel → 
 ## Como rodar um ciclo (quando os dados do tema estiverem prontos)
 
 ```bash
+# 0. Uma vez só (fora do Docker): instalar as dependências
+pip install -r requirements.txt
+
 # 1. Colocar as planilhas em ingestion/input/<tema>/<ano>/  (o "ano" = ciclo de recebimento)
 
 # 2. Rodar a ingestão (Python) — importa TODA aba de TODA planilha para o schema raw.
@@ -60,6 +63,7 @@ local** só para o pipeline. O produto final continua sendo o pacote em
 ```bash
 # uma vez só: construir a imagem (refazer só se mudar Dockerfile/requirements)
 make imagem
+make verifica        # confere banco, dbt e quais planilhas estão na pasta
 
 # a cada ciclo:
 # 1. colocar as planilhas em ingestion/input/<tema>/<ano>/
@@ -78,7 +82,9 @@ até ficar verde, depois `make exporta TEMA=lgbt` e comite o ajuste.
 | `make dry-run TEMA= ANO=` | mostra as tabelas `raw` que seriam criadas, sem gravar |
 | `make ingest TEMA= ANO=` | só a ingestão |
 | `make transforma TEMA=` | `dbt seed` + `dbt build --select tag:<tema>` |
-| `make exporta TEMA=` | gera `entrega/<tema>/<data>/` |
+| `make exporta TEMA=` | gera `entrega/<tema>/<data>/` e o `.zip` que vai para o dev |
+| `make verifica` | confere banco, dbt e planilhas presentes |
+| `make novo-tema TEMA=` | cria o esqueleto de um tema novo (ver abaixo) |
 | `make docs` | linhagem/documentação dbt em http://localhost:8080 |
 | `make psql` / `make shell` | psql no banco local / terminal no container |
 | `make parar` / `make zerar-banco` | desliga o banco / apaga o banco para recomeçar |
@@ -94,7 +100,41 @@ esses arquivos.
 Para abrir o banco no DBeaver: `localhost:5433`, banco `observadh`, usuário e
 senha `observadh` (padrões em `.env.example`; copie para `.env` para mudar).
 Os dados ficam no volume `pgdata` entre execuções. Arquivos do container:
-`Dockerfile`, `docker-compose.yml`, `Makefile`, `docker/`.
+`Dockerfile`, `docker-compose.yml`, `Makefile`, `docker/`, `requirements.txt`
+(lista única de dependências, com versões fixadas).
+
+Rodar o pipeline **não precisa de internet**: tudo (inclusive o pacote
+`dbt_utils`) é baixado só no `make imagem`. Se a rede bloquear o Docker Hub ou
+o repositório do PostgreSQL nesse momento, aponte as imagens base para o
+registro interno com `PYTHON_IMAGE` / `POSTGRES_IMAGE` no `.env` (exemplo em
+`.env.example`).
+
+## Novo tema (inclusive migração de PSR, PI e PCD)
+
+Todo tema segue o mesmo padrão; o esqueleto é criado por um comando:
+
+```bash
+make novo-tema TEMA=psr
+```
+
+Isso cria (sem sobrescrever nada que já exista) a config de ingestão
+(`ingestion/temas/psr_config.yml`), a pasta das planilhas
+(`ingestion/input/psr/`), as pastas `staging/intermediate/marts/psr/` com um
+`sources.yml` modelo, os arquivos de entrega (`scripts/entrega/psr.*`), um
+catálogo em branco (`docs/psr/`) e registra a tag `psr` no `dbt_project.yml`.
+Depois:
+
+1. planilhas em `ingestion/input/psr/<ano>/` e `make dry-run TEMA=psr ANO=<ano>`
+   para ver os nomes das tabelas `raw`;
+2. `make ingest TEMA=psr ANO=<ano>`;
+3. preencher `_psr__sources.yml` e escrever os modelos, seguindo o LGBTQIA+ e o
+   ICI como referência: staging (limpeza) → intermediate (regras dos
+   indicadores) → mart `psr_indicadores` + views `psr_indicadores_<nível>`;
+4. **temas que já existem no processo antigo:** antes de entregar, comparar os
+   valores do mart com as tabelas finais atuais em produção — o teste em
+   `transform/tests/` é o lugar dessa comparação;
+5. `make transforma TEMA=psr` até ficar verde, ajustar `scripts/entrega/psr.*`
+   e `make exporta TEMA=psr`.
 
 ## Status LGBTQIA+
 

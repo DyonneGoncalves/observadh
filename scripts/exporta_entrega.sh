@@ -120,5 +120,12 @@ echo "  ok  $SAIDA/LEIA-ME.txt"
 } > "$SAIDA/MANIFEST.txt"
 echo "  ok  $SAIDA/MANIFEST.txt"
 
+# --- 5. compacta (é o .zip que vai para o dev) ------------------------------
 echo
-echo "Pronto. Compacte com:  (cd $(dirname "$SAIDA") && zip -r $(basename "$SAIDA").zip $(basename "$SAIDA"))"
+if command -v zip >/dev/null 2>&1; then
+  ( cd "$(dirname "$SAIDA")" && rm -f "$(basename "$SAIDA").zip" \
+      && zip -qr "$(basename "$SAIDA").zip" "$(basename "$SAIDA")" -x '*.DS_Store' )
+  echo "Pronto: ${SAIDA}.zip"
+else
+  echo "Pronto. Compacte com:  (cd $(dirname "$SAIDA") && zip -r $(basename "$SAIDA").zip $(basename "$SAIDA"))"
+fi

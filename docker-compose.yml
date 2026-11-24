@@ -24,7 +24,7 @@ x-conexao: &conexao
 
 services:
   db:
-    image: postgres:17
+    image: ${POSTGRES_IMAGE:-postgres:17}
     environment:
       POSTGRES_DB: observadh
       POSTGRES_USER: ${OBSERVADH_DB_USER:-observadh}
@@ -40,7 +40,10 @@ services:
       retries: 30
 
   pipeline:
-    build: .
+    build:
+      context: .
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.13-slim-bookworm}
     image: observadh-pipeline:latest
     depends_on:
       db:
