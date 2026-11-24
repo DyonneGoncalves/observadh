@@ -226,7 +226,10 @@ predominante as (
             'categoria_predominante'::text as valor_tipo, ano_referencia
         from {{ cte }}
         where valor > 0
-        order by nivel, recorte_codigo, valor desc, categoria
+        -- empate no maior valor: desempata pela categoria em ordem alfabética do
+        -- português (ICU pt-BR), fixada aqui para o resultado não depender da
+        -- collation padrão do banco (Mac x Docker x produção)
+        order by nivel, recorte_codigo, valor desc, categoria collate "pt-BR-x-icu"
     ) x
     {{ "union all" if not loop.last }}
     {% endfor %}
