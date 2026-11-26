@@ -2,7 +2,9 @@
 
 Este repositório contém a camada de dados do ObservaDH: leitura das planilhas recebidas, transformação e disponibilização dos indicadores finais para a aplicação.
 
-> **Status:** projeto novo, em construção. Os temas PSR, PI e PCD continuam rodando no processo atual (fora deste repositório) até serem migrados um a um. O piloto desta nova arquitetura é o tema **LGBTQIA+**, começando pela categoria **6.1 — Proteção Social Especial** (a mais limpa da especificação — ver catálogo de indicadores).
+> **Temas no pipeline:** LGBTQIA+, ICI e PSR. Próximos: PI e PCD.
+>
+> **Roteiro de operação** (instalação, ciclo anual, padrão das planilhas, entrega e uma página por temática): `docs/wiki/`, a fonte das páginas publicadas na wiki do projeto.
 
 ## Estrutura
 
@@ -109,32 +111,32 @@ o repositório do PostgreSQL nesse momento, aponte as imagens base para o
 registro interno com `PYTHON_IMAGE` / `POSTGRES_IMAGE` no `.env` (exemplo em
 `.env.example`).
 
-## Novo tema (inclusive migração de PSR, PI e PCD)
+## Novo tema (PI, PCD e os próximos)
 
 Todo tema segue o mesmo padrão; o esqueleto é criado por um comando:
 
 ```bash
-make novo-tema TEMA=psr
+make novo-tema TEMA=pi
 ```
 
 Isso cria (sem sobrescrever nada que já exista) a config de ingestão
-(`ingestion/temas/psr_config.yml`), a pasta das planilhas
-(`ingestion/input/psr/`), as pastas `staging/intermediate/marts/psr/` com um
-`sources.yml` modelo, os arquivos de entrega (`scripts/entrega/psr.*`), um
-catálogo em branco (`docs/psr/`) e registra a tag `psr` no `dbt_project.yml`.
+(`ingestion/temas/pi_config.yml`), a pasta das planilhas
+(`ingestion/input/pi/`), as pastas `staging/intermediate/marts/pi/` com um
+`sources.yml` modelo, os arquivos de entrega (`scripts/entrega/pi.*`), um
+catálogo em branco (`docs/pi/`) e registra a tag `pi` no `dbt_project.yml`.
 Depois:
 
-1. planilhas em `ingestion/input/psr/<ano>/` e `make dry-run TEMA=psr ANO=<ano>`
+1. planilhas em `ingestion/input/pi/<ano>/` e `make dry-run TEMA=pi ANO=<ano>`
    para ver os nomes das tabelas `raw`;
-2. `make ingest TEMA=psr ANO=<ano>`;
-3. preencher `_psr__sources.yml` e escrever os modelos, seguindo o LGBTQIA+ e o
-   ICI como referência: staging (limpeza) → intermediate (regras dos
-   indicadores) → mart `psr_indicadores` + views `psr_indicadores_<nível>`;
-4. **temas que já existem no processo antigo:** antes de entregar, comparar os
-   valores do mart com as tabelas finais atuais em produção — o teste em
-   `transform/tests/` é o lugar dessa comparação;
-5. `make transforma TEMA=psr` até ficar verde, ajustar `scripts/entrega/psr.*`
-   e `make exporta TEMA=psr`.
+2. `make ingest TEMA=pi ANO=<ano>`;
+3. preencher `_pi__sources.yml` e escrever os modelos, seguindo o LGBTQIA+, o
+   ICI e o PSR como referência: staging (limpeza) → intermediate (regras dos
+   indicadores, um modelo por seção) → mart `pi_indicadores` + tabelas
+   `pi_indicadores_<nível>`;
+4. teste de valores em `transform/tests/` contra os números validados pela área
+   (planilha de cálculo ou relatório aprovado);
+5. `make transforma TEMA=pi` até ficar verde, ajustar `scripts/entrega/pi.*`
+   e `make exporta TEMA=pi`.
 
 ## Status LGBTQIA+
 
@@ -164,3 +166,14 @@ Depois:
 - [x] **Executado contra o Postgres real do projeto** (01/10/2026) — `ingest.py` + `dbt build --select tag:ici`: 33/33 PASS, 0 erro. `ici_indicadores` com 83.955 linhas (`ici_indicadores_estadual`: 405; `ici_indicadores_municipal`: 83.550).
 - [ ] **ICI-PSR municipal** (22 capitais) — planilha não recebida, seção não implementada.
 - [ ] **Decisão sobre peso das médias** (simples vs. ponderada por população) — implementado como simples por ora.
+
+## Status PSR (Pessoas em Situação de Rua)
+
+Ver [`docs/psr/catalogo-indicadores-psr.md`](docs/psr/catalogo-indicadores-psr.md) e o roteiro [`docs/wiki/tematicas/psr.md`](docs/wiki/tematicas/psr.md).
+
+- [x] **8 planilhas** (CadÚnico, SINAN, ONDH, CNES/Sisab, Censo SUAS, Censo 2022) ingeridas via `ingestion/temas/psr_config.yml`.
+- [x] **Staging** — 1 `stg_psr_*` por aba usada (código de município 6 → 7 dígitos, `-` → sem dado).
+- [x] **Intermediate** — base municipal (`int_psr_municipio_base`) → recortes municipal/estadual/nacional (`int_psr_recortes`, somas) → 1 modelo por seção (`int_psr_1_populacao` … `int_psr_5_politicas_publicas`).
+- [x] **Mart** — `psr_indicadores` (formato longo, 48 indicadores) + `psr_indicadores_{nacional,estadual,municipal}`. Guia de consumo em [`docs/psr/consumo-psr_indicadores.md`](docs/psr/consumo-psr_indicadores.md).
+- [x] **Testes** — 62 valores conferidos contra os relatórios validados pela área (`transform/tests/psr_valores.sql`) + unicidade/not_null/accepted_values.
+- [x] **Executado** (26/11/2026): 36 modelos e 19 testes, tudo verde. Nacional 124 linhas, estadual 3.267, municipal 631.254.
