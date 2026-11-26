@@ -1,7 +1,7 @@
 # Instalação do ambiente
 
 Feito **uma vez** por máquina. Depois disso, cada ciclo anual é só o
-[Ciclo anual de atualização](/Dados-ObservaDH/Ciclo-anual-de-atualização).
+[Ciclo anual de atualização](/Relatórios-Observa-DH/Arquitetura-de-Dados/Ciclo-anual-de-atualização).
 
 ## Pré-requisitos
 

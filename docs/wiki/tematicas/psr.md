@@ -11,8 +11,8 @@ situação de rua** na camada de dados do ObservaDH.
 | **Indicadores** | 48, em 14 (sub)seções do relatório |
 | **Comando do ciclo** | `make ciclo TEMA=psr ANO=<ano de recebimento>` |
 
-> Pré-requisito: ambiente instalado ([Instalação do ambiente](/Dados-ObservaDH/Instalação-do-ambiente)).
-> O roteiro geral do ciclo está em [Ciclo anual de atualização](/Dados-ObservaDH/Ciclo-anual-de-atualização).
+> Pré-requisito: ambiente instalado ([Instalação do ambiente](/Relatórios-Observa-DH/Arquitetura-de-Dados/Instalação-do-ambiente)).
+> O roteiro geral do ciclo está em [Ciclo anual de atualização](/Relatórios-Observa-DH/Arquitetura-de-Dados/Ciclo-anual-de-atualização).
 > Esta página traz o que é **específico do PSR**.
 
 ---
@@ -112,13 +112,13 @@ Regras adotadas onde o documento de cálculo e o relatório validado divergem
 
 ## 6. Entrega
 
-`entrega/psr/<data>.zip`, conforme [Entrega para o desenvolvimento](/Dados-ObservaDH/Entrega-para-o-desenvolvimento).
+`entrega/psr/<data>.zip`, conforme [Entrega para o desenvolvimento](/Relatórios-Observa-DH/Arquitetura-de-Dados/Entrega-para-o-desenvolvimento).
 O guia `consumo-psr_indicadores.md` (dentro do pacote) mapeia cada trecho do
 texto-base do relatório para a chave do indicador.
 
 ## 7. Checklist do ano seguinte
 
-- [ ] Receber os 8 arquivos e conferir abas e cabeçalhos com a tabela da seção 1 ([Padrão das planilhas](/Dados-ObservaDH/Padrão-das-planilhas)).
+- [ ] Receber os 8 arquivos e conferir abas e cabeçalhos com a tabela da seção 1 ([Padrão das planilhas](/Relatórios-Observa-DH/Arquitetura-de-Dados/Padrão-das-planilhas)).
 - [ ] Pedir à área os **valores de conferência** do ano (relatório ou planilha de cálculo validados).
 - [ ] Criar a branch `psr-<ano>` e a pasta `ingestion/input/psr/<ano>/`. Copiar as planilhas com os nomes corretos e atualizar `psr_config.yml` se os nomes mudaram (ex.: `2015-2024` → `2015-2025`).
 - [ ] Atualizar em `transform/dbt_project.yml`: `psr_ano_referencia` e `psr_ano_censo_suas` (e `psr_ano_censo_ibge` só se houver Censo novo).

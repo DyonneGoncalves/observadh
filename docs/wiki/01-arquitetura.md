@@ -1,4 +1,4 @@
-# Arquitetura
+# Visão geral do pipeline
 
 ## O problema
 

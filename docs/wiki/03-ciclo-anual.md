@@ -4,13 +4,13 @@ Roteiro **genérico**, igual para todas as temáticas. O que muda por temática
 (planilhas esperadas, anos de referência, valores de conferência) está na
 página da temática, na seção **Checklist do ano seguinte**.
 
-> Antes de começar: ambiente instalado ([Instalação do ambiente](/Dados-ObservaDH/Instalação-do-ambiente))
+> Antes de começar: ambiente instalado ([Instalação do ambiente](/Relatórios-Observa-DH/Arquitetura-de-Dados/Instalação-do-ambiente))
 > e Docker Desktop aberto.
 
 ## 1. Receber e conferir as planilhas
 
 - Confirme que chegaram **todos** os arquivos listados na página da temática.
-- Confira se seguem o [Padrão das planilhas](/Dados-ObservaDH/Padrão-das-planilhas): mesmos nomes de aba, mesmos cabeçalhos e uma linha por município.
+- Confira se seguem o [Padrão das planilhas](/Relatórios-Observa-DH/Arquitetura-de-Dados/Padrão-das-planilhas): mesmos nomes de aba, mesmos cabeçalhos e uma linha por município.
 - Se a área mudou a estrutura (aba nova, coluna renomeada, indicador novo), **anote antes de rodar**. Isso vai exigir ajuste no código (passo 5).
 
 ## 2. Criar uma branch e colocar as planilhas na pasta do ciclo
@@ -97,4 +97,4 @@ make exporta TEMA=<tema>        # quando estiver tudo verde
    git push --set-upstream origin <tema>-<ano>
    ```
    Abra o pull request para a `main`.
-3. Envie o `entrega/<tema>/<data>.zip` ao desenvolvimento (ver [Entrega para o desenvolvimento](/Dados-ObservaDH/Entrega-para-o-desenvolvimento)).
+3. Envie o `entrega/<tema>/<data>.zip` ao desenvolvimento (ver [Entrega para o desenvolvimento](/Relatórios-Observa-DH/Arquitetura-de-Dados/Entrega-para-o-desenvolvimento)).
