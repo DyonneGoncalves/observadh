@@ -97,8 +97,7 @@ Particularidades das planilhas, já tratadas no processamento:
 
 O teste `transform/tests/psr_valores.sql` confere **62 valores de conferência**
 validados pela área, nos três níveis (nacional, Acre e município de São Paulo).
-Se um valor sair da tolerância (0,06 ponto percentual nos percentuais; exato
-nas quantidades), o ciclo para antes de gerar a entrega.
+Se algum valor não conferir, o ciclo para antes de gerar a entrega.
 
 Regras de cálculo adotadas (detalhes no catálogo, seção 5):
 
