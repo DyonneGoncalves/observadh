@@ -1,0 +1,36 @@
+# Configuração de ingestão do tema PSR (Pessoas em Situação de Rua)
+#
+# Ingestão automática: uma tabela raw por aba de cada planilha em
+# ingestion/input/psr/<ano>/. Nome da tabela = psr_<planilha>_<aba>.
+#
+# Regras, abas usadas e particularidades: docs/psr/catalogo-indicadores-psr.md.
+#
+# Os nomes de arquivo vieram com acentuação corrompida (Assistˆncia,
+# Educa‡Ćo, Sa｣de...). Foram renomeados com a grafia correta ao copiar para
+# ingestion/input/psr/<ano>/ — as chaves abaixo usam a grafia corrigida.
+
+tema: psr
+
+prefixo_tabela: psr
+
+schema_raw: raw
+
+prefixos_planilha:
+  "PSR_Assistência social_Censo SUAS_RMA_CadÚnico_dez_2017_2024.xlsx": assist_social
+  "PSR_Educação_CadÚnico_dez_2024.xlsx": educ
+  "PSR_Perfil_CadÚnico_dez_2024.xlsx": perfil
+  "PSR_Quantas são_CadÚnico_Censo_2015-2024.xlsx": quantas_sao
+  "PSR_Saúde_Cnes_Sisab_Sinan_2015_2024.xlsx": saude
+  "PSR_Trabalho e Rendimento_CadÚnico_dez_2024.xlsx": trab_rend
+  "PSR_Violência interpessoal_Sinan_2015_2024.xlsx": viol_sinan
+  "PSR_Violência_ONDH_2020_2024.xlsx": viol_ondh
+
+# "Apoio à moradia UF e Reg" é uma tabela dinâmica (somas por região, com
+# colunas "só para ver a fórmula") — não é dado por município e não entra no
+# relatório. As demais abas são ingeridas mesmo quando o relatório não as usa
+# (ONDH denunciante/frequência/etc., SINAN local/agressor, carteira assinada):
+# ficam no raw, rastreáveis, caso a área peça depois.
+ignorar_abas:
+  - Apoio à moradia UF e Reg
+
+ano_padrao: 2026

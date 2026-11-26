@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: psr_indicadores
+    description: >
+      Todos os indicadores do relatório PSR no formato longo — uma linha por
+      (nivel, recorte_codigo, secao, indicador, categoria, ano_referencia).
+      União dos modelos int_psr_<secao>_*. Mesmo contrato do
+      lgbt_indicadores. Ver docs/psr/consumo-psr_indicadores.md.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - nivel
+              - recorte_codigo
+              - secao
+              - indicador
+              - categoria
+              - ano_referencia
+    columns:
+      - name: nivel
+        description: "'nacional' | 'estadual' | 'municipal'."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["nacional", "estadual", "municipal"]
+      - name: recorte_codigo
+        description: >
+          NULL no nível nacional; código IBGE da UF (2 dígitos) no estadual;
+          código IBGE do município (7 dígitos) no municipal.
+      - name: recorte_nome
+        description: "'Brasil', nome da UF ou nome do município."
+        tests:
+          - not_null
+      - name: secao
+        description: >
+          (Sub)seção do relatório: '1', '1.1', '1.2', '2.1', '2.2', '2.3',
+          '2.4', '3', '3.1', '3.2', '4', '5.1', '5.2', '5.3'.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["1", "1.1", "1.2", "2.1", "2.2", "2.3", "2.4", "3", "3.1", "3.2", "4", "5.1", "5.2", "5.3"]
+      - name: secao_nome
+        description: Nome legível da seção.
+        tests:
+          - not_null
+      - name: indicador
+        description: "Slug estável do indicador, ex. pct_psr_por_genero."
+        tests:
+          - not_null
+      - name: categoria
+        description: >
+          Quebra dentro do indicador (ex.: "Feminino", "2023", "30 a 39 anos")
+          ou, quando valor_tipo = 'categoria_predominante', a categoria
+          vencedora. NULL quando o indicador é um valor único.
+      - name: valor
+        description: >
+          Numérico, percentuais com 4 casas (sem arredondar para exibição).
+          Percentual com denominador zero = NULL ("sem dado": o recorte não
+          tem a população de referência). Números absolutos nunca são NULL.
+        tests:
+          - not_null:
+              config:
+                where: "valor_tipo = 'numero_absoluto'"
+      - name: valor_tipo
+        description: >
+          'numero_absoluto' | 'percentual' | 'categoria_predominante' (a
+          categoria vencedora vem em `categoria`; valor = o % dela).
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["numero_absoluto", "percentual", "categoria_predominante"]
+      - name: ano_referencia
+        description: Ano a que o dado se refere (varia por indicador).
+        tests:
+          - not_null
+
+  - name: psr_indicadores_nacional
+    description: Recorte nacional (nivel = 'nacional') do mart longo. Sem colunas de recorte.
+
+  - name: psr_indicadores_estadual
+    description: Recorte estadual do mart longo. recorte_codigo/nome renomeados para uf_codigo/uf_nome.
+
+  - name: psr_indicadores_municipal
+    description: Recorte municipal do mart longo. recorte_codigo/nome renomeados para municipio_codigo_ibge/municipio_nome.

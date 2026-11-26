@@ -1,0 +1,32 @@
+Entrega dos indicadores do relatório PSR (Pessoas em Situação de Rua) —
+formato longo, mesmo contrato do LGBTQIA+.
+
+3 tabelas (uma linha por indicador x recorte x categoria x ano):
+  psr_indicadores_nacional   — sem colunas de recorte
+  psr_indicadores_estadual   — uf_codigo + uf_nome
+  psr_indicadores_municipal  — municipio_codigo_ibge + municipio_nome
+
+Colunas comuns: secao, secao_nome, indicador, categoria, valor, valor_tipo,
+ano_referencia. valor_tipo = 'numero_absoluto' | 'percentual' |
+'categoria_predominante' (a categoria vencedora vem em `categoria`, valor = %).
+
+Cada .sql tem o CREATE TABLE + os dados (COPY ... FROM stdin). Sem schema
+qualificado: as tabelas entram no search_path de destino (public por
+padrão). Sem OWNER, sem GRANT. As DDLs também estão isoladas em _schema.sql.
+
+Carregar (exemplo):
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f psr_indicadores_nacional.sql
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f psr_indicadores_estadual.sql
+  psql -d SEU_BANCO -v ON_ERROR_STOP=1 -f psr_indicadores_municipal.sql
+
+Depois confira as contagens contra o MANIFEST.txt.
+
+Como a aplicação consulta e faz o bind no texto-base (com o mapa
+trecho do texto → chave, seção a seção): consumo-psr_indicadores.md.
+De-para completo dos indicadores: dicionario-psr_indicadores.csv.
+
+Percentual com denominador zero vem NULL = "sem dado" (ex.: município sem
+pessoas em situação de rua). Indicadores 'categoria_predominante' não têm
+linha quando o recorte não tem nenhum caso.
+
+Chave natural (para PK/índice na migration): ver MANIFEST.txt.

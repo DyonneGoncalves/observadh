@@ -1,0 +1,96 @@
+# Sources do tema PSR (Pessoas em Situação de Rua) — tabelas do schema `raw`.
+#
+# A ingestão importa toda aba de toda planilha em ingestion/input/psr/<ano>/
+# para `raw.psr_<planilha>_<aba>` (prefixos de planilha em
+# ingestion/temas/psr_config.yml). `identifier` = nome real no banco;
+# `name` = apelido usado nos modelos. Para reconferir após nova carga:
+#   make dry-run TEMA=psr ANO=<ano>
+#
+# Só estão declaradas as abas consumidas pelos modelos. As demais (ONDH
+# denunciante/tipos de violação/frequência/relação/natureza jurídica, SINAN
+# local/agressor, carteira assinada) ficam no raw, disponíveis, mas não entram
+# no relatório.
+
+version: 2
+
+sources:
+  - name: raw_psr
+    schema: raw
+    loaded_at_field: dt_importacao
+    tables:
+      # --- 1. Quantas são (CadÚnico) ---
+      - name: raw_psr_serie_historica
+        identifier: psr_quantas_sao_serie_historica_cad_unico
+        description: PSR no CadÚnico por município × ano (dez/2015 a dez/2024).
+      - name: raw_psr_distribuicao_territorial
+        identifier: psr_quantas_sao_distribuicao_territorial_caduni
+        description: PSR no CadÚnico (dez/2024) e população total IBGE 2024 por município.
+
+      # --- 2. Perfil (CadÚnico dez/2024; população geral do Censo 2022) ---
+      - name: raw_psr_perfil_genero
+        identifier: psr_perfil_genero
+      - name: raw_psr_perfil_faixa_etaria
+        identifier: psr_perfil_faixa_etaria
+      - name: raw_psr_perfil_raca_cor
+        identifier: psr_perfil_raca_ou_cor
+        description: >
+          PSR por cor (CadÚnico 2024) e população geral por cor (Censo 2022).
+          `total_amarela`/`total_indigena` trazem '-' (supressão do IBGE) e a
+          aba tem linhas de soma sem código no rodapé.
+      - name: raw_psr_perfil_existencia_deficiencia
+        identifier: psr_perfil_existencia_de_deficiencia
+      - name: raw_psr_perfil_tipo_deficiencia
+        identifier: psr_perfil_tipo_de_deficiencia
+
+      # --- 3. Violência ---
+      - name: raw_psr_ondh_serie
+        identifier: psr_viol_ondh_serie_histc_denuncia_violacao
+        description: >
+          Denúncias/violações ONDH por município (código de 6 dígitos) × ano
+          2020-2024. Inclui uma linha "Ignorado" (código 0) por ano.
+      - name: raw_psr_sinan_serie
+        identifier: psr_viol_sinan_serie_historica_notifica_sinan
+        description: Notificações SINAN por município de ocorrência (6 dígitos) × ano 2015-2024.
+      - name: raw_psr_sinan_interpessoal_genero
+        identifier: psr_viol_sinan_viol_interpessoal_genero
+      - name: raw_psr_sinan_interpessoal_raca_cor
+        identifier: psr_viol_sinan_viol_interpessoal_raca_cor
+      - name: raw_psr_sinan_interpessoal_tipo
+        identifier: psr_viol_sinan_viol_interpessoal_tipo
+
+      # --- 4. Trabalho e renda (CadÚnico dez/2024) ---
+      - name: raw_psr_pessoas_ocupadas
+        identifier: psr_trab_rend_pessoas_ocupadas
+      - name: raw_psr_funcoes_ocupadas
+        identifier: psr_trab_rend_funcoes_ocupadas
+      - name: raw_psr_formas_ganhar_dinheiro
+        identifier: psr_trab_rend_formas_de_ganhar_dinheiro
+      - name: raw_psr_rendimento_pobreza
+        identifier: psr_trab_rend_rendimento_e_pobreza
+
+      # --- 5.1 Saúde ---
+      - name: raw_psr_ecr
+        identifier: psr_saude_no_ecr
+        description: Equipes de Consultório na Rua por município × ano. '-' = sem equipe.
+      - name: raw_psr_atendimentos_ecr
+        identifier: psr_saude_atendimentos_ecr
+        description: Atendimentos das eCR — só municípios com atendimento.
+
+      # --- 5.2 Assistência social ---
+      - name: raw_psr_centros_pop
+        identifier: psr_assist_social_no_centros_pop_censo_suas
+      - name: raw_psr_atendimento_cadunico
+        identifier: psr_assist_social_situacao_atendimento_cadunico
+      - name: raw_psr_bpc
+        identifier: psr_assist_social_bpc
+      - name: raw_psr_bolsa_familia
+        identifier: psr_assist_social_bolsa_familia
+
+      # --- 5.3 Educação ---
+      - name: raw_psr_nao_sabem_ler
+        identifier: psr_educ_nao_sabem_ler_e_escrever
+      - name: raw_psr_analfabetismo
+        identifier: psr_educ_taxa_de_analfabetismo
+        description: Só municípios com PSR de 15+ anos (2.682 linhas).
+      - name: raw_psr_frequencia_escolar
+        identifier: psr_educ_frequencia_escolar

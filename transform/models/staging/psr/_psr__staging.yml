@@ -1,0 +1,32 @@
+version: 2
+
+# As fontes do SINAN e do ONDH usam código de município de 6 dígitos, traduzido
+# para 7 via dim_municipio. Se um ciclo novo trouxer código que não está na
+# dimensão, a linha ficaria sem município e sumiria das somas — estes testes
+# fazem o build falhar antes disso.
+models:
+  - name: stg_psr_ondh_denuncias
+    columns:
+      - name: municipio_codigo_ibge
+        tests: [not_null]
+  - name: stg_psr_sinan_notificacoes
+    columns:
+      - name: municipio_codigo_ibge
+        tests: [not_null]
+  - name: stg_psr_sinan_interpessoal_genero
+    columns:
+      - name: municipio_codigo_ibge
+        tests: [not_null]
+  - name: stg_psr_sinan_interpessoal_raca_cor
+    columns:
+      - name: municipio_codigo_ibge
+        tests: [not_null]
+  - name: stg_psr_sinan_interpessoal_tipo
+    columns:
+      - name: municipio_codigo_ibge
+        tests: [not_null]
+  - name: stg_psr_serie_historica
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [municipio_codigo_ibge, ano_referencia]

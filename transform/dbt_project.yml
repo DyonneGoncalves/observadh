@@ -27,6 +27,8 @@ models:
         +tags: ["lgbt"]
       ici:
         +tags: ["ici"]
+      psr:
+        +tags: ["psr"]
     intermediate:
       +materialized: view
       +schema: intermediate
@@ -34,6 +36,8 @@ models:
         +tags: ["lgbt"]
       ici:
         +tags: ["ici"]
+      psr:
+        +tags: ["psr"]
     marts:
       +materialized: table
       +schema: marts
@@ -41,7 +45,72 @@ models:
         +tags: ["lgbt"]
       ici:
         +tags: ["ici"]
+      psr:
+        +tags: ["psr"]
 
 seeds:
   observadh:
     +schema: referencia
+
+vars:
+  # ---- PSR (Pessoas em Situação de Rua) — ver docs/psr/catalogo-indicadores-psr.md
+  # Anos de referência do ciclo. No próximo ciclo basta atualizar aqui: o ano
+  # vai para a coluna ano_referencia de cada indicador.
+  psr_ano_referencia: 2024      # CadÚnico dez/2024, SINAN/ONDH/eCR 2024
+  psr_ano_inicio_serie: 2015    # início da série histórica do CadÚnico
+  psr_ano_censo_suas: 2023      # Centros Pop (Censo SUAS)
+  psr_ano_censo_ibge: 2022      # população geral por cor (Censo Demográfico)
+  psr_faixas_etarias: ['0_a_5_anos', '6_a_11_anos', '12_a_17_anos', '18_a_29_anos', '30_a_39_anos', '40_a_49_anos',
+                       '50_a_59_anos', '60_a_69_anos', '70_a_79_anos', '80_a_89_anos', '90_a_99_anos', '100_anos_ou_mais']
+  psr_racas: ['branca', 'preta', 'amarela', 'parda', 'indigena']
+  # ordem = ordem das colunas na planilha = critério de desempate do "principal"
+  psr_tipos_deficiencia: ['cegueira', 'baixa_visao', 'surdez_severa', 'surdez_leve', 'fisica', 'intelectual',
+                          'sindrome_de_down', 'transtorno_mental']
+  psr_tipos_violencia: ['fisica', 'psicologica_moral', 'tortura', 'sexual', 'trafico_de_seres_humanos',
+                        'financeira_economica', 'negligencia_abandono', 'trabalho_infantil', 'intervencao_legal', 'outros']
+  psr_formas_renda: ['construcao_civil', 'guardador_carro', 'carregador', 'catador', 'servicos_gerais', 'pedinte',
+                     'vendas', 'outra_forma']
+  # rótulos exibidos (coluna `categoria`) — chave = slug usado nos modelos
+  psr_rotulos:
+    0_a_5_anos: '0 a 5 anos'
+    6_a_11_anos: '6 a 11 anos'
+    12_a_17_anos: '12 a 17 anos'
+    18_a_29_anos: '18 a 29 anos'
+    30_a_39_anos: '30 a 39 anos'
+    40_a_49_anos: '40 a 49 anos'
+    50_a_59_anos: '50 a 59 anos'
+    60_a_69_anos: '60 a 69 anos'
+    70_a_79_anos: '70 a 79 anos'
+    80_a_89_anos: '80 a 89 anos'
+    90_a_99_anos: '90 a 99 anos'
+    100_anos_ou_mais: '100 anos ou mais'
+    branca: 'Branca'
+    preta: 'Preta'
+    amarela: 'Amarela'
+    parda: 'Parda'
+    indigena: 'Indígena'
+    cegueira: 'Cegueira'
+    baixa_visao: 'Baixa visão'
+    surdez_severa: 'Surdez severa'
+    surdez_leve: 'Surdez leve'
+    fisica: 'Física'
+    intelectual: 'Intelectual'
+    sindrome_de_down: 'Síndrome de Down'
+    transtorno_mental: 'Transtorno mental'
+    psicologica_moral: 'Psicológica/moral'
+    tortura: 'Tortura'
+    sexual: 'Sexual'
+    trafico_de_seres_humanos: 'Tráfico de seres humanos'
+    financeira_economica: 'Financeira/econômica'
+    negligencia_abandono: 'Negligência/abandono'
+    trabalho_infantil: 'Trabalho infantil'
+    intervencao_legal: 'Intervenção legal'
+    outros: 'Outros'
+    construcao_civil: 'Construção civil'
+    guardador_carro: 'Guardador de carro'
+    carregador: 'Carregador'
+    catador: 'Catador'
+    servicos_gerais: 'Serviços gerais'
+    pedinte: 'Pedinte'
+    vendas: 'Vendas'
+    outra_forma: 'Outra forma'
