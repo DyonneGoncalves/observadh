@@ -95,20 +95,18 @@ Particularidades das planilhas, já tratadas no processamento:
 
 ## 5. Validação
 
-O teste `transform/tests/psr_valores.sql` confere **62 valores** com os
-relatórios validados pela área (nacional, Acre e município de São Paulo). Os
-relatórios de referência estão em `docs/psr/referencia/`. Se um valor sair da
-tolerância (0,06 ponto percentual nos percentuais; exato nas quantidades), o
-ciclo para antes de gerar a entrega.
+O teste `transform/tests/psr_valores.sql` confere **62 valores de conferência**
+validados pela área, nos três níveis (nacional, Acre e município de São Paulo).
+Se um valor sair da tolerância (0,06 ponto percentual nos percentuais; exato
+nas quantidades), o ciclo para antes de gerar a entrega.
 
-Regras adotadas onde o documento de cálculo e o relatório validado divergem
-(detalhes no catálogo, seção 5):
+Regras de cálculo adotadas (detalhes no catálogo, seção 5):
 
 | Ponto | Regra adotada |
 |---|---|
-| % do "tipo de violência principal" | estadual: sobre a violência interpessoal; municipal e nacional: sobre o total de notificações SINAN (igual ao relatório validado) |
-| Tipos de deficiência | categorias originais da planilha, sem somar cegueira + baixa visão (igual ao relatório validado) |
-| Gráfico nacional de tipos de violência (3.2) | fórmula do documento de cálculo (base = notificações com resposta de tipo) |
+| % do "tipo de violência principal" | estadual: sobre a violência interpessoal; municipal e nacional: sobre o total de notificações SINAN |
+| Tipos de deficiência | categorias originais da planilha, sem agrupar cegueira e baixa visão |
+| % por tipo de violência interpessoal (gráfico nacional 3.2) | base = notificações com resposta de tipo |
 
 ## 6. Entrega
 

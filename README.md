@@ -175,5 +175,5 @@ Ver [`docs/psr/catalogo-indicadores-psr.md`](docs/psr/catalogo-indicadores-psr.m
 - [x] **Staging** — 1 `stg_psr_*` por aba usada (código de município 6 → 7 dígitos, `-` → sem dado).
 - [x] **Intermediate** — base municipal (`int_psr_municipio_base`) → recortes municipal/estadual/nacional (`int_psr_recortes`, somas) → 1 modelo por seção (`int_psr_1_populacao` … `int_psr_5_politicas_publicas`).
 - [x] **Mart** — `psr_indicadores` (formato longo, 48 indicadores) + `psr_indicadores_{nacional,estadual,municipal}`. Guia de consumo em [`docs/psr/consumo-psr_indicadores.md`](docs/psr/consumo-psr_indicadores.md).
-- [x] **Testes** — 62 valores conferidos contra os relatórios validados pela área (`transform/tests/psr_valores.sql`) + unicidade/not_null/accepted_values.
+- [x] **Testes** — 62 valores de conferência validados pela área (`transform/tests/psr_valores.sql`) + unicidade/not_null/accepted_values.
 - [x] **Executado** (26/11/2026): 36 modelos e 19 testes, tudo verde. Nacional 124 linhas, estadual 3.267, municipal 631.254.

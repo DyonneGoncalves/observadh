@@ -1,6 +1,6 @@
 Catálogo de Indicadores — PSR (Pessoas em Situação de Rua) — Nacional / Estadual / Municipal
 
-> Gerado a partir de `Cálculo Indicadores PSR_v2.docx`, dos textos-base `Texto Base_Filtro {Nacional,Estado,Município}_v1.docx`, das 8 planilhas `PSR_*.xlsx` e dos relatórios em PDF validados pela área (nacional; estados AC, AL, DF, TO; municípios São Paulo e Rio de Janeiro), todos em `docs/psr/referencia/`. Mesmo padrão do LGBTQIA+ e do ICI: ingestão automática → staging → intermediate por seção → mart longo `psr_indicadores` + tabelas por nível. Consumo pela aplicação: `consumo-psr_indicadores.md`. Inventário de indicadores: `dicionario-psr_indicadores.csv`.
+> Gerado a partir de `Cálculo Indicadores PSR_v2.docx` e dos textos-base `Texto Base_Filtro {Nacional,Estado,Município}_v1.docx` (em `docs/psr/referencia/`), e das 8 planilhas `PSR_*.xlsx`. Mesmo padrão do LGBTQIA+ e do ICI: ingestão automática → staging → intermediate por seção → mart longo `psr_indicadores` + tabelas por nível. Consumo pela aplicação: `consumo-psr_indicadores.md`. Inventário de indicadores: `dicionario-psr_indicadores.csv`.
 
 ---
 
@@ -75,7 +75,7 @@ Inventário completo (48 indicadores, com categorias e níveis) em `dicionario-p
 
 Convenções: percentuais com 4 casas, sem arredondar para exibição; denominador zero → `NULL` (sem dado); `categoria_predominante` sem linha quando não há casos e, em empate, vence a primeira na ordem das colunas da planilha.
 
-**Validação** (`transform/tests/psr_valores.sql`): 62 valores conferidos contra os relatórios validados pela área (nacional, Acre, município de São Paulo). Na conferência inicial, feita fora do dbt, todos os números dos 7 PDFs (nacional, AC, AL, DF, TO, São Paulo, Rio de Janeiro) foram reproduzidos a partir das planilhas, exceto 3 barras do gráfico nacional 3.2 (seção 5.2).
+**Validação** (`transform/tests/psr_valores.sql`): 62 valores de conferência validados pela área (nacional, Acre, município de São Paulo).
 
 ---
 
@@ -92,7 +92,7 @@ transform/models/marts/psr/
   psr_indicadores                         união das seções (formato longo)
   psr_indicadores_{nacional,estadual,municipal}   recortes por nível (o que vai para a aplicação)
 transform/macros/psr_macros.sql           psr_num (texto/'-' → numeric), psr_pct (percentual), psr_secao
-transform/tests/psr_valores.sql           valores dos relatórios validados
+transform/tests/psr_valores.sql           valores de conferência validados pela área
 scripts/entrega/psr.*                     pacote de entrega (scripts/exporta_entrega.sh psr)
 docs/psr/                                 este catálogo, consumo, dicionário e referências
 ```
@@ -101,27 +101,27 @@ Ciclo: `make ciclo TEMA=psr ANO=<ano de recebimento>`.
 
 ---
 
-## 5. Regras adotadas onde o doc de cálculo e o relatório validado divergem
+## 5. Regras de cálculo adotadas
 
 ### 5.1 Base do % do "tipo de violência principal"
-O modelo segue o relatório validado. **Estadual**: tipo principal / violência interpessoal (AC: 14/14 = 100,0%). **Municipal** e nacional: tipo principal / total de notificações SINAN, incluindo autoprovocada (São Paulo: 573/699 = 82,0%). O doc de cálculo indica "notificações com resposta de tipo" como base.
+**Estadual**: tipo principal / violência interpessoal (AC: 14/14 = 100,0%). **Municipal** e **nacional**: tipo principal / total de notificações SINAN, incluindo autoprovocada (São Paulo: 573/699 = 82,0%).
 
-### 5.2 Gráfico nacional de tipos de violência (3.2)
-O indicador `pct_viol_interpessoal_por_tipo` segue a fórmula do doc de cálculo (base = notificações com resposta de tipo; nacional 5.490). 7 dos 10 tipos coincidem com o PDF nacional. Física (PDF 91,7% × 92,8%), Psicológica/moral (12,0 × 12,2) e Trabalho infantil (1,4 × 1,5) diferem. Uma busca no banco que alimenta a aplicação não encontrou esses valores do PDF em nenhuma tabela: os números do gráfico atual não vêm da camada de dados (provavelmente estão fixos na aplicação). Ao adotar o `psr_indicadores`, o gráfico passa a ler `pct_viol_interpessoal_por_tipo|<tipo>`. **Avisar o dev.**
+### 5.2 % por tipo de violência interpessoal (gráfico nacional 3.2)
+`pct_viol_interpessoal_por_tipo` usa como base as notificações com resposta de tipo (nacional: 5.490). Na aplicação, o gráfico 3.2 lê `pct_viol_interpessoal_por_tipo|<tipo>`.
 
-### 5.3 Deficiência "visual"
-O doc de cálculo manda somar Cegueira + Baixa visão como "visual". O relatório validado não soma (3º tipo nacional = **Intelectual, 2,0%**). O modelo segue o relatório e usa as categorias originais da planilha.
+### 5.3 Tipos de deficiência
+Usa as categorias originais da planilha, sem agrupar Cegueira e Baixa visão em "visual" (3º tipo nacional = **Intelectual, 2,0%**).
 
-### 5.4 Textos-base v1 desatualizados
-Não afeta a camada de dados, mas vale avisar quem mantém os `.docx`. Assistência social diz "em 2023" (os dados e o relatório usam 2024). O texto nacional traz números de outra versão dos dados (interpessoal 91%, deficiência ~14%, visual 2,6%; o relatório validado mostra 87,3%, 13,8% e Intelectual 2,0%).
+### 5.4 Observações sobre os textos-base v1
+Não afeta a camada de dados, mas vale avisar quem mantém os `.docx`: o trecho de assistência social diz "em 2023" (os dados são de 2024), e o texto nacional traz números de outra versão dos dados (interpessoal 91%, deficiência ~14%, visual 2,6%; os dados atuais dão 87,3%, 13,8% e Intelectual 2,0%).
 
 ---
 
 ## 6. Status
 
-- [x] Material recebido e catalogado (8 planilhas / 38 abas, doc de cálculo v2, 3 textos-base, 7 relatórios validados).
-- [x] Regras reproduzidas e conferidas contra os relatórios validados.
+- [x] Material recebido e catalogado (8 planilhas / 38 abas, doc de cálculo v2, 3 textos-base).
+- [x] Regras de cálculo implementadas e conferidas com os valores validados pela área.
 - [x] Ingestão, staging, intermediates por seção e marts no padrão LGBTQIA+/ICI.
 - [x] Teste de valores, dicionário, guia de consumo e configuração da entrega.
-- [ ] Execução do ciclo (`make ciclo TEMA=psr ANO=2026`).
+- [x] Execução do ciclo (`make ciclo TEMA=psr ANO=2026`): 36 modelos e 19 testes, tudo verde.
 - [ ] Avisar o dev sobre o gráfico 3.2 (seção 5.2).

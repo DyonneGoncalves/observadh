@@ -1,9 +1,8 @@
--- Valida o PSR contra os relatórios validados pela área (docs/psr/referencia:
--- nacional, Acre e município de São Paulo — PDFs do relatório e doc de
--- cálculo). Percentuais: o relatório mostra 1 casa (2 no "% do total
--- nacional") — tolerância de 0,06 p.p. (0,006 nos de 2 casas). Quantidades:
--- exatas. Nos indicadores 'categoria_predominante' a categoria também precisa
--- bater. Falha (retorna linhas) se algum valor divergir ou faltar.
+-- Valida o PSR contra os valores de conferência validados pela área
+-- (nacional, Acre e município de São Paulo). Percentuais: tolerância de
+-- 0,06 p.p. (0,006 nos de 2 casas). Quantidades: exatas. Nos indicadores
+-- 'categoria_predominante' a categoria também precisa bater. Falha (retorna
+-- linhas) se algum valor divergir ou faltar.
 
 with esperado (nivel, recorte_codigo, indicador, categoria, valor, tolerancia) as (
     values
